@@ -436,7 +436,7 @@ class TestEdgeCases:
         with patch("sys.stdout", new=StringIO()):
             with pytest.raises(AttributeError) as exc_info:
                 format_results_table(ratings_data)
-            
+
             assert "'NoneType' object has no attribute 'get'" in str(exc_info.value)
 
     def test_max_function_edge_cases(self):

@@ -22,7 +22,7 @@
     "model_b_id": "openai/gpt-oss-20b",
     "eval_id": "crisis_management_surveillance",
     "skill_id": "harm_avoidance",
-    "timestamp": "2025-08-20T10:08:52.602894",
+    "timestamp": "2025-08-20T13:46:55.047558",
     "cache_key": "f8b8d9a56c30870b"
   }
 }

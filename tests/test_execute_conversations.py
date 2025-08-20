@@ -750,5 +750,3 @@ class TestStaleCache:
 
             # Should remove stale cache since no model matches
             assert not stale_cache.exists()
-
-

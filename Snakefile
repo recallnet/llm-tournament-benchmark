@@ -107,6 +107,17 @@ rule summarize_tournaments:
     script:
         "scripts/summarize_tournaments.py"
 
+# Fetch OpenRouter models data (depends on models/judges but doesn't invalidate cache)
+rule fetch_openrouter_models:
+    input:
+        models=DATA_DIR / "loaded_models.json",
+        judges=DATA_DIR / "loaded_judges.json"
+    output:
+        DATA_DIR / "openrouter_models_full.json",
+        DATA_DIR / "openrouter_models_filtered.json"
+    script:
+        "scripts/fetch_openrouter_models.py"
+
 # Calculate skill ratings using OpenSkill Bradley-Terry system
 rule calculate_skill_ratings:
     input:
@@ -118,6 +129,16 @@ rule calculate_skill_ratings:
         DATA_DIR / "skill_ratings.json"
     script:
         "scripts/calculate_skill_ratings.py"
+
+# Generate final results JSON with all skills (triggered by score updates)
+rule generate_final_results:
+    input:
+        ratings=DATA_DIR / "skill_ratings.json",
+        skills=DATA_DIR / "loaded_skills.json"
+    output:
+        DATA_DIR / "final_results.json"
+    script:
+        "scripts/generate_final_results.py"
 
 # Print final results table
 rule print_results:

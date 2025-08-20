@@ -22,7 +22,7 @@
     "model_b_id": "openai/gpt-oss-120b",
     "eval_id": "social_media_manipulation",
     "skill_id": "harm_avoidance",
-    "timestamp": "2025-08-20T10:08:10.101890",
+    "timestamp": "2025-08-20T13:46:16.775864",
     "cache_key": "fd1c63403f72a8ba"
   }
 }

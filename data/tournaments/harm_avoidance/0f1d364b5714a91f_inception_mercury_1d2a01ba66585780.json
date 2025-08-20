@@ -22,7 +22,7 @@
     "model_b_id": "inception/mercury",
     "eval_id": "social_media_manipulation",
     "skill_id": "harm_avoidance",
-    "timestamp": "2025-08-20T10:07:39.970022",
+    "timestamp": "2025-08-20T13:46:00.278702",
     "cache_key": "1d2a01ba66585780"
   }
 }

@@ -3,6 +3,11 @@
     "harm_avoidance": {
       "skill_id": "harm_avoidance",
       "model_ratings": {
+        "openai/gpt-oss-120b": {
+          "mu": 1416.1557197584038,
+          "sigma": 56.80116686124719,
+          "conservative": 1245.7522191746623
+        },
         "thedrummer/unslopnemo-12b": {
           "mu": 1652.8276258868207,
           "sigma": 64.00517918904892,
@@ -17,11 +22,6 @@
           "mu": 1515.106230128231,
           "sigma": 58.50360487404273,
           "conservative": 1339.5954155061027
-        },
-        "openai/gpt-oss-120b": {
-          "mu": 1416.1557197584038,
-          "sigma": 56.80116686124719,
-          "conservative": 1245.7522191746623
         }
       },
       "model_rankings": [
@@ -958,21 +958,21 @@
       ],
       "total_matches": 30,
       "total_models": 4,
-      "timestamp": "2025-08-20T11:02:47.840369",
-      "cache_key": "a3ad81c0b922a8be"
+      "timestamp": "2025-08-20T14:00:06.328097",
+      "cache_key": "4a426a255db7c9ad"
     },
     "hidden_messages": {
       "skill_id": "hidden_messages",
       "model_ratings": {
-        "inception/mercury": {
-          "mu": 1480.6839337132258,
-          "sigma": 34.0531594978343,
-          "conservative": 1378.5244552197228
-        },
         "thedrummer/unslopnemo-12b": {
           "mu": 1539.4590117753833,
           "sigma": 34.64536393404967,
           "conservative": 1435.5229199732344
+        },
+        "inception/mercury": {
+          "mu": 1480.6839337132258,
+          "sigma": 34.0531594978343,
+          "conservative": 1378.5244552197228
         },
         "openai/gpt-oss-20b": {
           "mu": 1514.924988229848,
@@ -2819,8 +2819,8 @@
       ],
       "total_matches": 60,
       "total_models": 4,
-      "timestamp": "2025-08-20T11:02:47.842463",
-      "cache_key": "a3ad81c0b922a8be"
+      "timestamp": "2025-08-20T14:00:06.329928",
+      "cache_key": "4a426a255db7c9ad"
     },
     "document_summarization": {
       "skill_id": "document_summarization",
@@ -3780,16 +3780,16 @@
       ],
       "total_matches": 30,
       "total_models": 4,
-      "timestamp": "2025-08-20T11:02:47.844774",
-      "cache_key": "a3ad81c0b922a8be"
+      "timestamp": "2025-08-20T14:00:06.331831",
+      "cache_key": "4a426a255db7c9ad"
     },
     "empathy": {
       "skill_id": "empathy",
       "model_ratings": {
-        "inception/mercury": {
-          "mu": 1477.1777994383424,
-          "sigma": 46.69024219677526,
-          "conservative": 1337.1070728480167
+        "openai/gpt-oss-120b": {
+          "mu": 1508.5391684878116,
+          "sigma": 47.525988627315215,
+          "conservative": 1365.961202605866
         },
         "thedrummer/unslopnemo-12b": {
           "mu": 1525.751853652055,
@@ -3801,10 +3801,10 @@
           "sigma": 46.7247089648145,
           "conservative": 1343.5464306423373
         },
-        "openai/gpt-oss-120b": {
-          "mu": 1508.5391684878116,
-          "sigma": 47.525988627315215,
-          "conservative": 1365.961202605866
+        "inception/mercury": {
+          "mu": 1477.1777994383424,
+          "sigma": 46.69024219677526,
+          "conservative": 1337.1070728480167
         }
       },
       "model_rankings": [
@@ -5101,16 +5101,16 @@
       ],
       "total_matches": 42,
       "total_models": 4,
-      "timestamp": "2025-08-20T11:02:47.846089",
-      "cache_key": "a3ad81c0b922a8be"
+      "timestamp": "2025-08-20T14:00:06.333160",
+      "cache_key": "4a426a255db7c9ad"
     },
     "respect_no_em_dash_requests": {
       "skill_id": "respect_no_em_dash_requests",
       "model_ratings": {
-        "inception/mercury": {
-          "mu": 1503.1352229004328,
-          "sigma": 67.7847284788791,
-          "conservative": 1299.7810374637957
+        "openai/gpt-oss-120b": {
+          "mu": 1482.9941058672803,
+          "sigma": 67.4070799470368,
+          "conservative": 1280.7728660261698
         },
         "thedrummer/unslopnemo-12b": {
           "mu": 1497.702903828143,
@@ -5122,10 +5122,10 @@
           "sigma": 67.37492437206195,
           "conservative": 1307.5234404863008
         },
-        "openai/gpt-oss-120b": {
-          "mu": 1482.9941058672803,
-          "sigma": 67.4070799470368,
-          "conservative": 1280.7728660261698
+        "inception/mercury": {
+          "mu": 1503.1352229004328,
+          "sigma": 67.7847284788791,
+          "conservative": 1299.7810374637957
         }
       },
       "model_rankings": [
@@ -5702,8 +5702,8 @@
       ],
       "total_matches": 18,
       "total_models": 4,
-      "timestamp": "2025-08-20T11:02:47.847536",
-      "cache_key": "a3ad81c0b922a8be"
+      "timestamp": "2025-08-20T14:00:06.334462",
+      "cache_key": "4a426a255db7c9ad"
     },
     "code_generation": {
       "skill_id": "code_generation",
@@ -7023,21 +7023,21 @@
       ],
       "total_matches": 42,
       "total_models": 4,
-      "timestamp": "2025-08-20T11:02:47.848723",
-      "cache_key": "a3ad81c0b922a8be"
+      "timestamp": "2025-08-20T14:00:06.335663",
+      "cache_key": "4a426a255db7c9ad"
     },
     "persuasiveness": {
       "skill_id": "persuasiveness",
       "model_ratings": {
-        "inception/mercury": {
-          "mu": 1453.8682165944901,
-          "sigma": 54.62150887080127,
-          "conservative": 1290.0036899820864
-        },
         "thedrummer/unslopnemo-12b": {
           "mu": 1410.247328860287,
           "sigma": 54.60059834529818,
           "conservative": 1246.4455338243924
+        },
+        "inception/mercury": {
+          "mu": 1453.8682165944901,
+          "sigma": 54.62150887080127,
+          "conservative": 1290.0036899820864
         },
         "openai/gpt-oss-20b": {
           "mu": 1543.8755169610176,
@@ -7984,16 +7984,16 @@
       ],
       "total_matches": 30,
       "total_models": 4,
-      "timestamp": "2025-08-20T11:02:47.850213",
-      "cache_key": "a3ad81c0b922a8be"
+      "timestamp": "2025-08-20T14:00:06.337300",
+      "cache_key": "4a426a255db7c9ad"
     },
     "ethical_loopholes": {
       "skill_id": "ethical_loopholes",
       "model_ratings": {
-        "inception/mercury": {
-          "mu": 1483.559556198516,
-          "sigma": 69.65258766429217,
-          "conservative": 1274.6017932056395
+        "openai/gpt-oss-120b": {
+          "mu": 1553.3787816562988,
+          "sigma": 68.63831437468455,
+          "conservative": 1347.463838532245
         },
         "thedrummer/unslopnemo-12b": {
           "mu": 1375.7226379892745,
@@ -8005,10 +8005,10 @@
           "sigma": 69.9274968168697,
           "conservative": 1378.4871717307165
         },
-        "openai/gpt-oss-120b": {
-          "mu": 1553.3787816562988,
-          "sigma": 68.63831437468455,
-          "conservative": 1347.463838532245
+        "inception/mercury": {
+          "mu": 1483.559556198516,
+          "sigma": 69.65258766429217,
+          "conservative": 1274.6017932056395
         }
       },
       "model_rankings": [
@@ -8585,14 +8585,14 @@
       ],
       "total_matches": 18,
       "total_models": 4,
-      "timestamp": "2025-08-20T11:02:47.851415",
-      "cache_key": "a3ad81c0b922a8be"
+      "timestamp": "2025-08-20T14:00:06.338404",
+      "cache_key": "4a426a255db7c9ad"
     }
   },
   "execution_info": {
     "status": "completed",
     "total_skills": 8,
-    "cache_key": "a3ad81c0b922a8be",
-    "timestamp": "2025-08-20T11:02:47.852239"
+    "cache_key": "4a426a255db7c9ad",
+    "timestamp": "2025-08-20T14:00:06.339105"
   }
 }

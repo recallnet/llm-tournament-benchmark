@@ -60,12 +60,17 @@ class SkillRatingCalculator:
             match_signatures = []
             for match in matches:
                 # Validate required fields - throw halting error if missing
-                required_fields = ['match_id', 'winner', 'timestamp']
+                required_fields = ["match_id", "winner", "timestamp"]
                 missing_fields = [field for field in required_fields if field not in match]
                 if missing_fields:
-                    raise ValueError(f"Tournament data integrity error in skill '{skill_id}': Missing required fields {missing_fields} in match: {match}")
-                
-                match_sig = f"{match['match_id']}:{match['winner']}:{match['timestamp']}"
+                    raise ValueError(
+                        f"Tournament data integrity error in skill '{skill_id}': Missing required fields {missing_fields} in match: {match}"
+                    )
+
+                # Include model participants to prevent cache collisions when models are swapped
+                model_a = match.get("model_a", "unknown_a")
+                model_b = match.get("model_b", "unknown_b")
+                match_sig = f"{match['match_id']}:{model_a}:{model_b}:{match['winner']}:{match['timestamp']}"
                 match_signatures.append(match_sig)
             tournament_data[skill_id] = sorted(match_signatures)
 
@@ -76,16 +81,17 @@ class SkillRatingCalculator:
     def _sanitize_path_component(self, component: str) -> str:
         """Sanitize a path component to prevent directory traversal and other attacks."""
         import re
+
         # Remove path separators and dangerous characters
-        sanitized = re.sub(r'[/\\:*?"<>|\x00-\x1f]', '_', component)
+        sanitized = re.sub(r'[/\\:*?"<>|\x00-\x1f]', "_", component)
         # Remove directory traversal sequences
-        sanitized = sanitized.replace('..', '_')
+        sanitized = sanitized.replace("..", "_")
         # Limit length to prevent filesystem issues
         if len(sanitized) > 100:
             sanitized = sanitized[:100]
         # Ensure it's not empty or just dots/spaces
-        if not sanitized or sanitized.strip('._ ') == '':
-            sanitized = 'invalid_id'
+        if not sanitized or sanitized.strip("._ ") == "":
+            sanitized = "invalid_id"
         return sanitized
 
     def _get_cache_path(self, skill_id: str, cache_key: str) -> Path:
