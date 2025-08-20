@@ -1,0 +1,40 @@
+"""
+AFBench Modular Snakemake workflow
+
+A modular data processing pipeline with rigorous QA standards.
+"""
+
+import pandas as pd
+from pathlib import Path
+
+# Configuration
+configfile: "../config/config.yaml"
+
+# Define output directories
+OUTPUT_DIR = Path("../output")
+DATA_DIR = Path("../data")
+RESULTS_DIR = OUTPUT_DIR / "results"
+PLOTS_DIR = OUTPUT_DIR / "plots"
+
+# Ensure directories exist
+Path.mkdir(OUTPUT_DIR, exist_ok=True)
+Path.mkdir(DATA_DIR, exist_ok=True)
+Path.mkdir(RESULTS_DIR, exist_ok=True)
+Path.mkdir(PLOTS_DIR, exist_ok=True)
+
+# Include modular rule files
+include: "rules/data_processing.smk"
+include: "rules/analysis.smk"
+include: "rules/visualization.smk"
+include: "rules/reporting.smk"
+
+# Define final outputs
+rule all:
+    input:
+        RESULTS_DIR / "final_report.json",
+        PLOTS_DIR / "summary_plot.png"
+
+# Clean intermediate files
+rule clean:
+    shell:
+        "rm -rf ../data/ ../output/"

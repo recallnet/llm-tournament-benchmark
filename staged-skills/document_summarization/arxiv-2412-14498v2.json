@@ -1,0 +1,21 @@
+{
+  "id": "arxiv-2412-14498v2",
+  "name": "ArXiv Paper 2412.14498v2 Summarization",
+  "chain": [
+    {
+      "id": "summarize",
+      "prompt": "Please read the following research paper and provide a concise summary that captures the main contributions, methodology, and key findings:\n\n{{document_text}}\n\nSummary:\n",
+      "inputs": {
+        "document_text": "${file:documents/arxiv-2412-14498v2/paper.md}"
+      }
+    }
+  ],
+  "judge": {
+    "system": "You are an impartial summarization judge.",
+    "prompt": "Evaluate two candidate summaries against the Human Reference Summary using this rubric:\n\n- Content Coverage (0–4): captures main contributions, methodology, key findings\n- Accuracy (0–3): technically correct, no factual errors\n- Clarity & Structure (0–2): organized, readable, logical flow\n- Conciseness (0–1): covers essentials without fluff\n\nHuman Reference Summary:\n${file:documents/arxiv-2412-14498v2/abstract.md}\n\nCandidate A:\n{{A}}\n\nCandidate B:\n{{B}}\n\nReturn JSON: {\"winner\":\"A|B|tie\",\"scores\":{\"A\":{\"coverage\":0-4,\"accuracy\":0-3,\"clarity\":0-2,\"concision\":0-1,\"total\":0-10},\"B\":{...}},\"reasons\":\"one or two sentences\"}",
+    "view": {
+      "A": [{ "kind": "step", "id": "summarize", "part": "final" }],
+      "B": [{ "kind": "step", "id": "summarize", "part": "final" }]
+    }
+  }
+}

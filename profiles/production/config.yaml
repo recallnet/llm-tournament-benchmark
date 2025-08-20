@@ -1,0 +1,11 @@
+# AFBench Production Profile  
+# Usage: snakemake --profile production
+
+# Production execution settings
+cores: 4
+keep-going: false
+printshellcmds: false
+
+# Production environment overrides
+configfiles:
+  - config/production_config.yaml

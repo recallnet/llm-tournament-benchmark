@@ -1,0 +1,19 @@
+{
+  "id": "racing_game",
+  "name": "Voice-Controlled Racing Game",
+  "chain": [
+    {
+      "id": "generate_code",
+      "prompt": "You are an expert JavaScript programmer. Write a single JavaScript function that creates a voice-controlled racing game.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Top-down racing track with curves and obstacles\n- Car speed controlled by microphone volume (louder = faster)\n- Web Audio API for microphone access with graceful permission handling\n- Visual volume meter showing microphone input level\n- Lap timing system with personal best tracking\n- Crash detection with realistic physics (speed affects severity)\n- \"Start Race\" button and race completion celebration\n- Mute/unmute toggle for testing\n- Smooth 60 FPS performance\n- No external libraries beyond Web Audio API\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting.",
+      "inputs": {}
+    }
+  ],
+  "judge": {
+    "system": "You are a JavaScript code quality expert with expertise in game development and Web Audio API. Evaluate code based on functionality, performance, best practices, and requirements fulfillment.",
+    "prompt": "Evaluate the JavaScript voice-controlled racing game implementation on a scale of 0-10 points:\n\n**Voice Control Integration (4 points)**: Does it properly implement Web Audio API for microphone access with volume-based speed control? Is the voice control responsive and intuitive?\n\n**Game Mechanics (3 points)**: Does it feature a complete racing experience with lap timing, crash detection, realistic physics, and personal best tracking?\n\n**User Interface (2 points)**: Does it include a visual volume meter, start button, completion celebration, and mute toggle? Are controls clear and functional?\n\n**Performance & Compatibility (1 point)**: Does it run smoothly at 60 FPS with proper microphone permission handling across browsers?\n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
+    "view": {
+      "A": [{ "kind": "step", "id": "generate_code", "part": "final" }],
+      "B": [{ "kind": "step", "id": "generate_code", "part": "final" }]
+    }
+  }
+}

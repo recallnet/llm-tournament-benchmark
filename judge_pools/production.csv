@@ -1,0 +1,2 @@
+id,author,slug,context_window,pricing,endpoint,max_tokens
+openai/gpt-4-turbo,OpenAI,gpt-4-turbo,128000,input:0.01,openai,4096

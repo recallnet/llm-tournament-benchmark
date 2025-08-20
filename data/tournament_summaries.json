@@ -1,0 +1,4209 @@
+{
+  "tournaments": {
+    "document_summarization": {
+      "skill_id": "document_summarization",
+      "total_matches": 6,
+      "model_rankings": [
+        {
+          "model_id": "thedrummer/unslopnemo-12b",
+          "wins": 2,
+          "losses": 1,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 2.0,
+          "win_rate": 0.667,
+          "rank": 1
+        },
+        {
+          "model_id": "openai/gpt-oss-120b",
+          "wins": 1,
+          "losses": 1,
+          "ties": 1,
+          "total_matches": 3,
+          "points": 1.5,
+          "win_rate": 0.333,
+          "rank": 2
+        },
+        {
+          "model_id": "openai/gpt-oss-20b",
+          "wins": 1,
+          "losses": 1,
+          "ties": 1,
+          "total_matches": 3,
+          "points": 1.5,
+          "win_rate": 0.333,
+          "rank": 3
+        },
+        {
+          "model_id": "inception/mercury",
+          "wins": 1,
+          "losses": 2,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 1.0,
+          "win_rate": 0.333,
+          "rank": 4
+        }
+      ],
+      "match_history": [
+        {
+          "match_id": "71b8bb737732ef0c",
+          "model_a": "inception/mercury",
+          "model_b": "openai/gpt-oss-20b",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 1
+          },
+          "winner": "A",
+          "judge_count": 4,
+          "timestamp": "2025-08-19T23:57:25.347493"
+        },
+        {
+          "match_id": "7c9e60a4bd1bbcb4",
+          "model_a": "thedrummer/unslopnemo-12b",
+          "model_b": "openai/gpt-oss-120b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 2,
+            "TIE": 1
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-19T23:57:26.889708"
+        },
+        {
+          "match_id": "6da18d129db51535",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 1,
+            "TIE": 2
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T00:31:44.855412"
+        },
+        {
+          "match_id": "bc298a2d7f8bcd31",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 4,
+            "B": 0,
+            "TIE": 2
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T00:31:57.283897"
+        },
+        {
+          "match_id": "2dfe8ed5093174a1",
+          "model_a": "thedrummer/unslopnemo-12b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 2,
+            "TIE": 1
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T00:32:07.775320"
+        },
+        {
+          "match_id": "d1b3f3ba0c6609cc",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "openai/gpt-oss-20b",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 3
+          },
+          "winner": "TIE",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T00:32:38.220213"
+        }
+      ],
+      "evals": {
+        "arxiv-2409-09684v2": {
+          "eval_id": "arxiv-2409-09684v2",
+          "total_matches": 6,
+          "model_rankings": [
+            {
+              "model_id": "thedrummer/unslopnemo-12b",
+              "wins": 2,
+              "losses": 1,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 2.0,
+              "win_rate": 0.667,
+              "rank": 1
+            },
+            {
+              "model_id": "openai/gpt-oss-120b",
+              "wins": 1,
+              "losses": 1,
+              "ties": 1,
+              "total_matches": 3,
+              "points": 1.5,
+              "win_rate": 0.333,
+              "rank": 2
+            },
+            {
+              "model_id": "openai/gpt-oss-20b",
+              "wins": 1,
+              "losses": 1,
+              "ties": 1,
+              "total_matches": 3,
+              "points": 1.5,
+              "win_rate": 0.333,
+              "rank": 3
+            },
+            {
+              "model_id": "inception/mercury",
+              "wins": 1,
+              "losses": 2,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 1.0,
+              "win_rate": 0.333,
+              "rank": 4
+            }
+          ],
+          "match_history": [
+            {
+              "match_id": "71b8bb737732ef0c",
+              "model_a": "inception/mercury",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 4,
+              "timestamp": "2025-08-19T23:57:25.347493"
+            },
+            {
+              "match_id": "7c9e60a4bd1bbcb4",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 2,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-19T23:57:26.889708"
+            },
+            {
+              "match_id": "6da18d129db51535",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 1,
+                "TIE": 2
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:31:44.855412"
+            },
+            {
+              "match_id": "bc298a2d7f8bcd31",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 0,
+                "TIE": 2
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:31:57.283897"
+            },
+            {
+              "match_id": "2dfe8ed5093174a1",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 2,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:32:07.775320"
+            },
+            {
+              "match_id": "d1b3f3ba0c6609cc",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 3
+              },
+              "winner": "TIE",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:32:38.220213"
+            }
+          ],
+          "matches": [
+            {
+              "match_id": "71b8bb737732ef0c",
+              "model_a": "inception/mercury",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 4,
+              "timestamp": "2025-08-19T23:57:25.347493"
+            },
+            {
+              "match_id": "7c9e60a4bd1bbcb4",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 2,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-19T23:57:26.889708"
+            },
+            {
+              "match_id": "6da18d129db51535",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 1,
+                "TIE": 2
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:31:44.855412"
+            },
+            {
+              "match_id": "bc298a2d7f8bcd31",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 0,
+                "TIE": 2
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:31:57.283897"
+            },
+            {
+              "match_id": "2dfe8ed5093174a1",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 2,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:32:07.775320"
+            },
+            {
+              "match_id": "d1b3f3ba0c6609cc",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 3
+              },
+              "winner": "TIE",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:32:38.220213"
+            }
+          ]
+        }
+      }
+    },
+    "empathy": {
+      "skill_id": "empathy",
+      "total_matches": 6,
+      "model_rankings": [
+        {
+          "model_id": "openai/gpt-oss-20b",
+          "wins": 3,
+          "losses": 0,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 3.0,
+          "win_rate": 1.0,
+          "rank": 1
+        },
+        {
+          "model_id": "openai/gpt-oss-120b",
+          "wins": 2,
+          "losses": 1,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 2.0,
+          "win_rate": 0.667,
+          "rank": 2
+        },
+        {
+          "model_id": "inception/mercury",
+          "wins": 1,
+          "losses": 2,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 1.0,
+          "win_rate": 0.333,
+          "rank": 3
+        },
+        {
+          "model_id": "thedrummer/unslopnemo-12b",
+          "wins": 0,
+          "losses": 3,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 0.0,
+          "win_rate": 0.0,
+          "rank": 4
+        }
+      ],
+      "match_history": [
+        {
+          "match_id": "43ae758830c1ce74",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:09:11.137088"
+        },
+        {
+          "match_id": "8f810133d0ae05ed",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:09:21.025725"
+        },
+        {
+          "match_id": "8290ebe7fb8630c2",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "openai/gpt-oss-120b",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 2,
+            "B": 1,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:09:36.109692"
+        },
+        {
+          "match_id": "32806e24a15e0d03",
+          "model_a": "thedrummer/unslopnemo-12b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 1,
+            "B": 2,
+            "TIE": 0
+          },
+          "winner": "B",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:09:48.680861"
+        },
+        {
+          "match_id": "0f0fb362efa8ece3",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:09:50.639043"
+        },
+        {
+          "match_id": "fdd9ce9767c80ac0",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:09:59.142342"
+        }
+      ],
+      "evals": {
+        "advanced-cancer-labs": {
+          "eval_id": "advanced-cancer-labs",
+          "total_matches": 6,
+          "model_rankings": [
+            {
+              "model_id": "openai/gpt-oss-20b",
+              "wins": 3,
+              "losses": 0,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 3.0,
+              "win_rate": 1.0,
+              "rank": 1
+            },
+            {
+              "model_id": "openai/gpt-oss-120b",
+              "wins": 2,
+              "losses": 1,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 2.0,
+              "win_rate": 0.667,
+              "rank": 2
+            },
+            {
+              "model_id": "inception/mercury",
+              "wins": 1,
+              "losses": 2,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 1.0,
+              "win_rate": 0.333,
+              "rank": 3
+            },
+            {
+              "model_id": "thedrummer/unslopnemo-12b",
+              "wins": 0,
+              "losses": 3,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 0.0,
+              "win_rate": 0.0,
+              "rank": 4
+            }
+          ],
+          "match_history": [
+            {
+              "match_id": "43ae758830c1ce74",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:11.137088"
+            },
+            {
+              "match_id": "8f810133d0ae05ed",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:21.025725"
+            },
+            {
+              "match_id": "8290ebe7fb8630c2",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:36.109692"
+            },
+            {
+              "match_id": "32806e24a15e0d03",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:48.680861"
+            },
+            {
+              "match_id": "0f0fb362efa8ece3",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:50.639043"
+            },
+            {
+              "match_id": "fdd9ce9767c80ac0",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:59.142342"
+            }
+          ],
+          "matches": [
+            {
+              "match_id": "43ae758830c1ce74",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:11.137088"
+            },
+            {
+              "match_id": "8f810133d0ae05ed",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:21.025725"
+            },
+            {
+              "match_id": "8290ebe7fb8630c2",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:36.109692"
+            },
+            {
+              "match_id": "32806e24a15e0d03",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:48.680861"
+            },
+            {
+              "match_id": "0f0fb362efa8ece3",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:50.639043"
+            },
+            {
+              "match_id": "fdd9ce9767c80ac0",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:09:59.142342"
+            }
+          ]
+        }
+      }
+    },
+    "respect_no_em_dash_requests": {
+      "skill_id": "respect_no_em_dash_requests",
+      "total_matches": 6,
+      "model_rankings": [
+        {
+          "model_id": "openai/gpt-oss-20b",
+          "wins": 3,
+          "losses": 0,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 3.0,
+          "win_rate": 1.0,
+          "rank": 1
+        },
+        {
+          "model_id": "inception/mercury",
+          "wins": 2,
+          "losses": 1,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 2.0,
+          "win_rate": 0.667,
+          "rank": 2
+        },
+        {
+          "model_id": "openai/gpt-oss-120b",
+          "wins": 1,
+          "losses": 2,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 1.0,
+          "win_rate": 0.333,
+          "rank": 3
+        },
+        {
+          "model_id": "thedrummer/unslopnemo-12b",
+          "wins": 0,
+          "losses": 3,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 0.0,
+          "win_rate": 0.0,
+          "rank": 4
+        }
+      ],
+      "match_history": [
+        {
+          "match_id": "1aa1a54b42a4a34d",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 5,
+            "B": 1,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-19T23:57:41.306870"
+        },
+        {
+          "match_id": "b1b00a34f1c3ea01",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "openai/gpt-oss-120b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 4,
+            "B": 2,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-19T23:57:46.615071"
+        },
+        {
+          "match_id": "c3c24bdc070548d6",
+          "model_a": "thedrummer/unslopnemo-12b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 4,
+            "B": 5,
+            "TIE": 0
+          },
+          "winner": "B",
+          "judge_count": 9,
+          "timestamp": "2025-08-19T23:57:50.656138"
+        },
+        {
+          "match_id": "7ed5712d0acf8123",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 9,
+            "B": 0,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 9,
+          "timestamp": "2025-08-20T00:32:58.703103"
+        },
+        {
+          "match_id": "15c28322531bdd5e",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 4,
+            "B": 2,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T00:33:27.557786"
+        },
+        {
+          "match_id": "f3be81fc5083c3f3",
+          "model_a": "inception/mercury",
+          "model_b": "openai/gpt-oss-120b",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 8,
+            "B": 1,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 9,
+          "timestamp": "2025-08-20T00:35:13.172288"
+        }
+      ],
+      "evals": {
+        "black-swan-event": {
+          "eval_id": "black-swan-event",
+          "total_matches": 6,
+          "model_rankings": [
+            {
+              "model_id": "openai/gpt-oss-20b",
+              "wins": 3,
+              "losses": 0,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 3.0,
+              "win_rate": 1.0,
+              "rank": 1
+            },
+            {
+              "model_id": "inception/mercury",
+              "wins": 2,
+              "losses": 1,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 2.0,
+              "win_rate": 0.667,
+              "rank": 2
+            },
+            {
+              "model_id": "openai/gpt-oss-120b",
+              "wins": 1,
+              "losses": 2,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 1.0,
+              "win_rate": 0.333,
+              "rank": 3
+            },
+            {
+              "model_id": "thedrummer/unslopnemo-12b",
+              "wins": 0,
+              "losses": 3,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 0.0,
+              "win_rate": 0.0,
+              "rank": 4
+            }
+          ],
+          "match_history": [
+            {
+              "match_id": "1aa1a54b42a4a34d",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 5,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-19T23:57:41.306870"
+            },
+            {
+              "match_id": "b1b00a34f1c3ea01",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-19T23:57:46.615071"
+            },
+            {
+              "match_id": "c3c24bdc070548d6",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 5,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 9,
+              "timestamp": "2025-08-19T23:57:50.656138"
+            },
+            {
+              "match_id": "7ed5712d0acf8123",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 9,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 9,
+              "timestamp": "2025-08-20T00:32:58.703103"
+            },
+            {
+              "match_id": "15c28322531bdd5e",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:33:27.557786"
+            },
+            {
+              "match_id": "f3be81fc5083c3f3",
+              "model_a": "inception/mercury",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 8,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 9,
+              "timestamp": "2025-08-20T00:35:13.172288"
+            }
+          ],
+          "matches": [
+            {
+              "match_id": "1aa1a54b42a4a34d",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 5,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-19T23:57:41.306870"
+            },
+            {
+              "match_id": "b1b00a34f1c3ea01",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-19T23:57:46.615071"
+            },
+            {
+              "match_id": "c3c24bdc070548d6",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 5,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 9,
+              "timestamp": "2025-08-19T23:57:50.656138"
+            },
+            {
+              "match_id": "7ed5712d0acf8123",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 9,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 9,
+              "timestamp": "2025-08-20T00:32:58.703103"
+            },
+            {
+              "match_id": "15c28322531bdd5e",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:33:27.557786"
+            },
+            {
+              "match_id": "f3be81fc5083c3f3",
+              "model_a": "inception/mercury",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 8,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 9,
+              "timestamp": "2025-08-20T00:35:13.172288"
+            }
+          ]
+        }
+      }
+    },
+    "code_generation": {
+      "skill_id": "code_generation",
+      "total_matches": 12,
+      "model_rankings": [
+        {
+          "model_id": "openai/gpt-oss-20b",
+          "wins": 5,
+          "losses": 0,
+          "ties": 1,
+          "total_matches": 6,
+          "points": 5.5,
+          "win_rate": 0.833,
+          "rank": 1
+        },
+        {
+          "model_id": "openai/gpt-oss-120b",
+          "wins": 4,
+          "losses": 1,
+          "ties": 1,
+          "total_matches": 6,
+          "points": 4.5,
+          "win_rate": 0.667,
+          "rank": 2
+        },
+        {
+          "model_id": "thedrummer/unslopnemo-12b",
+          "wins": 1,
+          "losses": 5,
+          "ties": 0,
+          "total_matches": 6,
+          "points": 1.0,
+          "win_rate": 0.167,
+          "rank": 3
+        },
+        {
+          "model_id": "inception/mercury",
+          "wins": 1,
+          "losses": 5,
+          "ties": 0,
+          "total_matches": 6,
+          "points": 1.0,
+          "win_rate": 0.167,
+          "rank": 4
+        }
+      ],
+      "match_history": [
+        {
+          "match_id": "1a5fa5be66a6c200",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "openai/gpt-oss-20b",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 1,
+            "B": 0,
+            "TIE": 2
+          },
+          "winner": "TIE",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:10:41.915191"
+        },
+        {
+          "match_id": "ba25736ea1ec7f1c",
+          "model_a": "thedrummer/unslopnemo-12b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 1,
+            "B": 2,
+            "TIE": 0
+          },
+          "winner": "B",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:10:43.533563"
+        },
+        {
+          "match_id": "d9b39201ab69bc89",
+          "model_a": "inception/mercury",
+          "model_b": "openai/gpt-oss-20b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 0,
+            "B": 3,
+            "TIE": 0
+          },
+          "winner": "B",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:10:59.287029"
+        },
+        {
+          "match_id": "fcfb4578d12b1771",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:11:20.361253"
+        },
+        {
+          "match_id": "8eaeca5a3c2aaa40",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:11:41.570258"
+        },
+        {
+          "match_id": "50640999362ae9f4",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 2,
+            "B": 1,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:11:49.958246"
+        },
+        {
+          "match_id": "a143b5ac63518477",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 3,
+            "B": 0,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:11:58.491888"
+        },
+        {
+          "match_id": "1f1a58773871581e",
+          "model_a": "inception/mercury",
+          "model_b": "openai/gpt-oss-120b",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 0,
+            "B": 3,
+            "TIE": 0
+          },
+          "winner": "B",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:12:19.654482"
+        },
+        {
+          "match_id": "bd9ec45428502b9a",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "openai/gpt-oss-120b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 2,
+            "B": 1,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:12:20.704814"
+        },
+        {
+          "match_id": "ab8a863506a1a47b",
+          "model_a": "thedrummer/unslopnemo-12b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 2,
+            "B": 1,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:13:14.986706"
+        },
+        {
+          "match_id": "ea277549b1f62c12",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 2,
+            "B": 0,
+            "TIE": 1
+          },
+          "winner": "A",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:13:16.362480"
+        },
+        {
+          "match_id": "17199fc070913f98",
+          "model_a": "thedrummer/unslopnemo-12b",
+          "model_b": "openai/gpt-oss-120b",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 1,
+            "B": 2,
+            "TIE": 0
+          },
+          "winner": "B",
+          "judge_count": 3,
+          "timestamp": "2025-08-20T01:14:01.533398"
+        }
+      ],
+      "evals": {
+        "conways_game_of_life": {
+          "eval_id": "conways_game_of_life",
+          "total_matches": 6,
+          "model_rankings": [
+            {
+              "model_id": "openai/gpt-oss-20b",
+              "wins": 3,
+              "losses": 0,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 3.0,
+              "win_rate": 1.0,
+              "rank": 1
+            },
+            {
+              "model_id": "openai/gpt-oss-120b",
+              "wins": 2,
+              "losses": 1,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 2.0,
+              "win_rate": 0.667,
+              "rank": 2
+            },
+            {
+              "model_id": "thedrummer/unslopnemo-12b",
+              "wins": 1,
+              "losses": 2,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 1.0,
+              "win_rate": 0.333,
+              "rank": 3
+            },
+            {
+              "model_id": "inception/mercury",
+              "wins": 0,
+              "losses": 3,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 0.0,
+              "win_rate": 0.0,
+              "rank": 4
+            }
+          ],
+          "match_history": [
+            {
+              "match_id": "a143b5ac63518477",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:11:58.491888"
+            },
+            {
+              "match_id": "1f1a58773871581e",
+              "model_a": "inception/mercury",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 0,
+                "B": 3,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:12:19.654482"
+            },
+            {
+              "match_id": "bd9ec45428502b9a",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:12:20.704814"
+            },
+            {
+              "match_id": "ab8a863506a1a47b",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:13:14.986706"
+            },
+            {
+              "match_id": "ea277549b1f62c12",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 0,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:13:16.362480"
+            },
+            {
+              "match_id": "17199fc070913f98",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:14:01.533398"
+            }
+          ],
+          "matches": [
+            {
+              "match_id": "a143b5ac63518477",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:11:58.491888"
+            },
+            {
+              "match_id": "1f1a58773871581e",
+              "model_a": "inception/mercury",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 0,
+                "B": 3,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:12:19.654482"
+            },
+            {
+              "match_id": "bd9ec45428502b9a",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:12:20.704814"
+            },
+            {
+              "match_id": "ab8a863506a1a47b",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:13:14.986706"
+            },
+            {
+              "match_id": "ea277549b1f62c12",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 0,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:13:16.362480"
+            },
+            {
+              "match_id": "17199fc070913f98",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:14:01.533398"
+            }
+          ]
+        },
+        "flight_simulator": {
+          "eval_id": "flight_simulator",
+          "total_matches": 6,
+          "model_rankings": [
+            {
+              "model_id": "openai/gpt-oss-120b",
+              "wins": 2,
+              "losses": 0,
+              "ties": 1,
+              "total_matches": 3,
+              "points": 2.5,
+              "win_rate": 0.667,
+              "rank": 1
+            },
+            {
+              "model_id": "openai/gpt-oss-20b",
+              "wins": 2,
+              "losses": 0,
+              "ties": 1,
+              "total_matches": 3,
+              "points": 2.5,
+              "win_rate": 0.667,
+              "rank": 2
+            },
+            {
+              "model_id": "inception/mercury",
+              "wins": 1,
+              "losses": 2,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 1.0,
+              "win_rate": 0.333,
+              "rank": 3
+            },
+            {
+              "model_id": "thedrummer/unslopnemo-12b",
+              "wins": 0,
+              "losses": 3,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 0.0,
+              "win_rate": 0.0,
+              "rank": 4
+            }
+          ],
+          "match_history": [
+            {
+              "match_id": "1a5fa5be66a6c200",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 0,
+                "TIE": 2
+              },
+              "winner": "TIE",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:10:41.915191"
+            },
+            {
+              "match_id": "ba25736ea1ec7f1c",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:10:43.533563"
+            },
+            {
+              "match_id": "d9b39201ab69bc89",
+              "model_a": "inception/mercury",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 0,
+                "B": 3,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:10:59.287029"
+            },
+            {
+              "match_id": "fcfb4578d12b1771",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:11:20.361253"
+            },
+            {
+              "match_id": "8eaeca5a3c2aaa40",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:11:41.570258"
+            },
+            {
+              "match_id": "50640999362ae9f4",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:11:49.958246"
+            }
+          ],
+          "matches": [
+            {
+              "match_id": "1a5fa5be66a6c200",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 0,
+                "TIE": 2
+              },
+              "winner": "TIE",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:10:41.915191"
+            },
+            {
+              "match_id": "ba25736ea1ec7f1c",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:10:43.533563"
+            },
+            {
+              "match_id": "d9b39201ab69bc89",
+              "model_a": "inception/mercury",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 0,
+                "B": 3,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:10:59.287029"
+            },
+            {
+              "match_id": "fcfb4578d12b1771",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:11:20.361253"
+            },
+            {
+              "match_id": "8eaeca5a3c2aaa40",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 3,
+                "B": 0,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:11:41.570258"
+            },
+            {
+              "match_id": "50640999362ae9f4",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 1,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 3,
+              "timestamp": "2025-08-20T01:11:49.958246"
+            }
+          ]
+        }
+      }
+    },
+    "persuasiveness": {
+      "skill_id": "persuasiveness",
+      "total_matches": 6,
+      "model_rankings": [
+        {
+          "model_id": "inception/mercury",
+          "wins": 3,
+          "losses": 0,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 3.0,
+          "win_rate": 1.0,
+          "rank": 1
+        },
+        {
+          "model_id": "openai/gpt-oss-120b",
+          "wins": 1,
+          "losses": 1,
+          "ties": 1,
+          "total_matches": 3,
+          "points": 1.5,
+          "win_rate": 0.333,
+          "rank": 2
+        },
+        {
+          "model_id": "openai/gpt-oss-20b",
+          "wins": 1,
+          "losses": 1,
+          "ties": 1,
+          "total_matches": 3,
+          "points": 1.5,
+          "win_rate": 0.333,
+          "rank": 3
+        },
+        {
+          "model_id": "thedrummer/unslopnemo-12b",
+          "wins": 0,
+          "losses": 3,
+          "ties": 0,
+          "total_matches": 3,
+          "points": 0.0,
+          "win_rate": 0.0,
+          "rank": 4
+        }
+      ],
+      "match_history": [
+        {
+          "match_id": "0206575776ad05bf",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 4,
+            "B": 2,
+            "TIE": 0
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T00:36:12.299514"
+        },
+        {
+          "match_id": "45c50af7ce8290b6",
+          "model_a": "openai/gpt-oss-20b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 0,
+            "B": 5,
+            "TIE": 1
+          },
+          "winner": "B",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T00:36:38.933357"
+        },
+        {
+          "match_id": "f2873138067b4157",
+          "model_a": "thedrummer/unslopnemo-12b",
+          "model_b": "openai/gpt-oss-120b",
+          "judges": [
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 2,
+            "B": 4,
+            "TIE": 0
+          },
+          "winner": "B",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T00:36:41.885182"
+        },
+        {
+          "match_id": "a0b859b9cd71c65d",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "inception/mercury",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            }
+          ],
+          "vote_counts": {
+            "A": 1,
+            "B": 5,
+            "TIE": 0
+          },
+          "winner": "B",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T01:14:16.140168"
+        },
+        {
+          "match_id": "b223e2f30eb058ba",
+          "model_a": "inception/mercury",
+          "model_b": "thedrummer/unslopnemo-12b",
+          "judges": [
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "A"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "A"
+            }
+          ],
+          "vote_counts": {
+            "A": 4,
+            "B": 1,
+            "TIE": 1
+          },
+          "winner": "A",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T01:14:42.349645"
+        },
+        {
+          "match_id": "714856112d8f905c",
+          "model_a": "openai/gpt-oss-120b",
+          "model_b": "openai/gpt-oss-20b",
+          "judges": [
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "openai/gpt-oss-20b",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "TIE"
+            },
+            {
+              "judge_id": "thedrummer/unslopnemo-12b",
+              "vote": "B"
+            },
+            {
+              "judge_id": "inception/mercury",
+              "vote": "TIE"
+            }
+          ],
+          "vote_counts": {
+            "A": 0,
+            "B": 2,
+            "TIE": 4
+          },
+          "winner": "TIE",
+          "judge_count": 6,
+          "timestamp": "2025-08-20T01:14:47.265989"
+        }
+      ],
+      "evals": {
+        "curiosity_killed_cat": {
+          "eval_id": "curiosity_killed_cat",
+          "total_matches": 6,
+          "model_rankings": [
+            {
+              "model_id": "inception/mercury",
+              "wins": 3,
+              "losses": 0,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 3.0,
+              "win_rate": 1.0,
+              "rank": 1
+            },
+            {
+              "model_id": "openai/gpt-oss-120b",
+              "wins": 1,
+              "losses": 1,
+              "ties": 1,
+              "total_matches": 3,
+              "points": 1.5,
+              "win_rate": 0.333,
+              "rank": 2
+            },
+            {
+              "model_id": "openai/gpt-oss-20b",
+              "wins": 1,
+              "losses": 1,
+              "ties": 1,
+              "total_matches": 3,
+              "points": 1.5,
+              "win_rate": 0.333,
+              "rank": 3
+            },
+            {
+              "model_id": "thedrummer/unslopnemo-12b",
+              "wins": 0,
+              "losses": 3,
+              "ties": 0,
+              "total_matches": 3,
+              "points": 0.0,
+              "win_rate": 0.0,
+              "rank": 4
+            }
+          ],
+          "match_history": [
+            {
+              "match_id": "0206575776ad05bf",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:36:12.299514"
+            },
+            {
+              "match_id": "45c50af7ce8290b6",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 0,
+                "B": 5,
+                "TIE": 1
+              },
+              "winner": "B",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:36:38.933357"
+            },
+            {
+              "match_id": "f2873138067b4157",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 4,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:36:41.885182"
+            },
+            {
+              "match_id": "a0b859b9cd71c65d",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 5,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T01:14:16.140168"
+            },
+            {
+              "match_id": "b223e2f30eb058ba",
+              "model_a": "inception/mercury",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 1,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T01:14:42.349645"
+            },
+            {
+              "match_id": "714856112d8f905c",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                }
+              ],
+              "vote_counts": {
+                "A": 0,
+                "B": 2,
+                "TIE": 4
+              },
+              "winner": "TIE",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T01:14:47.265989"
+            }
+          ],
+          "matches": [
+            {
+              "match_id": "0206575776ad05bf",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 2,
+                "TIE": 0
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:36:12.299514"
+            },
+            {
+              "match_id": "45c50af7ce8290b6",
+              "model_a": "openai/gpt-oss-20b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 0,
+                "B": 5,
+                "TIE": 1
+              },
+              "winner": "B",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:36:38.933357"
+            },
+            {
+              "match_id": "f2873138067b4157",
+              "model_a": "thedrummer/unslopnemo-12b",
+              "model_b": "openai/gpt-oss-120b",
+              "judges": [
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 2,
+                "B": 4,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T00:36:41.885182"
+            },
+            {
+              "match_id": "a0b859b9cd71c65d",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "inception/mercury",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                }
+              ],
+              "vote_counts": {
+                "A": 1,
+                "B": 5,
+                "TIE": 0
+              },
+              "winner": "B",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T01:14:16.140168"
+            },
+            {
+              "match_id": "b223e2f30eb058ba",
+              "model_a": "inception/mercury",
+              "model_b": "thedrummer/unslopnemo-12b",
+              "judges": [
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "A"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "A"
+                }
+              ],
+              "vote_counts": {
+                "A": 4,
+                "B": 1,
+                "TIE": 1
+              },
+              "winner": "A",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T01:14:42.349645"
+            },
+            {
+              "match_id": "714856112d8f905c",
+              "model_a": "openai/gpt-oss-120b",
+              "model_b": "openai/gpt-oss-20b",
+              "judges": [
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "openai/gpt-oss-20b",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                },
+                {
+                  "judge_id": "thedrummer/unslopnemo-12b",
+                  "vote": "B"
+                },
+                {
+                  "judge_id": "inception/mercury",
+                  "vote": "TIE"
+                }
+              ],
+              "vote_counts": {
+                "A": 0,
+                "B": 2,
+                "TIE": 4
+              },
+              "winner": "TIE",
+              "judge_count": 6,
+              "timestamp": "2025-08-20T01:14:47.265989"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "execution_info": {
+    "status": "completed",
+    "total_matches": 36,
+    "total_skills": 5,
+    "total_evals": 6,
+    "timestamp": "2025-08-20T01:14:53.619056"
+  }
+}

@@ -1,0 +1,38 @@
+abstract: |
+While large language models (LLMs) challenge conventional methods of
+teaching and learning, they present an exciting opportunity to improve
+efficiency and scale high-quality instruction. One promising
+application is the generation of customized exams, tailored to
+specific course content. There has been significant recent excitement
+on automatically generating questions using artificial intelligence,
+but also comparatively little work evaluating the psychometric quality
+of these items in real-world educational settings. Filling this gap is
+an important step toward understanding generative AI's role in
+effective test design. In this study, we introduce and evaluate an
+iterative refinement strategy for question generation, repeatedly
+producing, assessing, and improving questions through cycles of
+LLM-generated critique and revision. We evaluate the quality of these
+AI-generated questions in a large-scale field study involving 91
+classes---covering computer science, mathematics, chemistry, and
+more---in dozens of colleges across the United States, comprising
+nearly 1700 students. Our analysis, based on item response theory
+(IRT), suggests that for students in our sample the AI-generated
+questions performed comparably to expert-created questions designed
+for standardized exams. Our results illustrate the power of AI to make
+high-quality assessments more readily available, benefiting both
+teachers and students.
+author:
+
+- Calvin Isley^1^, Joshua Gilbert^2^, Evangelos Kassos^1^, Michaela
+  Kocher^1^, Allen Nie^3^, Emma Brunskill^3^, Ben Domingue^4^, Jake
+  Hofman^5^, Joscha Legewie^6^, Teddy Svoronos^1^, Charlotte
+  Tuminelli^1^, Sharad Goel^1^
+  bibliography:
+- draft_ai_exams.bib
+  title: "Assessing the Quality of AI-Generated Exams: A Large-Scale Field
+  Study"
+
+---
+
+::: links
+:::

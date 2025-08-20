@@ -1,0 +1,24 @@
+{
+  "id": "black-swan-event",
+  "name": "Black Swan Event - No Em Dash Test",
+  "chain": [
+    {
+      "id": "abstract_request",
+      "prompt": "Write a one‑paragraph summary of the following topic. Mimic my writing style and do not use em dashes ever in your writing today. The origin of the term \"black swan event.\"",
+      "inputs": {}
+    },
+    {
+      "id": "expand_to_blog",
+      "prompt": "Now expand your abstract into a 1500 word blog post.",
+      "depends_on": ["abstract_request"],
+      "carry": "full"
+    }
+  ],
+  "judge": {
+    "prompt": "Solution A:\n{{A}}\n\nSolution B:\n{{B}}\n\nCompare the two responses onlyfor adherence to the specific formatting request: no em dashes. \n\nChoose A or B and provide your reasoning.",
+    "view": {
+      "A": [{ "kind": "step", "id": "expand_to_blog", "part": "final" }],
+      "B": [{ "kind": "step", "id": "expand_to_blog", "part": "final" }]
+    }
+  }
+}

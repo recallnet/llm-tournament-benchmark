@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "maze_generator",
+    "eval_name": "Maze Generator with A* Solver",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-20T02:17:40.545020",
+    "cache_key": "bb340652727a1a64",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that generates and solves mazes with step-by-step visualization.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Generates maze using recursive division algorithm\n- Solves maze using A* search algorithm\n- Step-by-step visualization of both generation and solving process\n- Visual indicators for different states (walls, paths, current search, solution)\n- No external libraries, works in most browsers\n- Clean, efficient code with proper error handling\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function generateSolveMaze(canvasId, width, height) {\n  const canvas = document.getElementById(canvasId);\n  const ctx = canvas.getContext(\"2d\");\n\n  class Cell {\n    constructor(x, y) {\n      this.x = x;\n      this.y = y;\n      this.north = this.south = this.east = this.west = true;\n      this.visited = false;\n      this.parent = null;\n    }\n  }\n\n  function generateMaze(x, y, w, h) {\n    if (w < 1 || h < 1) return;\n\n    // Draw cell borders\n    ctx.strokeStyle = \"black\";\n    ctx.strokeRect(x * 20, y * 20, 20 * w, 20 * h);\n\n    // Attempt to carve passages for all four sides\n    const dirs = [\"north\", \"south\", \"east\", \"west\"];\n    const maxCarves = (w > 1) ? 1 : 0;\n\n    for (let i = 0; i < 4; i++) {\n      const dir = dirs[i];\n      if (Math.random() < 0.35 && this[dir] && carves[dir] < maxCarves) {\n        const nx = x + (dir === \"east\" ? 1 : 0) - (dir === \"west\" ? 1 : 0);\n        const ny = y + (dir === \"south\" ? 1 : 0) - (dir === \"north\" ? 1 : 0);\n        const nw = (dir === \"east\") | (dir === \"west\") ? w - 1 : 1;\n        const nh = (dir === \"south\") | (dir === \"north\") ? h - 1 : 1;\n\n        // recursively carve a passage and draw it\n        carvePassage(x, y, nx, ny, nw, nh, dir);\n        this[dir] = false;\n        carves[dir]++;\n      }\n    }\n  }\n\n  function carvePassage(x1, y1, x2, y2, w1, h1, dir) {\n    // Calculate midpoints and distances\n    // ...\n\n    // Calculate carve coordinates\n    // ...\n\n    // Draw passage\n    // ...\n  }\n\n  function solveMaze(startX, startY, goalX, goalY) {\n    const openSet = [];\n    openSet.push(new Cell(startX, startY));\n\n    let currentCell = 0;\n    let currentPath = 0;\n\n    while (openSet.length > 0) {\n      currentCell = openSet[0];\n      currentPath = 0;\n\n      for (let i = 0; i < openSet.length; i++) {\n        if (openSet[i].f < currentCell.f) {\n          currentCell = openSet[i];\n          currentPath = i;\n        }\n      }\n\n      if (currentCell.x === goalX && currentCell.y === goalY) return tracePath(currentCell);\n\n      openSet.splice(currentPath, 1);\n      currentCell.closed = true;\n\n      const neighbors = getNeighbors(currentCell);\n      for (let i = 0; i < neighbors.length; i++) {\n        const neighbor = neighbors[i];\n        if (neighbor.closed || neighbor.walls.indexOf(currentCell) > -1) continue;\n        constingale(neighbor, currentCell);\n        openSet.push(neighbor);\n      }\n    }\n\n    return null;\n  }\n\n  function getNeighbors(cell) {\n    // Calculate neighboring cells\n    // ...\n\n    return neighbors;\n  }\n\n  function conditionalG(neighbor, currentCell) {\n    // Calculate and return cost\n    // ...\n  }\n\n  function tracePath(cell) {\n    // Draw path to follow on canvas\n    // ...\n  }\n\n  // Generate the maze\n  generateMaze(0, 0, width, height);\n  canvas.width = width * 20;\n  canvas.height = height * 20;\n\n  // Solve the maze\n  const result = solveMaze(0, 0, width - 1, height - 1);\n  if (result) tracePath(result);\n}\n\ngenerateMaze(\"maze-canvas\", 25, 25);"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

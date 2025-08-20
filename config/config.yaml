@@ -1,0 +1,44 @@
+# AFBench Workflow Configuration
+
+# Model pool configuration
+model_pool:
+  default_pool: "test"  # Default pool to load (test, production, experimental)
+  pools_dir: "model_pools"
+
+# Judge pool configuration
+judge_pool:
+  default_pool: "test"  # Default judge pool to load (test, production, experimental)
+  pools_dir: "judge_pools"
+
+# Skills configuration
+skills:
+  skills_dir: "skills"
+  selected_skills: []  # Empty list means load all skills
+
+# Data generation parameters
+n_samples: 1000
+random_seed: 42
+
+# Processing parameters
+processing:
+  remove_outliers: true
+  outlier_threshold: 3.0
+  normalize: true
+
+# Analysis parameters
+analysis:
+  statistical_tests: true
+  correlation_analysis: true
+  significance_level: 0.05
+
+# Plotting parameters
+plotting:
+  figure_size: [10, 6]
+  dpi: 300
+  style: "seaborn-v0_8"
+
+# Report parameters
+report:
+  include_plots: true
+  format: "json"
+  timestamp: true

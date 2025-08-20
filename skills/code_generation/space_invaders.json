@@ -1,0 +1,19 @@
+{
+  "id": "space_invaders",
+  "name": "Space Invaders Game",
+  "chain": [
+    {
+      "id": "generate_code",
+      "prompt": "You are an expert JavaScript programmer. Write a single JavaScript function that creates a fully playable Space Invaders game.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Player ship movement using arrow keys\n- Shooting with spacebar key\n- Enemy invaders in formation that move and shoot back\n- Collision detection between all game objects\n- Score system and visual feedback\n- Game sprites: player ship, enemy invaders, bullets, explosions\n- Win condition: clear all enemies to advance level\n- Lose conditions: enemies reach bottom or hit player\n- Smooth 60 FPS performance\n- No external libraries, works in all major browsers\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting.",
+      "inputs": {}
+    }
+  ],
+  "judge": {
+    "system": "You are a JavaScript code quality expert with expertise in game development and interactive applications. Evaluate code based on functionality, performance, best practices, and requirements fulfillment.",
+    "prompt": "Evaluate the JavaScript Space Invaders game implementation on a scale of 0-10 points:\n\n**Game Completeness (4 points)**: Does it implement all core Space Invaders features - player movement, shooting, enemy formations, collision detection, and proper win/lose conditions?\n\n**Gameplay Quality (3 points)**: Are the controls responsive? Is the difficulty balanced? Do enemies move in proper formation and shoot back? Are collision mechanics accurate?\n\n**Visual & Audio Feedback (2 points)**: Does it include clear sprites, smooth animations, explosion effects, and score display? Is the visual feedback satisfying?\n\n**Performance & Code Quality (1 point)**: Does it run smoothly at 60 FPS with efficient game loop and well-structured code?\n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
+    "view": {
+      "A": [{ "kind": "step", "id": "generate_code", "part": "final" }],
+      "B": [{ "kind": "step", "id": "generate_code", "part": "final" }]
+    }
+  }
+}

@@ -1,0 +1,45 @@
+# AFBench Production Configuration
+# Overrides config.yaml for production environment
+
+# Model pool configuration - use production pool
+model_pool:
+  default_pool: "production"
+  pools_dir: "model_pools"
+
+# Judge pool configuration - use production pool
+judge_pool:
+  default_pool: "production"
+  pools_dir: "judge_pools"
+
+# Skills configuration
+skills:
+  skills_dir: "skills"
+  selected_skills: []  # Load all skills
+
+# Production data generation parameters
+n_samples: 10000
+random_seed: 42
+
+# Production processing parameters
+processing:
+  remove_outliers: true
+  outlier_threshold: 2.5  # Stricter outlier detection
+  normalize: true
+
+# Analysis parameters
+analysis:
+  statistical_tests: true
+  correlation_analysis: true
+  significance_level: 0.01  # Stricter significance level
+
+# High-quality plotting for production
+plotting:
+  figure_size: [12, 8]
+  dpi: 300
+  style: "seaborn-v0_8"
+
+# Report parameters
+report:
+  include_plots: true
+  format: "json"
+  timestamp: true

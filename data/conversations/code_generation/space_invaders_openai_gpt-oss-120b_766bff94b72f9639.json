@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "space_invaders",
+    "eval_name": "Space Invaders Game",
+    "model_id": "openai/gpt-oss-120b",
+    "model_slug": "gpt-oss-120b",
+    "model_author": "OpenAI",
+    "timestamp": "2025-08-20T02:14:49.303944",
+    "cache_key": "766bff94b72f9639",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that creates a fully playable Space Invaders game.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Player ship movement using arrow keys\n- Shooting with spacebar key\n- Enemy invaders in formation that move and shoot back\n- Collision detection between all game objects\n- Score system and visual feedback\n- Game sprites: player ship, enemy invaders, bullets, explosions\n- Win condition: clear all enemies to advance level\n- Lose conditions: enemies reach bottom or hit player\n- Smooth 60 FPS performance\n- No external libraries, works in all major browsers\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function startSpaceInvaders(canvasId){const c=document.getElementById(canvasId);if(!c)return;const ctx=c.getContext('2d');c.width=500;c.height=500;const W=c.width,H=c.height;let keys={};window.addEventListener('keydown',e=>{keys[e.code]=true;});window.addEventListener('keyup',e=>{keys[e.code]=false;});const player={x:W/2-15,y:H-40,w:30,h:20,color:'#0f0',speed:4,fireCooldown:0};const bullets=[];let enemies=[];let enemyRows=5,enemyCols=10,enemySpacingX=40,enemySpacingY=30,enemyW=30,enemyH=20;let enemyDir=1,enemySpeed=0.7,enemyDown=20,enemyFireTimer=0,enemyFireInterval=2000;let score=0,level=1,gameOver=false,win=false;function initEnemies(){enemies=[];const offsetX=(W-(enemyCols-1)*enemySpacingX-enemyW)/2;for(let r=0;r<enemyRows;r++){for(let col=0;col<enemyCols;col++){enemies.push({x:offsetX+col*enemySpacingX,y:30+r*enemySpacingY,w:enemyW,h:enemyH,color:'#f00',alive:true});}}}initEnemies();function spawnBullet(x,y,dy,owner){bullets.push({x,y,w:4,h:10,dy,color:owner==='player'?'#ff0':'#0ff',owner});}function update(){if(gameOver||win)return;handleInput();moveBullets();moveEnemies();checkCollisions();if(enemies.every(e=>!e.alive)){win=true;setTimeout(()=>{level++;enemySpeed+=0.2;enemyRows=Math.min(enemyRows+1,7);initEnemies();score=0;gameOver=false;win=false;},2000);}if(!gameOver&&enemies.some(e=>e.alive&&e.y+e.h>=player.y)){gameOver=true;}draw();requestAnimationFrame(update);}function handleInput(){if(keys['ArrowLeft'])player.x-=player.speed;if(keys['ArrowRight'])player.x+=player.speed;player.x=Math.max(0,Math.min(W-player.w,player.x));if(keys['Space']&&player.fireCooldown<=0){spawnBullet(player.x+player.w/2-2,player.y,-5,'player');player.fireCooldown=15;}if(player.fireCooldown>0)player.fireCooldown--;}function moveBullets(){for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];b.y+=b.dy;if(b.y<-10||b.y>H+10)bullets.splice(i,1);} }function moveEnemies(){let shiftDown=false;for(let e of enemies){if(!e.alive)continue;e.x+=enemySpeed*enemyDir;if(e.x<0||e.x+e.w>W)shiftDown=true;}if(shiftDown){enemyDir*=-1;for(let e of enemies){if(e.alive){e.y+=enemyDown;}}}enemyFireTimer+=16.7;if(enemyFireTimer>enemyFireInterval){enemyFireTimer=0;const shooters=enemies.filter(e=>e.alive);if(shooters.length){const s=shooters[Math.floor(Math.random()*shooters.length)];spawnBullet(s.x+s.w/2-2,s.y+s.h,3,'enemy');}}}function checkCollisions(){for(let i=bullets.length-1;i>=0;i--){const b=bullets[i];if(b.owner==='player'){for(let e of enemies){if(e.alive&&b.x<b.x+b.w&&b.x+b.w>e.x&&b.y<b.y+b.h&&b.y+b.h>e.y){e.alive=false;bullets.splice(i,1);score+=10;break;}}}else{if(b.x<b.x+b.w&&b.x+b.w>player.x&&b.y<b.y+b.h&&b.y+b.h>player.y){gameOver=true;return;}}}}function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle=player.color;ctx.fillRect(player.x,player.y,player.w,player.h);for(let b of bullets){ctx.fillStyle=b.color;ctx.fillRect(b.x,b.y,b.w,b.h);}ctx.fillStyle='#fff';for(let e of enemies){if(e.alive){ctx.fillRect(e.x,e.y,e.w,e.h);}}ctx.fillStyle='#0f0';ctx.font='16px monospace';ctx.fillText('Score: '+score,10,20);ctx.fillText('Level: '+level,10,40);if(gameOver){ctx.fillStyle='red';ctx.font='48px monospace';ctx.fillText('GAME OVER',W/2-150,H/2);}if(win){ctx.fillStyle='lime';ctx.font='48px monospace';ctx.fillText('YOU WIN!',W/2-130,H/2);}}update();}"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "conways_game_of_life",
+    "eval_name": "Conway's Game of Life with Emojis",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-20T02:13:28.226474",
+    "cache_key": "5c4d76d19e5d810b",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that implements Conway's Game of Life with advanced features.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Renders Conway's Game of Life on the provided canvas\n- Uses emojis to represent cells with different emojis for different generations\n- Includes famous patterns: Glider, Blinker, Gosper Gun, Pulsar (selectable via dropdown)\n- Speed control slider (1-10 generations per second)\n- Click-to-toggle cells for custom patterns\n- \"Randomize\" and \"Clear\" buttons\n- Aging system where cells change emojis based on survival time\n- Death animation with fade-out effect\n- Smooth 60 FPS performance\n- No external libraries, works in all major browsers\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "// Conway's Game of Life with advanced features\nfunction conwayGameOfLife(canvasId) {\n  const canvas = document.getElementById(canvasId);\n  const ctx = canvas.getContext(\"2d\");\n\n  const width = canvas.width = 500;\n  const height = canvas.height = 500;\n  const grid = Array.from({length: width}, () => new Array(height).fill(0));\n  const emojis = [\"\u263a\", \"\ud83d\ude0a\", \"\ud83d\ude03\", \"\ud83d\ude00\", \"\ud83d\ude07\"];\n  let generation = 0;\n  let speed = 3;\n\n  function clearCells() {\n    for (let x = 0; x < width; x++) {\n      for (let y = 0; y < height; y++) {\n        grid[x][y] = 0;\n      }\n    }\n  }\n\n  function drawCell(x, y) {\n    const emojiIndex = Math.min(generation % 4, emojis.length - 1);\n    const emoji = emojis[emojiIndex];\n    ctx.fillStyle = `rgb(${255 - 50 * emojiIndex}, ${50 * emojiIndex}, 0)`;\n    ctx.fillText(emoji, x * 10, y * 10);\n  }\n\n  function countNeighbors(x, y) {\n    let count = 0;\n    for (let i = -1; i <= 1; i++) {\n      for (let j = -1; j <= 1; j++) {\n        if (x + i >= 0 && x + i < width && y + j >= 0 && y + j < height) {\n          count += grid[x + i][y + j];\n        }\n      }\n    }\n    count -= grid[x][y];\n    return count;\n  }\n\n  function nextGeneration() {\n    const nextGen = Array.from({length: width}, () => new Array(height).fill(0));\n    for (let x = 0; x < width; x++) {\n      for (let y = 0; y < height; y++) {\n        const neighbors = countNeighbors(x, y);\n        if (grid[x][y] > 0) {\n          nextGen[x][y] = neighbors === 2 || neighbors === 3 ? Math.min(generation % 20 + 1, 100) : 0;\n        } else if (neighbors === 3) {\n          nextGen[x][y] = 1;\n        }\n      }\n    }\n    grid = nextGen;\n  }\n\n  function toggleCell(e) {\n    const x = Math.floor(e.offsetX / 10);\n    const y = Math.floor(e.offsetY / 10);\n    if (e.button === 0) {\n      grid[x][y] = Math.min(grid[x][y] + 1, 100);\n    } else if (e.button === 2) {\n      grid[x][y] = 0;\n    }\n  }\n\n  function addPattern(pattern, x, y) {\n    for (let i = 0; i < pattern.length; i++) {\n      const row = pattern[i];\n      for (let j = 0; j < row.length; j++) {\n        if (row[j] === 1) {\n          grid[x + j][y + i] = 1;\n        }\n      }\n    }\n  }\n\n  function drawPatterns() {\n    const glider = [\n      [0, 1, 0],\n      [0, 0, 1],\n      [1, 1, 1]\n    ];\n\n    const blinker = [\n      [1, 1, 1, 1],\n      [0, 0, 0, 0],\n      [1, 1, 1, 1]\n    ];\n\n    const gosperGun = [\n      [0, 0, 1, 1, 1, 0, 0],\n      [0, 0, 0, 0, 0, 1, 0],\n      [1, 1, 1, 0, 0, 0, 0],\n      [1, 1, 1, 0, 0, 0, 0],\n      [0, 0, 0, 1, 1, 1, 0],\n      [0, 0, 0, 1, 1, 1, 0]\n    ];\n\n    const pulsar = [\n      [0, 1, 0],\n      [1, 0, 1],\n      [0, 1, 0]\n    ];\n\n    addPattern(glider, 10, 10);\n    addPattern(blinker, 20, 10);\n    addPattern(gosperGun, 50, 50);\n    addPattern(pulsar, 80, 80);\n  }\n\n  function createInterface() {\n    const speedSlider = document.createElement(\"input\");\n    speedSlider.type = \"range\";\n    speedSlider.min = 1;\n    speedSlider.max = 10;\n    speedSlider.value = speed;\n    speedSlider.addEventListener(\"input\", function() {\n      speed = parseInt(this.value);\n    });\n    canvas.parentNode.appendChild(speedSlider);\n\n    const randomizeButton = document.createElement(\"button\");\n    randomizeButton.innerText = \"Randomize\";\n    randomizeButton.addEventListener(\"click\", function() {\n      for (let x = 0; x < width; x++) {\n        for (let y = 0; y < height; y++) {\n          grid[x][y] = Math.random() < 0.25 ? 1 : 0;\n        }\n      }\n    });\n    canvas.parentNode.appendChild(randomizeButton);\n\n    const clearButton = document.createElement(\"button\");\n    clearButton.innerText = \"Clear\";\n    clearButton.addEventListener(\"click\", clearCells);\n    canvas.parentNode.appendChild(clearButton);\n  }\n\n  function animate() {\n    ctx.clearRect(0, 0, width, height);\n    for (let x = 0; x < width; x++) {\n      for (let y = 0; y < height; y++) {\n        if (grid[x][y] > 0) {\n          drawCell(x, y);\n        }\n      }\n    }\n    generation++;\n    nextGeneration();\n    setTimeout(animate, 1000 / (speed * 10));\n  }\n\n  clearCells();\n  drawPatterns();\n  createInterface();\n  canvas.addEventListener(\"mousemove\", toggleCell);\n  canvas.addEventListener(\"DOMMouseScroll\", toggleCell);\n  animate();\n}"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

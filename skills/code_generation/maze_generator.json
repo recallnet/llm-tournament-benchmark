@@ -1,0 +1,19 @@
+{
+  "id": "maze_generator",
+  "name": "Maze Generator with A* Solver",
+  "chain": [
+    {
+      "id": "generate_code",
+      "prompt": "You are an expert JavaScript programmer. Write a single JavaScript function that generates and solves mazes with step-by-step visualization.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Generates maze using recursive division algorithm\n- Solves maze using A* search algorithm\n- Step-by-step visualization of both generation and solving process\n- Visual indicators for different states (walls, paths, current search, solution)\n- No external libraries, works in most browsers\n- Clean, efficient code with proper error handling\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting.",
+      "inputs": {}
+    }
+  ],
+  "judge": {
+    "system": "You are a JavaScript code quality expert with expertise in algorithms and visualization. Evaluate code based on functionality, performance, best practices, and requirements fulfillment.",
+    "prompt": "Evaluate the JavaScript maze generator implementation on a scale of 0-10 points:\n\n**Algorithm Implementation (4 points)**: Does it correctly implement recursive division for maze generation and A* search for pathfinding? Are both algorithms mathematically sound?\n\n**Visualization Quality (3 points)**: Does it provide clear step-by-step visualization of both maze generation and solving? Are different states (walls, paths, search progress, solution) clearly distinguished?\n\n**Performance (2 points)**: Do both generation and solving run efficiently with smooth animations? Is the rendering optimized for the canvas?\n\n**Code Quality (1 point)**: Is the code well-structured with proper error handling and browser compatibility?\n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
+    "view": {
+      "A": [{ "kind": "step", "id": "generate_code", "part": "final" }],
+      "B": [{ "kind": "step", "id": "generate_code", "part": "final" }]
+    }
+  }
+}
