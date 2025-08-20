@@ -25,8 +25,7 @@ Path.mkdir(PLOTS_DIR, exist_ok=True)
 # Define final outputs
 rule all:
     input:
-        RESULTS_DIR / "final_report.json",
-        PLOTS_DIR / "summary_plot.png"
+        DATA_DIR / "skill_ratings.json"
 
 # AFBench tournament pipeline
 rule afbench:
@@ -127,66 +126,6 @@ rule print_results:
     shell:
         "python scripts/print_results_table.py"
 
-# Generate sample data
-rule generate_data:
-    input:
-        DATA_DIR / "loaded_models.json",
-        DATA_DIR / "loaded_judges.json",
-        DATA_DIR / "loaded_skills.json"
-    output:
-        DATA_DIR / "raw_data.csv"
-    params:
-        n_samples=config.get("n_samples", 1000),
-        random_seed=config.get("random_seed", 42)
-    script:
-        "scripts/generate_data.py"
-
-# Process raw data
-rule process_data:
-    input:
-        DATA_DIR / "raw_data.csv"
-    output:
-        DATA_DIR / "processed_data.csv"
-    params:
-        processing_params=config.get("processing", {})
-    script:
-        "scripts/process_data.py"
-
-# Analyze processed data
-rule analyze_data:
-    input:
-        DATA_DIR / "processed_data.csv"
-    output:
-        RESULTS_DIR / "analysis_results.json"
-    params:
-        analysis_params=config.get("analysis", {})
-    threads: 2
-    script:
-        "scripts/analyze_data.py"
-
-# Create visualization
-rule create_plots:
-    input:
-        DATA_DIR / "processed_data.csv",
-        RESULTS_DIR / "analysis_results.json"
-    output:
-        PLOTS_DIR / "summary_plot.png"
-    params:
-        plot_params=config.get("plotting", {})
-    script:
-        "scripts/create_plots.py"
-
-# Generate final report
-rule generate_report:
-    input:
-        RESULTS_DIR / "analysis_results.json",
-        PLOTS_DIR / "summary_plot.png"
-    output:
-        RESULTS_DIR / "final_report.json"
-    params:
-        report_params=config.get("report", {})
-    script:
-        "scripts/generate_report.py"
 
 # Clean intermediate files
 rule clean:

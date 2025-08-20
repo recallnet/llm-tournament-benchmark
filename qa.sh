@@ -18,6 +18,28 @@ ruff check scripts/ tests/ --show-fixes --ignore=F821,PLR2004,PLR0912,PLR0915,PL
 echo "📦 Checking import sorting with isort..."
 isort --check-only --diff scripts/ tests/
 
+# Test organization check
+echo "🧪 Checking test file organization..."
+if find . -name "test_*.py" -not -path "./tests/*" | head -1 | read; then
+    echo "❌ Test files found outside tests/ directory:"
+    find . -name "test_*.py" -not -path "./tests/*"
+    exit 1
+fi
+
+if find . -name "*_test.py" -not -path "./tests/*" | head -1 | read; then
+    echo "❌ Test files found outside tests/ directory:"
+    find . -name "*_test.py" -not -path "./tests/*"
+    exit 1
+fi
+
+if grep -r "def test_" scripts/ --include="*.py" | head -1 | read; then
+    echo "❌ Test functions found in scripts/ directory:"
+    grep -r "def test_" scripts/ --include="*.py"
+    exit 1
+fi
+
+echo "✅ All test files properly organized in tests/ directory"
+
 # Security scanning (allow some issues for script context)
 echo "🔒 Running security analysis with bandit..."
 bandit -r scripts/ -f json -ll || echo "⚠️ Some security issues found but acceptable for scripts"

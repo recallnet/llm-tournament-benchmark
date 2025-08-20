@@ -49,8 +49,21 @@ line-length = 127
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "PLR", "TRY", "PTH"]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "PLR", "TRY", "PTH", "PT"]
 ignore = ["TRY003"]  # Long exception messages
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+parametrize-names-type = "tuple"
+
+# Enforce test organization
+[tool.ruff.lint.per-file-ignores]
+# Allow test files only in tests/ directory
+"!tests/**/*test*.py" = ["PT"]
+"!tests/**/test_*.py" = ["PT"] 
+# Scripts directory should not contain test functions
+"scripts/**/*.py" = ["PT011", "PT012", "PT013"]
 
 [tool.isort]
 profile = "black"

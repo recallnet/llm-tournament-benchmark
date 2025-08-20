@@ -2,7 +2,7 @@
 # Usage: snakemake --profile test
 
 # Default execution settings
-cores: 1
+cores: 4
 keep-going: true
 printshellcmds: true
 

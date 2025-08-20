@@ -59,6 +59,12 @@ class SkillRatingCalculator:
             # Create hash of all match data (IDs, timestamps, outcomes)
             match_signatures = []
             for match in matches:
+                # Validate required fields - throw halting error if missing
+                required_fields = ['match_id', 'winner', 'timestamp']
+                missing_fields = [field for field in required_fields if field not in match]
+                if missing_fields:
+                    raise ValueError(f"Tournament data integrity error in skill '{skill_id}': Missing required fields {missing_fields} in match: {match}")
+                
                 match_sig = f"{match['match_id']}:{match['winner']}:{match['timestamp']}"
                 match_signatures.append(match_sig)
             tournament_data[skill_id] = sorted(match_signatures)
@@ -67,9 +73,26 @@ class SkillRatingCalculator:
 
         return hashlib.sha256(json.dumps(cache_content, sort_keys=True).encode()).hexdigest()[:CACHE_KEY_LENGTH]
 
+    def _sanitize_path_component(self, component: str) -> str:
+        """Sanitize a path component to prevent directory traversal and other attacks."""
+        import re
+        # Remove path separators and dangerous characters
+        sanitized = re.sub(r'[/\\:*?"<>|\x00-\x1f]', '_', component)
+        # Remove directory traversal sequences
+        sanitized = sanitized.replace('..', '_')
+        # Limit length to prevent filesystem issues
+        if len(sanitized) > 100:
+            sanitized = sanitized[:100]
+        # Ensure it's not empty or just dots/spaces
+        if not sanitized or sanitized.strip('._ ') == '':
+            sanitized = 'invalid_id'
+        return sanitized
+
     def _get_cache_path(self, skill_id: str, cache_key: str) -> Path:
         """Get cache file path for skill ratings."""
-        return self.cache_dir / f"{skill_id}_{cache_key}.json"
+        # Sanitize skill_id to prevent directory traversal attacks
+        safe_skill_id = self._sanitize_path_component(skill_id)
+        return self.cache_dir / f"{safe_skill_id}_{cache_key}.json"
 
     def _load_cached_ratings(self, cache_path: Path) -> dict[str, Any] | None:
         """Load cached skill ratings."""

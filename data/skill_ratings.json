@@ -8,6 +8,11 @@
           "sigma": 87.34973243858572,
           "conservative": 1198.620584235185
         },
+        "openai/gpt-oss-120b": {
+          "mu": 1507.0232495552955,
+          "sigma": 87.34973243858572,
+          "conservative": 1244.9740522395382
+        },
         "openai/gpt-oss-20b": {
           "mu": 1507.0232495552955,
           "sigma": 87.34973243858572,
@@ -17,11 +22,6 @@
           "mu": 1525.2837193384667,
           "sigma": 87.34973243858572,
           "conservative": 1263.2345220227094
-        },
-        "openai/gpt-oss-120b": {
-          "mu": 1507.0232495552955,
-          "sigma": 87.34973243858572,
-          "conservative": 1244.9740522395382
         }
       },
       "model_rankings": [
@@ -33,14 +33,14 @@
           "rank": 1
         },
         {
-          "model_id": "openai/gpt-oss-20b",
+          "model_id": "openai/gpt-oss-120b",
           "rating": 1507.02,
           "sigma": 87.35,
           "conservative_rating": 1244.97,
           "rank": 2
         },
         {
-          "model_id": "openai/gpt-oss-120b",
+          "model_id": "openai/gpt-oss-20b",
           "rating": 1507.02,
           "sigma": 87.35,
           "conservative_rating": 1244.97,
@@ -238,22 +238,12 @@
       ],
       "total_matches": 6,
       "total_models": 4,
-      "timestamp": "2025-08-20T01:14:53.709063",
-      "cache_key": "9b09e4b539b5f266"
+      "timestamp": "2025-08-20T04:15:25.999253",
+      "cache_key": "26dbbc80e0baf248"
     },
     "empathy": {
       "skill_id": "empathy",
       "model_ratings": {
-        "thedrummer/unslopnemo-12b": {
-          "mu": 1407.3403358272797,
-          "sigma": 87.37486953344225,
-          "conservative": 1145.2157272269528
-        },
-        "openai/gpt-oss-20b": {
-          "mu": 1592.6596641727203,
-          "sigma": 87.37486953344225,
-          "conservative": 1330.5350555723935
-        },
         "inception/mercury": {
           "mu": 1474.79809473729,
           "sigma": 87.37486953344225,
@@ -263,6 +253,16 @@
           "mu": 1525.20190526271,
           "sigma": 87.37486953344225,
           "conservative": 1263.077296662383
+        },
+        "openai/gpt-oss-20b": {
+          "mu": 1592.6596641727203,
+          "sigma": 87.37486953344225,
+          "conservative": 1330.5350555723935
+        },
+        "thedrummer/unslopnemo-12b": {
+          "mu": 1407.3403358272797,
+          "sigma": 87.37486953344225,
+          "conservative": 1145.2157272269528
         }
       },
       "model_rankings": [
@@ -479,8 +479,8 @@
       ],
       "total_matches": 6,
       "total_models": 4,
-      "timestamp": "2025-08-20T01:14:53.709662",
-      "cache_key": "9b09e4b539b5f266"
+      "timestamp": "2025-08-20T04:15:25.999892",
+      "cache_key": "26dbbc80e0baf248"
     },
     "respect_no_em_dash_requests": {
       "skill_id": "respect_no_em_dash_requests",
@@ -489,6 +489,11 @@
           "mu": 1534.1340583535484,
           "sigma": 87.38386565911374,
           "conservative": 1271.982461376207
+        },
+        "openai/gpt-oss-120b": {
+          "mu": 1469.0404334745454,
+          "sigma": 86.89956452729982,
+          "conservative": 1208.3417398926458
         },
         "openai/gpt-oss-20b": {
           "mu": 1580.7460653959472,
@@ -499,11 +504,6 @@
           "mu": 1410.3421667558719,
           "sigma": 87.87688977614266,
           "conservative": 1146.7114974274439
-        },
-        "openai/gpt-oss-120b": {
-          "mu": 1469.0404334745454,
-          "sigma": 86.89956452729982,
-          "conservative": 1208.3417398926458
         }
       },
       "model_rankings": [
@@ -720,12 +720,17 @@
       ],
       "total_matches": 6,
       "total_models": 4,
-      "timestamp": "2025-08-20T01:14:53.710096",
-      "cache_key": "9b09e4b539b5f266"
+      "timestamp": "2025-08-20T04:15:26.000308",
+      "cache_key": "26dbbc80e0baf248"
     },
     "code_generation": {
       "skill_id": "code_generation",
       "model_ratings": {
+        "inception/mercury": {
+          "mu": 1404.5688877395362,
+          "sigma": 78.32975399690773,
+          "conservative": 1169.579625748813
+        },
         "openai/gpt-oss-120b": {
           "mu": 1563.2118561522307,
           "sigma": 77.26475261633715,
@@ -740,11 +745,6 @@
           "mu": 1420.7808125154988,
           "sigma": 78.18173117987766,
           "conservative": 1186.235618975866
-        },
-        "inception/mercury": {
-          "mu": 1404.5688877395362,
-          "sigma": 78.32975399690773,
-          "conservative": 1169.579625748813
         }
       },
       "model_rankings": [
@@ -1141,31 +1141,31 @@
       ],
       "total_matches": 12,
       "total_models": 4,
-      "timestamp": "2025-08-20T01:14:53.710694",
-      "cache_key": "9b09e4b539b5f266"
+      "timestamp": "2025-08-20T04:15:26.000818",
+      "cache_key": "26dbbc80e0baf248"
     },
     "persuasiveness": {
       "skill_id": "persuasiveness",
       "model_ratings": {
-        "thedrummer/unslopnemo-12b": {
-          "mu": 1419.2539346040528,
-          "sigma": 88.38775803634273,
-          "conservative": 1154.0906604950246
-        },
-        "openai/gpt-oss-20b": {
-          "mu": 1498.3055050649946,
-          "sigma": 87.38386565911374,
-          "conservative": 1236.1539080876532
+        "inception/mercury": {
+          "mu": 1589.6578332441281,
+          "sigma": 87.87688977614266,
+          "conservative": 1326.0271639157002
         },
         "openai/gpt-oss-120b": {
           "mu": 1498.938967694085,
           "sigma": 86.89956452729982,
           "conservative": 1238.2402741121855
         },
-        "inception/mercury": {
-          "mu": 1589.6578332441281,
-          "sigma": 87.87688977614266,
-          "conservative": 1326.0271639157002
+        "openai/gpt-oss-20b": {
+          "mu": 1498.3055050649946,
+          "sigma": 87.38386565911374,
+          "conservative": 1236.1539080876532
+        },
+        "thedrummer/unslopnemo-12b": {
+          "mu": 1419.2539346040528,
+          "sigma": 88.38775803634273,
+          "conservative": 1154.0906604950246
         }
       },
       "model_rankings": [
@@ -1382,14 +1382,14 @@
       ],
       "total_matches": 6,
       "total_models": 4,
-      "timestamp": "2025-08-20T01:14:53.711163",
-      "cache_key": "9b09e4b539b5f266"
+      "timestamp": "2025-08-20T04:15:26.001312",
+      "cache_key": "26dbbc80e0baf248"
     }
   },
   "execution_info": {
     "status": "completed",
     "total_skills": 5,
-    "cache_key": "9b09e4b539b5f266",
-    "timestamp": "2025-08-20T01:14:53.711442"
+    "cache_key": "26dbbc80e0baf248",
+    "timestamp": "2025-08-20T04:15:26.001589"
   }
 }

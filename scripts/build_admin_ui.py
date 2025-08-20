@@ -147,7 +147,7 @@ def create_data_access():
         print("⚠️  Data directory not found - site will not have data access")
 
 
-def test_streamlit_app():
+def validate_streamlit_app():
     """Test that the Streamlit app can start without errors."""
     site_dir = Path("site")
 
@@ -226,7 +226,7 @@ def main():
         create_data_access()
 
         # Step 7: Test the application
-        test_streamlit_app()
+        validate_streamlit_app()
 
         # Step 8: Create run script
         create_run_script()

@@ -49,19 +49,11 @@ class ConversationExecutor:
 
     def _generate_cache_key(self, model_id: str, eval_data: dict[str, Any]) -> str:
         """Generate a unique cache key for model-eval combination."""
-        # Use source file hash for reliable cache invalidation
-        eval_file_path = eval_data.get("_metadata", {}).get("file_path")
-        if eval_file_path and Path(eval_file_path).exists():
-            # Hash the source file content directly
-            with open(eval_file_path, "rb") as f:
-                file_content = f.read()
-            file_hash = hashlib.sha256(file_content).hexdigest()[:8]
-            cache_content = f"{model_id}:{file_hash}"
-        else:
-            # Fallback to JSON content hash (without metadata)
-            eval_data_for_hash = {k: v for k, v in eval_data.items() if k != "_metadata"}
-            eval_content = json.dumps(eval_data_for_hash, sort_keys=True)
-            cache_content = f"{model_id}:{eval_content}"
+        # Always use eval data content hash for reliable cache invalidation
+        # This ensures changes in eval configuration properly invalidate cache
+        eval_data_for_hash = {k: v for k, v in eval_data.items() if k != "_metadata"}
+        eval_content = json.dumps(eval_data_for_hash, sort_keys=True)
+        cache_content = f"{model_id}:{eval_content}"
 
         return hashlib.sha256(cache_content.encode()).hexdigest()[:16]
 
@@ -369,23 +361,20 @@ def cleanup_stale_cache(models: list, judges: list, cache_dir: Path, intermediar
         for skill_dir in cache_dir.iterdir():
             if skill_dir.is_dir():
                 for cache_file in skill_dir.glob("*.json"):
-                    # Extract model ID from filename: eval_model_hash.json
-                    parts = cache_file.stem.split("_")
-                    if len(parts) >= 3:
-                        # Reconstruct model ID (handle slashes that became underscores)
-                        model_parts = parts[1:-1]  # Skip eval name and hash
-                        potential_model_id = "/".join(model_parts)
-
-                        # Also check with underscores (fallback)
-                        potential_model_id_underscore = "_".join(model_parts)
-
-                        if (
-                            potential_model_id not in current_model_ids
-                            and potential_model_id_underscore not in current_model_ids
-                        ):
-                            print(f"   🗑️  Removing stale conversation cache: {cache_file.name}")
+                    try:
+                        # Read the actual metadata from the JSON file
+                        with open(cache_file) as f:
+                            cache_data = json.load(f)
+                        model_id = cache_data.get("metadata", {}).get("model_id")
+                        if model_id and model_id not in current_model_ids:
+                            print(f"   🗑️  Removing stale conversation cache: {cache_file.name} (model: {model_id})")
                             cache_file.unlink()
                             cleaned_count += 1
+                    except (json.JSONDecodeError, OSError):
+                        # If we can't read the file, it's corrupted - remove it
+                        print(f"   🗑️  Removing corrupted conversation cache: {cache_file.name}")
+                        cache_file.unlink()
+                        cleaned_count += 1
 
     # Clean intermediary cache
     if intermediary_cache_dir.exists():
