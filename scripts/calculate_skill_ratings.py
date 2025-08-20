@@ -36,14 +36,16 @@ class SkillRatingCalculator:
     def _create_rating(self, mu: Optional[float] = None, sigma: Optional[float] = None) -> BradleyTerryFullRating:
         """Create an OpenSkill rating object."""
         return BradleyTerryFullRating(
-            mu=mu if mu is not None else self.default_mu,
-            sigma=sigma if sigma is not None else self.default_sigma
+            mu=mu if mu is not None else self.default_mu, sigma=sigma if sigma is not None else self.default_sigma
         )
 
-    def _generate_cache_key(self, current_models: list[dict[str, Any]],
-                          current_judges: list[dict[str, Any]],
-                          current_evals: list[dict[str, Any]],
-                          tournament_summaries: dict[str, Any]) -> str:
+    def _generate_cache_key(
+        self,
+        current_models: list[dict[str, Any]],
+        current_judges: list[dict[str, Any]],
+        current_evals: list[dict[str, Any]],
+        tournament_summaries: dict[str, Any],
+    ) -> str:
         """Generate cache key based on current state of models, judges, evals, and tournaments."""
         # Create a stable representation of the current state
         model_ids = sorted([model["id"] for model in current_models])
@@ -61,12 +63,7 @@ class SkillRatingCalculator:
                 match_signatures.append(match_sig)
             tournament_data[skill_id] = sorted(match_signatures)
 
-        cache_content = {
-            "models": model_ids,
-            "judges": judge_ids,
-            "evals": eval_ids,
-            "tournaments": tournament_data
-        }
+        cache_content = {"models": model_ids, "judges": judge_ids, "evals": eval_ids, "tournaments": tournament_data}
 
         return hashlib.sha256(json.dumps(cache_content, sort_keys=True).encode()).hexdigest()[:CACHE_KEY_LENGTH]
 
@@ -90,9 +87,9 @@ class SkillRatingCalculator:
         with open(cache_path, "w") as f:
             json.dump(ratings_data, f, indent=2)
 
-    def cleanup_invalid_rating_cache(self, current_models: list[dict[str, Any]],
-                                   current_judges: list[dict[str, Any]],
-                                   current_evals: list[dict[str, Any]]) -> None:
+    def cleanup_invalid_rating_cache(
+        self, current_models: list[dict[str, Any]], current_judges: list[dict[str, Any]], current_evals: list[dict[str, Any]]
+    ) -> None:
         """Remove all cached ratings that are no longer valid."""
         current_model_ids = {model["id"] for model in current_models}
         current_judge_ids = {judge["id"] for judge in current_judges}
@@ -150,8 +147,7 @@ class SkillRatingCalculator:
         else:
             print("   ✅ No invalid rating cache files found")
 
-    def calculate_skill_ratings(self, skill_id: str, tournament_data: dict[str, Any],
-                              cache_key: str) -> dict[str, Any]:
+    def calculate_skill_ratings(self, skill_id: str, tournament_data: dict[str, Any], cache_key: str) -> dict[str, Any]:
         """Calculate ratings for a skill using all matches in chronological order."""
         cache_path = self._get_cache_path(skill_id, cache_key)
 
@@ -173,7 +169,7 @@ class SkillRatingCalculator:
                 "model_ratings": {},
                 "model_rankings": [],
                 "total_matches": 0,
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": datetime.utcnow().isoformat(),
             }
 
         # Initialize all models with default ratings
@@ -219,35 +215,39 @@ class SkillRatingCalculator:
             model_ratings[model_b] = new_ratings[1][0]
 
             # Record match result with rating changes
-            match_results.append({
-                "match_number": i + 1,
-                "match_id": match["match_id"],
-                "model_a": model_a,
-                "model_b": model_b,
-                "winner": winner,
-                "timestamp": timestamp,
-                "rating_changes": {
-                    model_a: {
-                        "before": {"mu": rating_a.mu, "sigma": rating_a.sigma},
-                        "after": {"mu": new_ratings[0][0].mu, "sigma": new_ratings[0][0].sigma}
+            match_results.append(
+                {
+                    "match_number": i + 1,
+                    "match_id": match["match_id"],
+                    "model_a": model_a,
+                    "model_b": model_b,
+                    "winner": winner,
+                    "timestamp": timestamp,
+                    "rating_changes": {
+                        model_a: {
+                            "before": {"mu": rating_a.mu, "sigma": rating_a.sigma},
+                            "after": {"mu": new_ratings[0][0].mu, "sigma": new_ratings[0][0].sigma},
+                        },
+                        model_b: {
+                            "before": {"mu": rating_b.mu, "sigma": rating_b.sigma},
+                            "after": {"mu": new_ratings[1][0].mu, "sigma": new_ratings[1][0].sigma},
+                        },
                     },
-                    model_b: {
-                        "before": {"mu": rating_b.mu, "sigma": rating_b.sigma},
-                        "after": {"mu": new_ratings[1][0].mu, "sigma": new_ratings[1][0].sigma}
-                    }
                 }
-            })
+            )
 
         # Create final model rankings
         model_rankings = []
         for model_id, rating in model_ratings.items():
-            model_rankings.append({
-                "model_id": model_id,
-                "rating": round(rating.mu, 2),
-                "sigma": round(rating.sigma, 2),
-                "conservative_rating": round(rating.mu - CONSERVATIVE_MULTIPLIER * rating.sigma, 2),
-                "rank": 0  # Will be set after sorting
-            })
+            model_rankings.append(
+                {
+                    "model_id": model_id,
+                    "rating": round(rating.mu, 2),
+                    "sigma": round(rating.sigma, 2),
+                    "conservative_rating": round(rating.mu - CONSERVATIVE_MULTIPLIER * rating.sigma, 2),
+                    "rank": 0,  # Will be set after sorting
+                }
+            )
 
         # Sort by rating (descending)
         model_rankings.sort(key=lambda x: x["rating"], reverse=True)
@@ -263,7 +263,7 @@ class SkillRatingCalculator:
                 model_id: {
                     "mu": rating.mu,
                     "sigma": rating.sigma,
-                    "conservative": rating.mu - CONSERVATIVE_MULTIPLIER * rating.sigma
+                    "conservative": rating.mu - CONSERVATIVE_MULTIPLIER * rating.sigma,
                 }
                 for model_id, rating in model_ratings.items()
             },
@@ -272,7 +272,7 @@ class SkillRatingCalculator:
             "total_matches": len(match_history),
             "total_models": len(model_ids),
             "timestamp": datetime.utcnow().isoformat(),
-            "cache_key": cache_key
+            "cache_key": cache_key,
         }
 
         # Save to cache
@@ -300,8 +300,8 @@ def main() -> None:
             "execution_info": {
                 "status": "no_tournament_data",
                 "message": "No tournament summaries found",
-                "timestamp": datetime.utcnow().isoformat()
-            }
+                "timestamp": datetime.utcnow().isoformat(),
+            },
         }
     else:
         # Load input data
@@ -329,8 +329,8 @@ def main() -> None:
                 "execution_info": {
                     "status": "no_tournaments",
                     "message": "No tournaments found in summaries",
-                    "timestamp": datetime.utcnow().isoformat()
-                }
+                    "timestamp": datetime.utcnow().isoformat(),
+                },
             }
         else:
             calculator = SkillRatingCalculator()
@@ -352,7 +352,7 @@ def main() -> None:
 
                 # Print top 3 models for this skill
                 print(f"   🏆 Top 3 models in {skill_id}:")
-                for model in skill_rating['model_rankings'][:3]:
+                for model in skill_rating["model_rankings"][:3]:
                     print(f"      {model['rank']}. {model['model_id']} - {model['rating']} (±{model['sigma']:.1f})")
 
             result = {
@@ -361,8 +361,8 @@ def main() -> None:
                     "status": "completed",
                     "total_skills": len(skill_ratings),
                     "cache_key": cache_key,
-                    "timestamp": datetime.utcnow().isoformat()
-                }
+                    "timestamp": datetime.utcnow().isoformat(),
+                },
             }
 
     # Save results

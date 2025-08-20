@@ -50,16 +50,16 @@ class ConversationExecutor:
     def _generate_cache_key(self, model_id: str, eval_data: dict[str, Any]) -> str:
         """Generate a unique cache key for model-eval combination."""
         # Use source file hash for reliable cache invalidation
-        eval_file_path = eval_data.get('_metadata', {}).get('file_path')
+        eval_file_path = eval_data.get("_metadata", {}).get("file_path")
         if eval_file_path and Path(eval_file_path).exists():
             # Hash the source file content directly
-            with open(eval_file_path, 'rb') as f:
+            with open(eval_file_path, "rb") as f:
                 file_content = f.read()
             file_hash = hashlib.sha256(file_content).hexdigest()[:8]
             cache_content = f"{model_id}:{file_hash}"
         else:
             # Fallback to JSON content hash (without metadata)
-            eval_data_for_hash = {k: v for k, v in eval_data.items() if k != '_metadata'}
+            eval_data_for_hash = {k: v for k, v in eval_data.items() if k != "_metadata"}
             eval_content = json.dumps(eval_data_for_hash, sort_keys=True)
             cache_content = f"{model_id}:{eval_content}"
 

@@ -88,7 +88,7 @@ class TournamentMatch:
             "judge_explanations": self.judge_explanations,
             "result": self.result,
             "conversation_a_key": self.conversation_a_key,
-            "conversation_b_key": self.conversation_b_key
+            "conversation_b_key": self.conversation_b_key,
         }
 
 
@@ -129,12 +129,10 @@ class SwissTournament:
             # First round: random pairings
             shuffled = self.model_ids.copy()
             random.shuffle(shuffled)
-            return [(shuffled[i], shuffled[i+1]) for i in range(0, len(shuffled)-1, 2)]
+            return [(shuffled[i], shuffled[i + 1]) for i in range(0, len(shuffled) - 1, 2)]
 
         # Subsequent rounds: pair by score, avoid rematches
-        sorted_by_score = sorted(self.model_ids,
-                               key=lambda x: (self.scores[x], x),
-                               reverse=True)
+        sorted_by_score = sorted(self.model_ids, key=lambda x: (self.scores[x], x), reverse=True)
 
         pairings = []
         used = set()
@@ -154,9 +152,9 @@ class SwissTournament:
                 pair_key = tuple(sorted([model_a, model_b]))
 
                 # Avoid rematches
-                if pair_key not in [(tuple(sorted([m.model_a_id, m.model_b_id])))
-                                   for round_matches in self.rounds
-                                   for m in round_matches]:
+                if pair_key not in [
+                    (tuple(sorted([m.model_a_id, m.model_b_id]))) for round_matches in self.rounds for m in round_matches
+                ]:
                     pairings.append((model_a, model_b))
                     used.add(model_a)
                     used.add(model_b)
@@ -219,7 +217,7 @@ class SwissTournament:
             "head_to_head": {f"{k[0]}:{k[1]}": v for k, v in self.head_to_head.items()},
             "completed": self.completed,
             "winner": self.winner,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
 
@@ -239,9 +237,9 @@ class JudgeExecutor:
         self.last_request_time = 0
         self.min_interval = 0.1  # 100ms between requests
 
-    def cleanup_invalid_match_cache(self, current_models: list[dict[str, Any]],
-                                   current_judges: list[dict[str, Any]],
-                                   current_evals: list[dict[str, Any]]) -> None:
+    def cleanup_invalid_match_cache(
+        self, current_models: list[dict[str, Any]], current_judges: list[dict[str, Any]], current_evals: list[dict[str, Any]]
+    ) -> None:
         """Remove ALL cached judge decisions that are no longer valid due to model/judge/eval changes."""
         current_model_ids = {model["id"] for model in current_models}
         current_judge_ids = {judge["id"] for judge in current_judges}
@@ -264,6 +262,7 @@ class JudgeExecutor:
                     if skill_name not in current_skill_ids:
                         print(f"   🗑️  Removing entire skill directory: {skill_name}")
                         import shutil
+
                         shutil.rmtree(skill_dir)
                         cleaned_count += 1
                         continue
@@ -319,8 +318,9 @@ class JudgeExecutor:
         else:
             print("   ✅ No invalid match cache files found")
 
-    def _generate_judge_cache_key_with_prompt(self, match: TournamentMatch, judge_id: str,
-                                            final_prompt: str, eval_config: dict[str, Any]) -> str:
+    def _generate_judge_cache_key_with_prompt(
+        self, match: TournamentMatch, judge_id: str, final_prompt: str, eval_config: dict[str, Any]
+    ) -> str:
         """Generate cache key for judge decision including the actual final prompt."""
         # Include match details + judge + FINAL prompt for cache key
         cache_content = {
@@ -329,7 +329,7 @@ class JudgeExecutor:
             "final_prompt": final_prompt,  # This includes all substitutions and modifications
             "model_a": match.model_a_id,
             "model_b": match.model_b_id,
-            "eval_judge_system": eval_config.get("judge", {}).get("system", "")
+            "eval_judge_system": eval_config.get("judge", {}).get("system", ""),
         }
         return hashlib.sha256(json.dumps(cache_content, sort_keys=True).encode()).hexdigest()[:16]
 
@@ -374,10 +374,15 @@ class JudgeExecutor:
         response.raise_for_status()
         return response.json()
 
-    def _build_view_content(self, view_spec: list[dict[str, str]],
-                           conversations_data: dict[str, Any],
-                           intermediaries_data: dict[str, Any],
-                           model_id: str, skill_id: str, eval_id: str) -> str:
+    def _build_view_content(
+        self,
+        view_spec: list[dict[str, str]],
+        conversations_data: dict[str, Any],
+        intermediaries_data: dict[str, Any],
+        model_id: str,
+        skill_id: str,
+        eval_id: str,
+    ) -> str:
         """Build the content shown to judge based on view specification."""
         content_parts = []
 
@@ -390,9 +395,11 @@ class JudgeExecutor:
                 # Find conversation for this model/eval
                 conversation = None
                 for conv in conversations_data.get("conversations", []):
-                    if (conv["metadata"]["model_id"] == model_id and
-                        conv["metadata"]["skill_id"] == skill_id and
-                        conv["metadata"]["eval_id"] == eval_id):
+                    if (
+                        conv["metadata"]["model_id"] == model_id
+                        and conv["metadata"]["skill_id"] == skill_id
+                        and conv["metadata"]["eval_id"] == eval_id
+                    ):
                         conversation = conv
                         break
 
@@ -419,10 +426,12 @@ class JudgeExecutor:
                 # Find intermediary result for this model/eval/intermediary
                 intermediary = None
                 for inter in intermediaries_data.get("intermediaries", []):
-                    if (inter["metadata"]["judge_model_id"] and  # Has judge model
-                        inter["metadata"]["skill_id"] == skill_id and
-                        inter["metadata"]["eval_id"] == eval_id and
-                        inter["metadata"]["intermediary_id"] == item_id):
+                    if (
+                        inter["metadata"]["judge_model_id"]  # Has judge model
+                        and inter["metadata"]["skill_id"] == skill_id
+                        and inter["metadata"]["eval_id"] == eval_id
+                        and inter["metadata"]["intermediary_id"] == item_id
+                    ):
                         # Check if this intermediary was generated from the right model's conversation
                         # We'd need to match conversation cache keys for this
                         intermediary = inter
@@ -448,10 +457,14 @@ class JudgeExecutor:
 
         return "\n\n".join(content_parts)
 
-    def execute_judge_decision(self, match: TournamentMatch, judge: dict[str, Any],
-                              eval_config: dict[str, Any],
-                              conversations_data: dict[str, Any],
-                              intermediaries_data: dict[str, Any]) -> tuple[str, list[dict[str, str]], str]:
+    def execute_judge_decision(
+        self,
+        match: TournamentMatch,
+        judge: dict[str, Any],
+        eval_config: dict[str, Any],
+        conversations_data: dict[str, Any],
+        intermediaries_data: dict[str, Any],
+    ) -> tuple[str, list[dict[str, str]], str]:
         """Execute judge decision for a match and return vote, conversation, explanation."""
 
         judge_id = judge["id"]
@@ -459,12 +472,10 @@ class JudgeExecutor:
 
         # Build view content for model A and B FIRST
         view_a_content = self._build_view_content(
-            judge_config["view"]["A"], conversations_data, intermediaries_data,
-            match.model_a_id, match.skill_id, match.eval_id
+            judge_config["view"]["A"], conversations_data, intermediaries_data, match.model_a_id, match.skill_id, match.eval_id
         )
         view_b_content = self._build_view_content(
-            judge_config["view"]["B"], conversations_data, intermediaries_data,
-            match.model_b_id, match.skill_id, match.eval_id
+            judge_config["view"]["B"], conversations_data, intermediaries_data, match.model_b_id, match.skill_id, match.eval_id
         )
 
         # Build the FINAL prompt that will actually be executed
@@ -516,8 +527,8 @@ class JudgeExecutor:
                     "eval_id": match.eval_id,
                     "skill_id": match.skill_id,
                     "timestamp": datetime.utcnow().isoformat(),
-                    "cache_key": cache_key
-                }
+                    "cache_key": cache_key,
+                },
             }
             self._save_judge_cache(cache_path, judge_result)
 
@@ -543,8 +554,8 @@ class JudgeExecutor:
                     "skill_id": match.skill_id,
                     "error": str(e),
                     "timestamp": datetime.utcnow().isoformat(),
-                    "cache_key": cache_key
-                }
+                    "cache_key": cache_key,
+                },
             }
             self._save_judge_cache(cache_path, error_result)
 
@@ -628,8 +639,8 @@ def main():
             "execution_info": {
                 "status": "insufficient_models",
                 "models_count": len(models),
-                "message": "Need at least 2 models for tournaments"
-            }
+                "message": "Need at least 2 models for tournaments",
+            },
         }
     else:
         print(f"🚀 Running tournaments for {len(evals)} evals...")
@@ -677,7 +688,11 @@ def main():
                     for judge in judges:
                         try:
                             vote, conversation, explanation = judge_executor.execute_judge_decision(
-                                match, judge, eval_data, conversations_data, conversations_data  # Using conversations for intermediaries too
+                                match,
+                                judge,
+                                eval_data,
+                                conversations_data,
+                                conversations_data,  # Using conversations for intermediaries too
                             )
                             match.add_judge_result(judge["id"], vote, conversation, explanation)
                         except Exception as e:
@@ -685,7 +700,7 @@ def main():
                             # Add error vote
                             error_conversation = [
                                 {"role": "user", "content": "[JUDGE_EXECUTION_ERROR]"},
-                                {"role": "assistant", "content": f"Error: {e}"}
+                                {"role": "assistant", "content": f"Error: {e}"},
                             ]
                             match.add_judge_result(judge["id"], "TIE", error_conversation, f"Error: {e}")
 
@@ -716,8 +731,8 @@ def main():
                 "tournaments_count": len(all_tournaments),
                 "total_models": len(models),
                 "total_judges": len(judges),
-                "timestamp": datetime.utcnow().isoformat()
-            }
+                "timestamp": datetime.utcnow().isoformat(),
+            },
         }
 
     # Save results

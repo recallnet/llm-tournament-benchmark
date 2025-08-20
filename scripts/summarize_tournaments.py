@@ -53,10 +53,7 @@ def calculate_match_result(judge_votes: list[dict[str, Any]]) -> tuple[str, dict
             vote_counts["TIE"] += 1  # Default invalid votes to TIE
             vote = "TIE"
 
-        judge_details.append({
-            "judge_id": judge_id,
-            "vote": vote
-        })
+        judge_details.append({"judge_id": judge_id, "vote": vote})
 
     # Determine winner by majority
     max_votes = max(vote_counts.values())
@@ -73,11 +70,13 @@ def calculate_match_result(judge_votes: list[dict[str, Any]]) -> tuple[str, dict
 def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
     """Create tournament summary organized by skill and eval."""
     tournaments_by_skill: dict[str, dict[str, list[dict[str, Any]]]] = defaultdict(lambda: defaultdict(list))
-    skill_summaries: dict[str, dict[str, Any]] = defaultdict(lambda: {
-        "matches": [],
-        "model_scores": defaultdict(lambda: {"wins": 0, "losses": 0, "ties": 0, "total": 0}),
-        "total_matches": 0
-    })
+    skill_summaries: dict[str, dict[str, Any]] = defaultdict(
+        lambda: {
+            "matches": [],
+            "model_scores": defaultdict(lambda: {"wins": 0, "losses": 0, "ties": 0, "total": 0}),
+            "total_matches": 0,
+        }
+    )
 
     # Process matches
     for match_id, judge_votes in matches.items():
@@ -105,7 +104,7 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
             "vote_counts": vote_counts,
             "winner": result,
             "judge_count": len(judge_votes),
-            "timestamp": metadata.get("timestamp")
+            "timestamp": metadata.get("timestamp"),
         }
 
         # Add to tournaments
@@ -142,15 +141,17 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
             win_rate = scores["wins"] / scores["total"] if scores["total"] > 0 else 0
             points = scores["wins"] + (scores["ties"] * 0.5)  # 1 point for win, 0.5 for tie
 
-            model_rankings.append({
-                "model_id": model_id,
-                "wins": scores["wins"],
-                "losses": scores["losses"],
-                "ties": scores["ties"],
-                "total_matches": scores["total"],
-                "points": points,
-                "win_rate": round(win_rate, 3)
-            })
+            model_rankings.append(
+                {
+                    "model_id": model_id,
+                    "wins": scores["wins"],
+                    "losses": scores["losses"],
+                    "ties": scores["ties"],
+                    "total_matches": scores["total"],
+                    "points": points,
+                    "win_rate": round(win_rate, 3),
+                }
+            )
 
         # Sort by points (descending), then by win rate
         model_rankings.sort(key=lambda x: (x["points"], x["win_rate"]), reverse=True)
@@ -167,7 +168,7 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
             "total_matches": skill_data["total_matches"],
             "model_rankings": model_rankings,
             "match_history": all_skill_matches,
-            "evals": {}
+            "evals": {},
         }
 
         # Add per-eval details
@@ -199,15 +200,17 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
                 win_rate = scores["wins"] / scores["total"] if scores["total"] > 0 else 0
                 points = scores["wins"] + (scores["ties"] * 0.5)
 
-                eval_rankings.append({
-                    "model_id": model_id,
-                    "wins": scores["wins"],
-                    "losses": scores["losses"],
-                    "ties": scores["ties"],
-                    "total_matches": scores["total"],
-                    "points": points,
-                    "win_rate": round(win_rate, 3)
-                })
+                eval_rankings.append(
+                    {
+                        "model_id": model_id,
+                        "wins": scores["wins"],
+                        "losses": scores["losses"],
+                        "ties": scores["ties"],
+                        "total_matches": scores["total"],
+                        "points": points,
+                        "win_rate": round(win_rate, 3),
+                    }
+                )
 
             eval_rankings.sort(key=lambda x: (x["points"], x["win_rate"]), reverse=True)
             for i, model in enumerate(eval_rankings):
@@ -221,7 +224,7 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
                 "total_matches": len(eval_matches),
                 "model_rankings": eval_rankings,
                 "match_history": eval_matches_sorted,
-                "matches": eval_matches_sorted  # Keep both for compatibility
+                "matches": eval_matches_sorted,  # Keep both for compatibility
             }
 
     return tournament_summaries
@@ -241,8 +244,8 @@ def main() -> None:
             "execution_info": {
                 "status": "no_tournament_data",
                 "message": "No tournament cache files found",
-                "timestamp": datetime.utcnow().isoformat()
-            }
+                "timestamp": datetime.utcnow().isoformat(),
+            },
         }
     else:
         # Load all judge cache files
@@ -256,8 +259,8 @@ def main() -> None:
                 "execution_info": {
                     "status": "no_valid_matches",
                     "message": "No valid tournament matches found in cache",
-                    "timestamp": datetime.utcnow().isoformat()
-                }
+                    "timestamp": datetime.utcnow().isoformat(),
+                },
             }
         else:
             print(f"🔍 Found {len(matches)} tournament matches")
@@ -279,8 +282,8 @@ def main() -> None:
                     "total_matches": total_matches,
                     "total_skills": total_skills,
                     "total_evals": total_evals,
-                    "timestamp": datetime.utcnow().isoformat()
-                }
+                    "timestamp": datetime.utcnow().isoformat(),
+                },
             }
 
             # Print quick summary
@@ -288,8 +291,10 @@ def main() -> None:
                 print(f"\n🏆 {skill_id}:")
                 print(f"   📊 {skill_data['total_matches']} total matches across {len(skill_data['evals'])} evals")
                 print("   🥇 Top 3 models:")
-                for model in skill_data['model_rankings'][:3]:
-                    print(f"      {model['rank']}. {model['model_id']} - {model['points']} pts ({model['wins']}W/{model['losses']}L/{model['ties']}T)")
+                for model in skill_data["model_rankings"][:3]:
+                    print(
+                        f"      {model['rank']}. {model['model_id']} - {model['points']} pts ({model['wins']}W/{model['losses']}L/{model['ties']}T)"
+                    )
 
     # Save results
     output_file.parent.mkdir(parents=True, exist_ok=True)
