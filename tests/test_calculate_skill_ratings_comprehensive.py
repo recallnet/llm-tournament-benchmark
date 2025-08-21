@@ -1,14 +1,13 @@
 """Comprehensive tests for calculate_skill_ratings.py to achieve 90%+ coverage."""
 
 import json
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import Mock, mock_open, patch
 
 import pytest
 
-from scripts.calculate_skill_ratings import CONSERVATIVE_MULTIPLIER, DEFAULT_MU, DEFAULT_SIGMA, SkillRatingCalculator, main
+from scripts.calculate_skill_ratings import CONSERVATIVE_MULTIPLIER, DEFAULT_MU, SkillRatingCalculator, main
 
 
 class TestSpecificLineCoverage:
@@ -283,11 +282,11 @@ class TestMainFunctionScenarios:
                 output_file.parent = output_parent
 
                 mock_path_class.side_effect = lambda x: {
-                    "data/tournament_summaries.json": summaries_file,
-                    "data/loaded_models.json": Mock(),
-                    "data/loaded_judges.json": Mock(),
-                    "data/loaded_skills.json": Mock(),
-                    "data/skill_ratings.json": output_file,
+                    "data/testonly/tournament_summaries.json": summaries_file,
+                    "data/testonly/loaded_models.json": Mock(),
+                    "data/testonly/loaded_judges.json": Mock(),
+                    "data/testonly/loaded_skills.json": Mock(),
+                    "data/testonly/skill_ratings.json": output_file,
                 }[x]
 
                 with patch("builtins.open", mock_open()) as mock_file:
@@ -388,11 +387,11 @@ class TestMainFunctionScenarios:
                 summaries_file.exists.return_value = False
 
                 mock_path_class.side_effect = lambda x: {
-                    "data/tournament_summaries.json": summaries_file,
-                    "data/loaded_models.json": Mock(),
-                    "data/loaded_judges.json": Mock(),
-                    "data/loaded_skills.json": Mock(),
-                    "data/skill_ratings.json": output_file,
+                    "data/testonly/tournament_summaries.json": summaries_file,
+                    "data/testonly/loaded_models.json": Mock(),
+                    "data/testonly/loaded_judges.json": Mock(),
+                    "data/testonly/loaded_skills.json": Mock(),
+                    "data/testonly/skill_ratings.json": output_file,
                 }[x]
 
                 with patch("builtins.open", mock_open()) as mock_file:

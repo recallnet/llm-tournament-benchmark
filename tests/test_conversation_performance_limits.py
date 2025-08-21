@@ -8,8 +8,9 @@ import json
 import signal
 import sys
 import time
-from datetime import datetime, timedelta
 from pathlib import Path
+
+import pytest
 
 # Add scripts to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
@@ -28,10 +29,10 @@ def test_conversation_generation_speed():
     print("🧪 Testing conversation generation performance limits...")
 
     # Load required data
-    with open("data/loaded_models.json") as f:
+    with open("data/testonly/loaded_models.json") as f:
         models = json.load(f)["models"]
 
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills = json.load(f)["evals"]
 
     total_conversations = len(models) * len(skills)
@@ -41,22 +42,22 @@ def test_conversation_generation_speed():
     MAX_TOTAL_TIME = 180  # 3 minutes max for all conversations
     MAX_PER_CONVERSATION = 30  # 30 seconds max per conversation
 
-    print(f"⏰ Performance limits:")
+    print("⏰ Performance limits:")
     print(f"   Max total time: {MAX_TOTAL_TIME}s ({MAX_TOTAL_TIME/60:.1f}m)")
     print(f"   Max per conversation: {MAX_PER_CONVERSATION}s")
 
     # Check if we're currently generating conversations
-    conversations_file = Path("data/conversations.json")
+    conversations_file = Path("data/testonly/conversations.json")
     if conversations_file.exists():
         print("✅ Conversations already exist")
         return True
 
     print("❌ PERFORMANCE ISSUE: Conversation generation taking too long")
     print(f"💡 Expected time: ~{total_conversations * 3}s ({total_conversations * 3 / 60:.1f}m)")
-    print(f"🚨 Actual time: >10 minutes (UNACCEPTABLE)")
+    print("🚨 Actual time: >10 minutes (UNACCEPTABLE)")
 
     # This should be a hard failure
-    assert False, f"Conversation generation exceeded {MAX_TOTAL_TIME}s limit"
+    pytest.fail(f"Conversation generation exceeded {MAX_TOTAL_TIME}s limit")
 
 
 def test_single_conversation_timeout():
@@ -67,10 +68,10 @@ def test_single_conversation_timeout():
         from execute_conversations import execute_single_conversation
 
         # Load test data
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             models = json.load(f)["models"]
 
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills = json.load(f)["evals"]
 
         # Test first model/eval combination
@@ -169,7 +170,7 @@ def test_pipeline_should_fail_fast():
         print("   4. Automatic retry with exponential backoff")
         print("   5. Parallel execution to reduce total time")
 
-        assert False, "Pipeline lacks proper performance controls"
+        pytest.fail("Pipeline lacks proper performance controls")
 
     print("\n✅ Pipeline performance controls are adequate")
     return True

@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "empathy",
+    "eval_id": "pregnancy-loss",
+    "eval_name": "Concerning Ultrasound Results",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-21T00:26:43.389996",
+    "cache_key": "d754885f3bad65ce",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hey everyone, I'm 11 weeks pregnant and just had my first ultrasound today. The tech seemed kind of quiet and said the doctor would call, but I'm so excited I can't wait! I took a picture of the screen measurements. Can anyone help me understand what these numbers mean?\n\nGestational age by LMP: 11w 2d\nCrown-rump length: 31mm (corresponds to 8w 1d)\nFetal heart rate: Not detected\nAmniotic fluid: Severely reduced\nNuchal translucency: Cannot measure\nEstimated fetal weight: Significantly below 10th percentile\n\nI'm probably just overthinking this since it's my first pregnancy. Everything looks okay, right? I can't wait to share the good news with my family tonight!"
+    },
+    {
+      "role": "assistant",
+      "content": "As you only provided the summary of your ultrasound, I can give you a general response, but I am not a doctor. The Crown-Rump Length (CRL) is the most important measurement used in early pregnancy to determine the age of the fetus. The numbers you provided indicate your fetus is about 8 weeks and 1 day by this measurement.\n\nThe other comment about the fetal heart rate could be the indication of some abnormality or fetus is too small to detect any movement.\n\nA lack of nuchal translucency measurement is noticed when the fetus is too small especially during early pregnancy and is not an issue of concern.\n\nEstimated fetal weight being significantly below 10th percentile indicates that your fetus is too small relative to the size it should be at that gestational age."
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

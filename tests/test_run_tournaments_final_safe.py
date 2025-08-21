@@ -1,11 +1,8 @@
 """Safe final tests to push coverage closer to 90% without breaking functionality."""
 
-import json
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
-
-import pytest
+from unittest.mock import patch
 
 from scripts.run_tournaments import JudgeExecutor, SwissTournament, TournamentMatch
 

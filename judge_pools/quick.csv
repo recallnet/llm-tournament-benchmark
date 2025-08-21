@@ -1,0 +1,4 @@
+id,author,slug,context_window,pricing,endpoint,max_tokens
+inception/mercury,Inception,mercury,32768,input:0.0001,openrouter,4000000
+thedrummer/unslopnemo-12b,TheDrummer,unslopnemo-12b,32768,input:0.0001,openrouter,4000000
+openai/gpt-oss-20b,OpenAI,gpt-oss-20b,131072,input:0.0001,openrouter,4000000

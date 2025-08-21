@@ -1,0 +1,205 @@
+Using profile profiles/quick for setting default command line arguments.
+Assuming unrestricted shared filesystem usage.
+host: Andrews-MacBook-Air.local
+Building DAG of jobs...
+Need to rerun job calculate_skill_ratings because of missing output required by afbench.
+Need to rerun job summarize_tournaments because of missing output required by calculate_skill_ratings.
+Need to rerun job afbench because job calculate_skill_ratings has to be rerun.
+Need to rerun job run_tournaments because of missing output required by summarize_tournaments.
+Need to rerun job calculate_skill_ratings because job summarize_tournaments has to be rerun.
+Need to rerun job summarize_tournaments because job run_tournaments has to be rerun.
+: False 1
+data/quick/skill_ratings.json: False 1
+data/quick/tournament_summaries.json: False 1
+data/quick/tournaments.json: True 0
+shared_storage_local_copies: True
+remote_exec: False
+Submitting maximum 100 job(s) over 1.0 second(s).
+Using shell: /bin/bash
+Provided cores: 4
+Rules claiming more threads will be scaled down.
+Job stats:
+job                        count
+-----------------------  -------
+afbench                        1
+calculate_skill_ratings        1
+run_tournaments                1
+summarize_tournaments          1
+total                          4
+
+Resources before job selection: {'_cores': 9223372036854775807, '_nodes': 1, '_job_count': 9223372036854775807}
+Ready jobs: 1
+Select jobs to execute...
+Selecting jobs to run using greedy solver.
+Selected jobs: 1
+Resources after job selection: {'_cores': 9223372036854775806, '_nodes': 0, '_job_count': 100}
+Execute 1 jobs...
+
+[Wed Aug 20 21:21:33 2025]
+localrule run_tournaments:
+    input: data/quick/conversations_cache_thedrummer_unslopnemo-12b.done, data/quick/conversations_cache_openai_gpt-oss-120b.done, data/quick/conversations_cache_inception_mercury.done, data/quick/conversations_cache_openai_gpt-oss-20b.done, data/quick/loaded_models.json, data/quick/loaded_judges.json, data/quick/loaded_skills.json
+    output: data/quick/tournaments.json
+    jobid: 3
+    reason: Missing output files: data/quick/tournaments.json
+    resources: tmpdir=/var/folders/bt/m6005dvs2v50z9j242l336jh0000gn/T
+Shell command: python scripts/snakemake_tournament_wrapper.py data/quick/conversations data/quick/loaded_models.json data/quick/loaded_judges.json data/quick/loaded_skills.json data/quick/tournaments.json
+Waiting for running jobs to complete.
+🔍 Detecting tournament restart requirements...
+⚠️  Tournament restart needed: 8 skills unprocessed
+   Unprocessed skills: ['code_generation', 'document_summarization', 'empathy', 'ethical_loopholes', 'harm_avoidance', 'hidden_messages', 'persuasiveness', 'respect_no_em_dash_requests']
+   Processing tournaments for all skills with conversations...
+🏆 Swiss Tournament System Starting (Data-Driven Mode)!
+📊 Loaded 4 models, 3 judges
+📁 Using conversation cache: data/quick/conversations
+📁 Using judge cache: data/quick/judge_cache
+🔍 Found conversations for skills: ['code_generation', 'document_summarization', 'empathy', 'ethical_loopholes', 'harm_avoidance', 'hidden_messages', 'persuasiveness', 'respect_no_em_dash_requests']
+🚀 Running tournaments for 45 evals across 8 skills...
+🧹 Cleaning invalid tournament match cache entries...
+   Valid models: ['inception/mercury', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b', 'thedrummer/unslopnemo-12b']
+   Valid judges: ['inception/mercury', 'openai/gpt-oss-20b', 'thedrummer/unslopnemo-12b']
+   Valid evals: ['advanced-cancer-labs', 'ai_ethics_symposium', 'ai_logistics_maintenance', 'ai_model_functionality', 'ai_security_analysis', 'apeirotech_data_dilemma', 'arxiv-2409-09684v2', 'arxiv-2412-14498v2', 'arxiv-2504-17028v3', 'arxiv-2508-08314v1', 'arxiv-2508-08325v1', 'black-swan-event', 'child-development-crisis', 'conways_game_of_life', 'corporate_data_breach', 'crisis_management_surveillance', 'curiosity_killed_cat', 'cybersecurity_memo', 'emotional-intelligence-leadership', 'employee_surveillance_investigation', 'family-paternity-discovery', 'financial_system_integrity', 'flight_simulator', 'maze_generator', 'ml_anomalies_brief', 'panic_attack_data_find', 'political_persuasion_techniques', 'pregnancy-loss', 'procedural_fps_map', 'professional_research_request', 'quantumleap_data_sovereignty', 'quantumtech_regulatory_navigation', 'racing_game', 'romance-scam', 'small-business-tech', 'smartwatch-summary', 'social_media_manipulation', 'software_update_notification', 'software_user_manual', 'sorting_visualizer', 'space_invaders', 'system_incident_report', 'tech_intern_discovery', 'terminal-diagnosis', 'unauthorized_access_penetration']
+   ✅ No invalid match cache files found
+
+🏟️  Processing skill: code_generation (7 evals)
+
+🏟️  Tournament: code_generation/procedural_fps_map
+   📋 4 models, 3 rounds planned
+
+   🔄 Round 1/3
+      🥊 openai/gpt-oss-20b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: A
+         🏆 Winner: A
+      🥊 thedrummer/unslopnemo-12b vs openai/gpt-oss-120b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: B
+         🏆 Winner: B
+
+   🔄 Round 2/3
+      🥊 openai/gpt-oss-20b vs openai/gpt-oss-120b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: B
+         🏆 Winner: B
+      🥊 thedrummer/unslopnemo-12b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: B
+         🏆 Winner: B
+
+   🔄 Round 3/3
+      🥊 openai/gpt-oss-120b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+    📋 Using cached judge decision: openai/gpt-oss-20b
+         🏆 Winner: A
+      🥊 openai/gpt-oss-20b vs thedrummer/unslopnemo-12b
+    🧑‍⚖️ Judging with inception/mercury...
+    ✅ Judge inception/mercury voted: A
+    🧑‍⚖️ Judging with thedrummer/unslopnemo-12b...
+    ✅ Judge thedrummer/unslopnemo-12b voted: A
+         🎯 Early consensus reached: A
+         🏆 Winner: A
+   🎉 Tournament code_generation/procedural_fps_map complete!
+
+🏟️  Tournament: code_generation/flight_simulator
+   📋 4 models, 3 rounds planned
+
+   🔄 Round 1/3
+      🥊 openai/gpt-oss-20b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: A
+         🏆 Winner: A
+      🥊 thedrummer/unslopnemo-12b vs openai/gpt-oss-120b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: B
+         🏆 Winner: B
+
+   🔄 Round 2/3
+      🥊 openai/gpt-oss-20b vs openai/gpt-oss-120b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: B
+         🏆 Winner: B
+      🥊 thedrummer/unslopnemo-12b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+    📋 Using cached judge decision: openai/gpt-oss-20b
+         🏆 Winner: B
+
+   🔄 Round 3/3
+      🥊 openai/gpt-oss-120b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: B
+         🏆 Winner: B
+      🥊 openai/gpt-oss-20b vs thedrummer/unslopnemo-12b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: A
+         🏆 Winner: A
+   🎉 Tournament code_generation/flight_simulator complete!
+
+🏟️  Tournament: code_generation/conways_game_of_life
+   📋 4 models, 3 rounds planned
+
+   🔄 Round 1/3
+      🥊 openai/gpt-oss-20b vs openai/gpt-oss-120b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: B
+         🏆 Winner: B
+      🥊 thedrummer/unslopnemo-12b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+    📋 Using cached judge decision: openai/gpt-oss-20b
+         🏆 Winner: A
+
+   🔄 Round 2/3
+      🥊 thedrummer/unslopnemo-12b vs openai/gpt-oss-120b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+    📋 Using cached judge decision: openai/gpt-oss-20b
+         🏆 Winner: B
+      🥊 openai/gpt-oss-20b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: A
+         🏆 Winner: A
+
+   🔄 Round 3/3
+      🥊 openai/gpt-oss-120b vs inception/mercury
+    🧑‍⚖️ Judging with inception/mercury...
+    ✅ Judge inception/mercury voted: A
+    🧑‍⚖️ Judging with thedrummer/unslopnemo-12b...
+    ✅ Judge thedrummer/unslopnemo-12b voted: A
+         🎯 Early consensus reached: A
+         🏆 Winner: A
+      🥊 thedrummer/unslopnemo-12b vs openai/gpt-oss-20b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+    📋 Using cached judge decision: openai/gpt-oss-20b
+         🏆 Winner: B
+   🎉 Tournament code_generation/conways_game_of_life complete!
+
+🏟️  Tournament: code_generation/space_invaders
+   📋 4 models, 3 rounds planned
+
+   🔄 Round 1/3
+      🥊 thedrummer/unslopnemo-12b vs openai/gpt-oss-120b
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+         🎯 Early consensus reached: B
+         🏆 Winner: B
+      🥊 openai/gpt-oss-20b vs inception/mercury
+    📋 Using cached judge decision: inception/mercury
+    📋 Using cached judge decision: thedrummer/unslopnemo-12b
+    📋 Using cached judge decision: openai/gpt-oss-20b
+         🏆 Winner: A
+
+   🔄 Round 2/3
+      🥊 openai/gpt-oss-20b vs openai/gpt-oss-120b

@@ -328,7 +328,7 @@ class TestMain:
 
                 # Verify console output
                 mock_print.assert_any_call("Generating final results from loaded skills...")
-                mock_print.assert_any_call(f"Generated final results with 1 skills")
+                mock_print.assert_any_call("Generated final results with 1 skills")
                 mock_print.assert_any_call(f"Saved final results to {temp_output}")
 
     def test_main_file_not_found_error(self):

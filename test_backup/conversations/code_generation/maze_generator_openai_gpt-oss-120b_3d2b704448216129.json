@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "maze_generator",
+    "eval_name": "Maze Generator with A* Solver",
+    "model_id": "openai/gpt-oss-120b",
+    "model_slug": "gpt-oss-120b",
+    "model_author": "OpenAI",
+    "timestamp": "2025-08-20T23:09:46.094833",
+    "cache_key": "3d2b704448216129",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that generates and solves mazes with step-by-step visualization.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Generates maze using recursive division algorithm\n- Solves maze using A* search algorithm\n- Step-by-step visualization of both generation and solving process\n- Visual indicators for different states (walls, paths, current search, solution)\n- No external libraries, works in most browsers\n- Clean, efficient code with proper error handling\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function runMaze(canvasId){const sleep=ms=>new Promise(r=>setTimeout(r,r));function err(e){console.error(e);throw new Error(e);}const canvas=document.getElementById(canvasId);if(!canvas)err('Canvas not found');const ctx=canvas.getContext('2d');if(!ctx)err('2D context not available');const size=500;canvas.width=size;canvas.height=size;const cols=25,rows=25;const cellSize=size/cols;const WALL=1,PATH=0;const grid=Array.from({length:rows},()=>Array(cols).fill(PATH));function drawCell(x,y,color){ctx.fillStyle=color;ctx.fillRect(x*cellSize,y*cellSize,cellSize,cellSize);}function drawAll(){for(let y=0;y<rows;y++)for(let x=0;x<cols;x++)drawCell(x,y,grid[y][x]===WALL?'#000':'#fff');}function randomEven(min,max){let v=Math.floor(Math.random()*(max-min+1))+min;return v%2===0?v:v+1<=max?v+1:v-1;}function randomOdd(min,max){let v=Math.floor(Math.random()*(max-min+1))+min;return v%2===1?v:v+1<=max?v+1:v-1;}async function divide(x,y,w,h,orientation){if(w<2||h<2)return;let horizontal=orientation==='H';let wx,wy;let passageX,passageY;if(horizontal){wy=randomEven(y+1,y+h-2);for(let i=x;i<x+w;i++){grid[wy][i]=WALL;drawCell(i,wy,'#000');await sleep(5);}passageX=randomOdd(x,x+w-1);grid[wy][passageX]=PATH;drawCell(passageX,wy,'#fff');await sleep(5);await divide(x,y,w,wy-y,'H');await divide(x,wy+1,w,y+h-wy-1,'H');}else{wx=randomEven(x+1,x+w-2);for(let i=y;i<y+h;i++){grid[i][wx]=WALL;drawCell(wx,i,'#000');await sleep(5);}passageY=randomOdd(y,y+h-1);grid[passageY][wx]=PATH;drawCell(wx,passageY,'#fff');await sleep(5);await divide(x,y,wx-x,h,'V');await divide(wx+1,y,x+w-wx-1,h,'V');}}async function generate(){await divide(0,0,cols,rows,cols>rows?'V':'H');grid[0][0]=PATH;grid[rows-1][cols-1]=PATH;drawCell(0,0,'#fff');drawCell(cols-1,rows-1,'#fff');}function heuristic(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y);}async function solve(){const open=[];const closed=new Set();function enc(p){return p.x+','+p.y;}open.push({x:0,y:0,g:0,f:heuristic({x:0,y:0},{x:cols-1,y:rows-1}),parent:null});while(open.length){open.sort((a,b)=>a.f-b.f);const current=open.shift();if(enc(current)==enc({x:cols-1,y:rows-1})){let node=current;while(node){drawCell(node.x,node.y,'#0f0');await sleep(5);node=node.parent;}return;}drawCell(current.x,current.y,'#00f');await sleep(5);closed.add(enc(current));const dirs=[[1,0],[-1,0],[0,1],[0,-1]];for(const[dx,dy]of dirs){const nx=current.x+dx,ny=current.y+dy;if(nx<0||ny<0||nx>=cols||ny>=rows)continue;if(grid[ny][nx]===WALL)continue;if(closed.has(enc({x:nx,y:ny})))continue;const g=current.g+1;const f=g+heuristic({x:nx,y:ny},{x:cols-1,y:rows-1});open.push({x:nx,y:ny,g,f,parent:current});drawCell(nx,ny,'#aaa');await sleep(5);}}drawAll();await generate();await solve();}"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

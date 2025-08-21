@@ -230,10 +230,29 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
     return tournament_summaries
 
 
-def main() -> None:
+def main(tournaments_dir: Path | str | None = None, output_file: Path | str | None = None) -> None:
     """Main function for tournament summarization."""
-    tournaments_dir = Path("data/tournaments")
-    output_file = Path("data/tournament_summaries.json")
+    if tournaments_dir is None:
+        # SAFETY: Require explicit data directory
+        data_dir_env = os.getenv("AFBENCH_DATA_DIR")
+        if not data_dir_env:
+            raise ValueError(
+                "🚨 SAFETY: summarize_tournaments.py requires explicit data directory.\n"
+                "Set AFBENCH_DATA_DIR environment variable or pass tournaments_dir parameter."
+            )
+        tournaments_dir = Path(data_dir_env) / "judge_cache"
+    else:
+        tournaments_dir = Path(tournaments_dir)
+
+    if output_file is None:
+        # Use same data directory for output file
+        if tournaments_dir.name == "judge_cache":
+            data_dir = tournaments_dir.parent
+        else:
+            data_dir = tournaments_dir  # fallback
+        output_file = data_dir / "tournament_summaries.json"
+    else:
+        output_file = Path(output_file)
 
     print("📊 Tournament Summarizer Starting!")
 

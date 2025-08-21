@@ -1,0 +1,11 @@
+# AFBench Quick Profile
+# Usage: snakemake --profile quick
+
+# Default execution settings
+cores: 4
+keep-going: true
+printshellcmds: true
+
+# Quick environment overrides
+configfiles:
+  - config/quick_config.yaml

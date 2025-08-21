@@ -66,7 +66,11 @@ def test_input_data_validity():
     """Test if input data files are valid and complete."""
     print("\n🧪 Testing input data validity...")
 
-    required_files = ["data/loaded_models.json", "data/loaded_skills.json", "data/loaded_judges.json"]
+    required_files = [
+        "data/testonly/loaded_models.json",
+        "data/testonly/loaded_skills.json",
+        "data/testonly/loaded_judges.json",
+    ]
 
     for file_path in required_files:
         if not Path(file_path).exists():
@@ -186,37 +190,36 @@ def test_should_conversation_generation_be_skipped():
     """Test if conversation generation should be skipped entirely."""
     print("\n🧪 Testing if conversation generation should be skipped...")
 
-    # If conversations already exist and are valid, skip generation
-    conversations_file = Path("data/conversations.json")
+    # Check for cache marker files that indicate completed conversation generation
+    data_dir = Path("data")
+    cache_markers = list(data_dir.glob("conversations_cache_*.done"))
 
-    if conversations_file.exists():
-        try:
-            with open(conversations_file) as f:
-                conversations_data = json.load(f)
+    if not cache_markers:
+        print("⚠️ No conversation cache markers found - generation needed")
+        return False
 
-            conversations = conversations_data.get("conversations", [])
+    print(f"✅ Found {len(cache_markers)} conversation cache markers:")
+    for marker in cache_markers:
+        print(f"   📄 {marker.name}")
 
-            if len(conversations) > 0:
-                # Check if conversations have valid structure
-                valid_conversations = 0
-                for conv in conversations:
-                    if (conv.get("steps") and len(conv["steps"]) > 0) or (conv.get("messages") and len(conv["messages"]) > 0):
-                        valid_conversations += 1
-
-                if valid_conversations == len(conversations):
-                    print(f"✅ Found {len(conversations)} valid conversations")
-                    print("💡 Conversation generation should be skipped")
-                    return True
-                else:
-                    print(f"⚠️ Only {valid_conversations}/{len(conversations)} conversations are valid")
-                    print("💡 Conversation generation should be rerun")
-                    return False
-
-        except json.JSONDecodeError:
-            print("❌ conversations.json is corrupted")
+        # Verify marker file has content
+        if marker.stat().st_size == 0:
+            print(f"   ⚠️ {marker.name} is empty - may need regeneration")
             return False
 
-    print("⚠️ No valid conversations found - generation needed")
+    # Also check if individual conversation cache files exist
+    conversations_dir = data_dir / "conversations"
+    if conversations_dir.exists():
+        cache_files = list(conversations_dir.rglob("*.json"))
+        if cache_files:
+            print(f"✅ Found {len(cache_files)} individual conversation cache files")
+            print("💡 Conversation generation should be skipped")
+            return True
+        else:
+            print("⚠️ No individual conversation cache files found despite markers")
+            return False
+    else:
+        print("⚠️ Conversations cache directory doesn't exist")
     return False
 
 

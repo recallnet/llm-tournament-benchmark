@@ -4,7 +4,6 @@ End-to-end cache invalidation testing.
 Verifies that changes in one stage properly invalidate downstream caches.
 """
 
-import hashlib
 import json
 import shutil
 import sys
@@ -18,16 +17,16 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 def simulate_conversation_cache_generation():
     """Simulate generating conversation cache keys."""
     try:
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             models_data = json.load(f)
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills_data = json.load(f)
     except FileNotFoundError:
         return None
 
     from execute_conversations import ConversationExecutor
 
-    executor = ConversationExecutor(Path("data/conversations"), Path("data/intermediaries"))
+    executor = ConversationExecutor(Path("data/testonly/conversations"), Path("data/testonly/intermediaries"))
 
     # Generate cache keys for current state
     cache_keys = {}
@@ -54,7 +53,7 @@ def test_eval_modification_invalidation():
     # Modify eval configuration in memory (simulating loaded_skills.json change)
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_skills = Path(temp_dir) / "loaded_skills.json"
-        shutil.copy("data/loaded_skills.json", temp_skills)
+        shutil.copy("data/testonly/loaded_skills.json", temp_skills)
 
         # Modify the skills data
         with open(temp_skills) as f:
@@ -70,8 +69,8 @@ def test_eval_modification_invalidation():
             json.dump(skills_data, f, indent=2)
 
         # Temporarily replace the skills file
-        original_skills = Path("data/loaded_skills.json")
-        backup_skills = Path("data/loaded_skills.json.backup")
+        original_skills = Path("data/testonly/loaded_skills.json")
+        backup_skills = Path("data/testonly/loaded_skills.json.backup")
 
         try:
             shutil.copy(original_skills, backup_skills)
@@ -100,15 +99,11 @@ def test_eval_modification_invalidation():
                         return False
                     else:
                         changed_keys += 1
+                elif original_key != modified_key:
+                    print(f"   ❌ Cache key should NOT change for unmodified eval {eval_id}: {original_key} -> {modified_key}")
+                    return False
                 else:
-                    # This eval was not modified - key should stay same
-                    if original_key != modified_key:
-                        print(
-                            f"   ❌ Cache key should NOT change for unmodified eval {eval_id}: {original_key} -> {modified_key}"
-                        )
-                        return False
-                    else:
-                        unchanged_keys += 1
+                    unchanged_keys += 1
 
             print(f"   ✅ {changed_keys} cache keys properly invalidated for modified eval")
             print(f"   ✅ {unchanged_keys} cache keys properly preserved for unmodified evals")
@@ -132,8 +127,8 @@ def test_model_removal_invalidation():
         return True
 
     # Temporarily remove a model
-    original_models = Path("data/loaded_models.json")
-    backup_models = Path("data/loaded_models.json.backup")
+    original_models = Path("data/testonly/loaded_models.json")
+    backup_models = Path("data/testonly/loaded_models.json.backup")
 
     try:
         shutil.copy(original_models, backup_models)
@@ -218,9 +213,9 @@ def test_collision_resistance():
     print("\n🧪 Testing cache key collision resistance...")
 
     try:
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             models_data = json.load(f)
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills_data = json.load(f)
     except FileNotFoundError:
         print("   ⚠️ Cannot load test data - skipping")
@@ -228,7 +223,7 @@ def test_collision_resistance():
 
     from execute_conversations import ConversationExecutor
 
-    executor = ConversationExecutor(Path("data/conversations"), Path("data/intermediaries"))
+    executor = ConversationExecutor(Path("data/testonly/conversations"), Path("data/testonly/intermediaries"))
 
     # Create slightly different eval configurations
     base_eval = skills_data["evals"][0]
@@ -286,7 +281,7 @@ if __name__ == "__main__":
             results.append((test_name, False))
 
     # Summary
-    print(f"\n📋 END-TO-END CACHE INVALIDATION SUMMARY:")
+    print("\n📋 END-TO-END CACHE INVALIDATION SUMMARY:")
     passed = 0
     for test_name, result in results:
         status = "✅ PASS" if result else "❌ FAIL"

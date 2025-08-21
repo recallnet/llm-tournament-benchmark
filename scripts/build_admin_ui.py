@@ -54,10 +54,10 @@ def clean_site_directory():
 
     if site_dir.exists():
         shutil.rmtree(site_dir)
-        print(f"🗑️  Removed existing site directory")
+        print("🗑️  Removed existing site directory")
 
     site_dir.mkdir()
-    print(f"📁 Created fresh site directory")
+    print("📁 Created fresh site directory")
 
 
 def check_dependencies():
@@ -165,7 +165,7 @@ def validate_streamlit_app():
         )
 
         if result.returncode != 0:
-            print(f"❌ App import failed:")
+            print("❌ App import failed:")
             print(result.stderr)
             sys.exit(1)
 

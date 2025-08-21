@@ -1,2 +1,4 @@
 id,author,slug,context_window,pricing,endpoint,max_tokens
-openai/gpt-4-turbo,OpenAI,gpt-4-turbo,128000,input:0.01,openai,4096
+meta-llama/llama-4-scout,meta-llama,meta_llama_llama_4_scout,1048576,0.0,openrouter,4096
+openai/gpt-oss-20b,OpenAI,gpt-oss-20b,131072,input:0.0001,openrouter,4000000
+deepseek/deepseek-r1-0528-qwen3-8b,deepseek,deepseek_deepseek_0528_qwen3_8b,131072,0.0,openrouter,4096

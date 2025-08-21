@@ -22,9 +22,8 @@ load_dotenv(dotenv_path=".env.local")
 class ConversationExecutor:
     """Executes conversations between models and evals with caching."""
 
-    def __init__(
-        self, cache_dir: Path = Path("data/conversations"), intermediary_cache_dir: Path = Path("data/intermediaries")
-    ):
+    def __init__(self, cache_dir: Path, intermediary_cache_dir: Path):
+        # SAFETY: Cache directories must always be provided by caller to prevent path confusion
         self.api_key = os.getenv("OPENROUTER_API_KEY")
         if not self.api_key:
             raise ValueError("OPENROUTER_API_KEY not found in environment")
@@ -408,6 +407,11 @@ def cleanup_stale_cache(models: list, judges: list, cache_dir: Path, intermediar
 def execute_all_conversations(models_file: Path, skills_file: Path, judges_file: Path, output_file: Path):
     """Execute conversations for all model-eval pairs."""
 
+    # Define cache directories from output file path structure
+    data_dir = output_file.parent
+    cache_dir = data_dir / "conversations"
+    intermediary_cache_dir = data_dir / "intermediaries"
+
     # Load models, skills, and judges
     with open(models_file) as f:
         models_data = json.load(f)
@@ -425,7 +429,7 @@ def execute_all_conversations(models_file: Path, skills_file: Path, judges_file:
     print(f"🎯 Executing conversations for {len(models)} models x {len(evals)} evals = {len(models) * len(evals)} total")
     print(f"🧑‍⚖️ Using {len(judges)} judge models for intermediaries (primary: {judges[0]['id'] if judges else 'none'})")
 
-    executor = ConversationExecutor()
+    executor = ConversationExecutor(cache_dir, intermediary_cache_dir)
 
     # Clean up stale cache entries
     cleanup_stale_cache(models, judges, executor.cache_dir, executor.intermediary_cache_dir)
@@ -538,11 +542,19 @@ def main():
         judges_file = Path(snakemake.input.judges)
         output_file = Path(snakemake.output[0])
     else:
-        # Called directly for testing
-        models_file = Path("data/loaded_models.json")
-        skills_file = Path("data/loaded_skills.json")
-        judges_file = Path("data/loaded_judges.json")
-        output_file = Path("data/conversations.json")
+        # Called directly - MUST provide data_dir via environment variable
+        data_dir_env = os.getenv("AFBENCH_DATA_DIR")
+        if not data_dir_env:
+            raise ValueError(
+                "🚨 SAFETY: execute_conversations.py requires explicit data directory.\n"
+                "Set AFBENCH_DATA_DIR environment variable or run via Snakemake."
+            )
+
+        data_dir = Path(data_dir_env)
+        models_file = data_dir / "loaded_models.json"
+        skills_file = data_dir / "loaded_skills.json"
+        judges_file = data_dir / "loaded_judges.json"
+        output_file = data_dir / "conversations.json"
 
     execute_all_conversations(models_file, skills_file, judges_file, output_file)
 

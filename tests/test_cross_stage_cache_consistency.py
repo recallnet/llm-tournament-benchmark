@@ -4,10 +4,10 @@ Test cross-stage cache consistency to ensure changes propagate correctly through
 """
 
 import json
-import shutil
 import sys
-import tempfile
 from pathlib import Path
+
+from .test_utils_judge_cache import get_judge_cache_dir
 
 # Add scripts to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
@@ -18,8 +18,8 @@ def test_conversation_to_tournament_consistency():
     print("🔗 Testing conversation-to-tournament cache consistency...")
 
     # Check if we have both conversation and tournament data
-    conv_files = list(Path("data/conversations").glob("*/*.json"))
-    tournament_files = list(Path("data/tournaments").glob("*/*.json"))
+    conv_files = list(Path("data/testonly/conversations").glob("*/*.json"))
+    tournament_files = list(get_judge_cache_dir().glob("*/*.json"))
 
     if not conv_files:
         print("   ⚠️ No conversation files - skipping")
@@ -90,14 +90,14 @@ def test_tournament_to_ratings_consistency():
     print("\n🔗 Testing tournament-to-ratings cache consistency...")
 
     # Check for skill rating files
-    rating_files = list(Path("data/skill_ratings").glob("*.json"))
+    rating_files = list(Path("data/testonly/skill_ratings").glob("*.json"))
     if not rating_files:
         print("   ⚠️ No skill rating files - skipping")
         return True
 
     # Load tournament summaries
     try:
-        with open("data/tournament_summaries.json") as f:
+        with open("data/testonly/tournament_summaries.json") as f:
             tournament_summaries = json.load(f)
     except FileNotFoundError:
         print("   ⚠️ No tournament summaries file - skipping")
@@ -135,9 +135,9 @@ def test_model_judge_consistency_across_stages():
     print("\n🔗 Testing model/judge consistency across pipeline stages...")
 
     try:
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             models_data = json.load(f)
-        with open("data/loaded_judges.json") as f:
+        with open("data/testonly/loaded_judges.json") as f:
             judges_data = json.load(f)
     except FileNotFoundError:
         print("   ⚠️ Model/judge data not found - skipping")
@@ -147,7 +147,7 @@ def test_model_judge_consistency_across_stages():
     current_judge_ids = {judge["id"] for judge in judges_data["judges"]}
 
     # Check conversation files
-    conv_files = list(Path("data/conversations").glob("*/*.json"))
+    conv_files = list(Path("data/testonly/conversations").glob("*/*.json"))
     for conv_file in conv_files[:5]:  # Sample check
         try:
             with open(conv_file) as f:
@@ -163,7 +163,7 @@ def test_model_judge_consistency_across_stages():
             return False
 
     # Check tournament files
-    tournament_files = list(Path("data/tournaments").glob("*/*.json"))
+    tournament_files = list(get_judge_cache_dir().glob("*/*.json"))
     for tournament_file in tournament_files[:3]:  # Sample check
         try:
             with open(tournament_file) as f:
@@ -200,7 +200,7 @@ def test_eval_id_consistency():
     print("\n🔗 Testing eval ID consistency across pipeline stages...")
 
     try:
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills_data = json.load(f)
     except FileNotFoundError:
         print("   ⚠️ Skills data not found - skipping")
@@ -209,7 +209,7 @@ def test_eval_id_consistency():
     current_eval_ids = {eval_data["id"] for eval_data in skills_data["evals"]}
 
     # Check conversation files
-    conv_files = list(Path("data/conversations").glob("*/*.json"))
+    conv_files = list(Path("data/testonly/conversations").glob("*/*.json"))
     for conv_file in conv_files:
         try:
             with open(conv_file) as f:
@@ -225,7 +225,7 @@ def test_eval_id_consistency():
             return False
 
     # Check tournament files
-    tournament_files = list(Path("data/tournaments").glob("*/*.json"))
+    tournament_files = list(get_judge_cache_dir().glob("*/*.json"))
     for tournament_file in tournament_files:
         try:
             with open(tournament_file) as f:
@@ -264,7 +264,7 @@ if __name__ == "__main__":
             results.append((test_name, False))
 
     # Summary
-    print(f"\n📋 CROSS-STAGE CACHE CONSISTENCY SUMMARY:")
+    print("\n📋 CROSS-STAGE CACHE CONSISTENCY SUMMARY:")
     passed = 0
     for test_name, result in results:
         status = "✅ PASS" if result else "❌ FAIL"

@@ -1,6 +1,9 @@
 # AFBench Production Configuration
 # Overrides config.yaml for production environment
 
+# Data directory - production data 
+data_dir: "data/production"
+
 # Model pool configuration - use production pool
 model_pool:
   default_pool: "production"

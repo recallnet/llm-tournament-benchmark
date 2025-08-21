@@ -31,10 +31,10 @@ def test_minimal_conversation_generation():
         from execute_conversations import ConversationExecutor
 
         # Load test data
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             models = json.load(f)["models"]
 
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills = json.load(f)["evals"]
 
         # Use first model and eval

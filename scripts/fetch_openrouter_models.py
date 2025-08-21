@@ -100,11 +100,19 @@ def main():
         full_output_path = Path(snakemake.output[0])
         filtered_output_path = Path(snakemake.output[1])
     else:
-        # Called directly for testing
-        models_path = Path("data/loaded_models.json")
-        judges_path = Path("data/loaded_judges.json")
-        full_output_path = Path("data/openrouter_models_full.json")
-        filtered_output_path = Path("data/openrouter_models_filtered.json")
+        # Called directly - MUST provide data_dir via environment variable
+        data_dir_env = os.getenv("AFBENCH_DATA_DIR")
+        if not data_dir_env:
+            raise ValueError(
+                "🚨 SAFETY: fetch_openrouter_models.py requires explicit data directory.\n"
+                "Set AFBENCH_DATA_DIR environment variable or run via Snakemake."
+            )
+
+        data_dir = Path(data_dir_env)
+        models_path = data_dir / "loaded_models.json"
+        judges_path = data_dir / "loaded_judges.json"
+        full_output_path = data_dir / "openrouter_models_full.json"
+        filtered_output_path = data_dir / "openrouter_models_filtered.json"
 
     print("Fetching OpenRouter models...")
 

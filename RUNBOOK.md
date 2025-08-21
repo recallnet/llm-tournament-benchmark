@@ -28,13 +28,13 @@ AFBench uses Snakemake to orchestrate a multi-stage AI model evaluation pipeline
 
 AFBench supports two execution profiles for different environments:
 
-#### Test Profile
+#### Quick Profile  
 ```bash
-# Run with test profile (fast, lightweight models)
-snakemake --profile profiles/test
+# Run with quick profile (fast, lightweight models)
+snakemake --profile profiles/quick
 
 # Development workflow: unlock and run AFBench tournament pipeline
-snakemake --unlock && snakemake afbench --profile profiles/test
+snakemake --unlock && snakemake afbench --profile profiles/quick
 ```
 
 **Expected Output**: Complete evaluation pipeline using test model pools, single-core execution, and smaller samples for rapid testing. The `afbench` rule runs the tournament pipeline and prints results table.
@@ -66,7 +66,7 @@ snakemake --cores 4
 snakemake --dry-run
 
 # Or with specific profile
-snakemake --profile profiles/test --dry-run
+snakemake --profile profiles/quick --dry-run
 ```
 
 **Expected Output**: List of rules that would be executed with their dependencies, useful for validating pipeline structure.
@@ -77,7 +77,7 @@ snakemake --profile profiles/test --dry-run
 snakemake --cores 4 --configfile config/config.yaml
 
 # Profile-based configuration (recommended)
-snakemake --profile profiles/test --configfile config/custom_config.yaml
+snakemake --profile profiles/quick --configfile config/custom_config.yaml
 ```
 
 **Expected Output**: Same as full pipeline but using specified configuration parameters.
@@ -86,14 +86,31 @@ snakemake --profile profiles/test --configfile config/custom_config.yaml
 
 #### AFBench Tournament Pipeline (Most Used)
 ```bash
-# Development workflow - run tournament pipeline with test profile
-snakemake --unlock && snakemake afbench --profile profiles/test
+# Development workflow - run tournament pipeline with quick profile (parallel execution)
+snakemake --unlock && snakemake afbench --profile profiles/quick
 
-# Production workflow - run tournament pipeline with production profile
+# Production workflow - run tournament pipeline with production profile (parallel execution)
 snakemake --unlock && snakemake afbench --profile profiles/production
+
+# Recommended: limit to 5 concurrent models (*be respectful of OpenRouter API)
+snakemake --unlock && snakemake afbench --profile profiles/quick -j 5
 ```
 
-**Expected Output**: Runs the complete AFBench tournament evaluation pipeline and prints final results table to console.
+**Expected Output**: Runs the complete AFBench tournament evaluation pipeline with parallel conversation execution and prints final results table to console.
+
+#### Quick Commands for Parallel Execution
+```bash
+# Recommended parallel execution (*be respectful of OpenRouter API)
+snakemake --profile profiles/quick -j 5 data/conversations.json
+
+# Conservative parallel execution (for slower systems or API limits)
+snakemake --profile profiles/quick -j 2 data/conversations.json
+
+# Debug individual model execution
+snakemake --profile profiles/quick data/conversations_thedrummer_unslopnemo-12b.json
+```
+
+**⚠️ Important**: Always use `-j 4` to `-j 6` to be respectful of OpenRouter API rate limits. Avoid running without job limits as this can overwhelm the API service.
 
 #### Unlock Workflow
 ```bash
@@ -101,7 +118,7 @@ snakemake --unlock && snakemake afbench --profile profiles/production
 snakemake --unlock
 
 # Then run any command
-snakemake --profile profiles/test
+snakemake --profile profiles/quick
 ```
 
 **When to use `--unlock`**: 
@@ -128,11 +145,11 @@ snakemake --rulegraph | dot -Tpng > rules_dag.png
 
 AFBench uses profile-based configuration for different environments:
 
-#### Test Profile (`profiles/test/config.yaml`)
+#### Quick Profile (`profiles/quick/config.yaml`)
 - **Single core execution** for fast development
 - **Verbose output** with shell command printing
 - **Keep-going enabled** to continue on errors
-- **Uses test model/judge pools** with lightweight models
+- **Uses quick model/judge pools** with lightweight models
 
 #### Production Profile (`profiles/production/config.yaml`) 
 - **Multi-core execution (4 cores)** for performance
@@ -142,14 +159,14 @@ AFBench uses profile-based configuration for different environments:
 
 ### Environment-Specific Configuration Files
 
-#### Test Configuration (`config/test_config.yaml`)
+#### Quick Configuration (`config/quick_config.yaml`)
 ```yaml
 model_pool:
-  default_pool: "test"
+  default_pool: "quick"
   pools_dir: "model_pools"
 
 judge_pool:
-  default_pool: "test"
+  default_pool: "quick"
   pools_dir: "judge_pools"
 
 # Smaller samples for faster testing
@@ -198,11 +215,11 @@ For backwards compatibility, the main configuration file can still be used:
 
 ```yaml
 model_pool:
-  default_pool: "test"     # Options: test, production
+  default_pool: "quick"     # Options: quick, production
   pools_dir: "model_pools"
 
 judge_pool:
-  default_pool: "test"     # Options: test, production
+  default_pool: "quick"     # Options: quick, production
   pools_dir: "judge_pools"
 
 skills:
@@ -218,14 +235,14 @@ Load models, judges, and skills from configuration files.
 
 #### Profile-Based Loading (Recommended)
 ```bash
-# Load models using test profile
-snakemake --profile profiles/test data/loaded_models.json
+# Load models using quick profile
+snakemake --profile profiles/quick data/loaded_models.json
 
 # Load judges using production profile
 snakemake --profile profiles/production data/loaded_judges.json
 
 # Load skills (same across profiles)
-snakemake --profile profiles/test data/loaded_skills.json
+snakemake --profile profiles/quick data/loaded_skills.json
 ```
 
 #### Legacy Loading
@@ -249,23 +266,50 @@ snakemake --cores 1 data/loaded_skills.json
 
 Execute conversations between models and evaluation scenarios.
 
-#### Profile-Based Execution
-```bash
-# Run conversation generation with test profile (faster)
-snakemake --profile profiles/test data/conversations.json
+#### Parallel Execution (Default)
 
-# Run conversation generation with production profile (comprehensive)
+AFBench now supports **per-model parallelization** for dramatically faster conversation execution:
+
+```bash
+# Run parallel conversation generation with quick profile (4 models in parallel)
+snakemake --profile profiles/quick data/conversations.json
+
+# Run parallel conversation generation with production profile (2 models in parallel)  
 snakemake --profile profiles/production data/conversations.json
+
+# Recommended parallelization (*be respectful of OpenRouter API)
+snakemake --profile profiles/quick -j 5 data/conversations.json
 ```
 
-#### Legacy Execution
+**Parallelization Details:**
+- **Per-model execution**: Each model processes all evals independently
+- **Automatic aggregation**: Results combined into unified `conversations.json` format
+- **Cache preservation**: Existing conversation cache files remain valid
+- **Backward compatibility**: Output format identical to sequential execution
+
+#### Sequential Execution (Legacy Fallback)
+
+If needed, you can still use the original sequential execution:
+
 ```bash
-# Run conversation generation (legacy method)
-snakemake --cores 4 data/conversations.json
+# Run sequential conversation generation (legacy method)
+snakemake --cores 4 data/conversations_legacy.json
 ```
+
+#### Performance Comparison
+
+**Before (Sequential)**:
+- 4 models × 45 evals = 180 conversations executed one-by-one
+- Estimated time: ~30-45 minutes
+
+**After (Parallel)**:
+- 4-5 models execute simultaneously across all evals  
+- Estimated time with `-j 5`: ~6-10 minutes (4-5x speedup)
+- **⚠️ Use `-j 5` to be respectful of OpenRouter API limits**
 
 **Expected Output**: 
-- `data/conversations.json`: Raw conversation data between models and skills
+- `data/conversations.json`: Raw conversation data between models and skills (unified format)
+- `data/conversations_{model_id}.json`: Individual per-model conversation files (intermediate)
 - `data/conversations/`: Individual conversation files organized by skill category
 
 ### Stage 3: Tournament System
@@ -274,8 +318,8 @@ Conduct Swiss-system tournaments between models.
 
 #### Profile-Based Tournament Execution
 ```bash
-# Run tournaments with test profile (small model pool)
-snakemake --profile profiles/test data/tournaments.json
+# Run tournaments with quick profile (small model pool)
+snakemake --profile profiles/quick data/tournaments.json
 
 # Generate tournament summaries with production profile
 snakemake --profile profiles/production data/tournament_summaries.json
@@ -301,8 +345,8 @@ Calculate OpenSkill Bradley-Terry ratings for each model.
 
 #### Profile-Based Rating Calculation
 ```bash
-# Calculate skill ratings with test profile
-snakemake --profile profiles/test data/skill_ratings.json
+# Calculate skill ratings with quick profile
+snakemake --profile profiles/quick data/skill_ratings.json
 
 # Calculate skill ratings with production profile (stricter analysis)
 snakemake --profile profiles/production data/skill_ratings.json
@@ -324,8 +368,8 @@ Generate final analysis and visualizations.
 
 #### Profile-Based Reporting
 ```bash
-# Generate analysis with test profile (lower resolution, faster)
-snakemake --profile profiles/test output/results/analysis_results.json
+# Generate analysis with quick profile (lower resolution, faster)
+snakemake --profile profiles/quick output/results/analysis_results.json
 
 # Create high-resolution plots with production profile
 snakemake --profile profiles/production output/plots/summary_plot.png
@@ -353,18 +397,44 @@ snakemake --cores 1 output/results/final_report.json
 
 ## Individual Rule Execution
 
+### ⚠️ CRITICAL WARNING: --forceall Flag
+
+```bash
+# 🚨 NEVER USE UNLESS ABSOLUTELY NECESSARY 🚨
+# This flag will regenerate ALL conversations from scratch, 
+# ignoring all existing cache files and costing significant time and money!
+
+# ❌ DON'T DO THIS unless you really mean to start completely over:
+# snakemake --forceall  # <-- VERY EXPENSIVE!
+
+# ✅ Instead, target specific rules or use --forcerun:
+snakemake --forcerun SPECIFIC_RULE target_file.json
+```
+
+**Why --forceall is dangerous:**
+- **Ignores ALL cache files** - will regenerate every conversation from scratch
+- **Extremely expensive** - hours of API calls and significant monetary cost
+- **Usually unnecessary** - most issues can be solved with targeted reruns
+- **Defeats the purpose** of our efficient caching architecture
+
+**When --forceall might be needed (rare cases):**
+- Complete model pool changes requiring fresh evaluation
+- Major pipeline architecture changes
+- Corrupted cache requiring full regeneration
+- **Always confirm intent before using!**
+
 ### Force Rerun Specific Rules
 
 #### Profile-Based Force Rerun
 ```bash
-# Force rerun model loading with test profile (when model pools change)
-snakemake --profile profiles/test --forcerun load_models data/loaded_models.json
+# Force rerun model loading with quick profile (when model pools change)
+snakemake --profile profiles/quick --forcerun load_models data/loaded_models.json
 
 # Force rerun conversations with production profile (when skills change)
 snakemake --profile profiles/production --forcerun execute_conversations data/conversations.json
 
 # Force rerun tournaments with specific profile (for different tournament settings)
-snakemake --profile profiles/test --forcerun run_tournaments data/tournaments.json
+snakemake --profile profiles/quick --forcerun run_tournaments data/tournaments.json
 ```
 
 #### Legacy Force Rerun
@@ -383,8 +453,8 @@ snakemake --cores 4 --forcerun run_tournaments data/tournaments.json
 
 #### Profile-Based Targeting
 ```bash
-# Generate only tournament results with test profile
-snakemake --profile profiles/test data/tournaments.json data/tournament_summaries.json
+# Generate only tournament results with quick profile
+snakemake --profile profiles/quick data/tournaments.json data/tournament_summaries.json
 
 # Generate only skill ratings with production profile
 snakemake --profile profiles/production data/skill_ratings.json
@@ -429,8 +499,8 @@ pip install -r requirements.txt
 #### Configuration Errors
 
 ```bash
-# Validate test profile configuration
-snakemake --profile profiles/test --dry-run
+# Validate quick profile configuration
+snakemake --profile profiles/quick --dry-run
 
 # Validate production profile configuration
 snakemake --profile profiles/production --dry-run
@@ -446,7 +516,7 @@ snakemake --dry-run --configfile config/config.yaml
 snakemake --lint
 
 # Validate file existence with specific profile
-snakemake --profile profiles/test --summary
+snakemake --profile profiles/quick --summary
 
 # Validate file existence (legacy)
 snakemake --summary
@@ -455,8 +525,8 @@ snakemake --summary
 #### Debug Mode
 
 ```bash
-# Run with verbose output using test profile (already includes printshellcmds)
-snakemake --profile profiles/test --verbose
+# Run with verbose output using quick profile (already includes printshellcmds)
+snakemake --profile profiles/quick --verbose
 
 # Run with debugging information
 snakemake --profile profiles/production --debug-dag
@@ -465,12 +535,51 @@ snakemake --profile profiles/production --debug-dag
 snakemake --cores 4 --verbose --debug-dag
 ```
 
+#### Parallel Execution Issues
+
+Common issues with the new parallel conversation execution:
+
+**Individual Model Failures**
+```bash
+# Check per-model conversation files for errors
+ls data/conversations_*.json
+
+# Debug specific model execution
+snakemake --profile profiles/quick data/conversations_thedrummer_unslopnemo-12b.json
+
+# Force rerun failed model
+snakemake --profile profiles/quick --forcerun execute_conversations_for_model data/conversations_thedrummer_unslopnemo-12b.json
+```
+
+**API Rate Limiting**
+```bash
+# Recommended: be respectful of OpenRouter API limits
+snakemake --profile profiles/quick -j 5 data/conversations.json
+
+# Further reduce if experiencing rate limits
+snakemake --profile profiles/quick -j 2 data/conversations.json
+
+# Use sequential execution if needed
+snakemake --profile profiles/quick data/conversations_legacy.json
+```
+
+**⚠️ OpenRouter API Etiquette**: Always use `-j 4` to `-j 6` to avoid overwhelming the API service. Running unlimited parallel jobs can cause rate limiting and service degradation.
+
+**Aggregation Problems**
+```bash
+# Force reaggregation of per-model files
+snakemake --profile profiles/quick --forcerun aggregate_conversations data/conversations.json
+
+# Check intermediate per-model files
+python scripts/aggregate_conversations.py data/conversations.json data/conversations_*.json
+```
+
 ### Performance Tuning
 
 #### Profile-Based Performance
 ```bash
 # Test profile is optimized for speed (1 core, continue on errors)
-snakemake --profile profiles/test
+snakemake --profile profiles/quick
 
 # Production profile is optimized for thoroughness (4 cores, stop on errors)
 snakemake --profile profiles/production
@@ -493,7 +602,7 @@ snakemake --cores 8 data/tournaments.json
 
 ### Profile-Specific Issues
 
-#### Test Profile Issues
+#### Quick Profile Issues
 - **Faster execution** but may miss edge cases
 - **Continues on errors** which may hide problems
 - **Smaller sample sizes** may not be representative
@@ -533,26 +642,41 @@ output/
     └── final_report.json         # Comprehensive report
 ```
 
-## Static Site Generation
+## Admin UI - Web Interface
 
 Generate a web interface for reviewing results:
 
+### Quick Profile Results (Default)
 ```bash
 cd site
 ./run.sh
 ```
 
-**Expected Output**: Static site available for viewing evaluation results, typically served on localhost.
+### Production Profile Results
+```bash
+cd site
+AFBENCH_ADMIN_DATA_DIR=data/production ./run.sh
+```
 
-This creates a user-friendly interface for exploring model performance, tournament results, and skill ratings.
+### Legacy Data Directory
+```bash
+cd site
+AFBENCH_ADMIN_DATA_DIR=data ./run.sh
+```
+
+**Expected Output**: Admin UI available at http://localhost:8501 for viewing evaluation results.
+
+**Data Directory Configuration**: The admin UI now defaults to `data/quick` (matching the quick profile). Use the environment variable `AFBENCH_ADMIN_DATA_DIR` to point to different data directories as needed.
+
+This creates a user-friendly interface for exploring model performance, tournament results, and skill ratings from your chosen profile.
 
 ## Profile Usage Recommendations
 
 ### Development Workflow
-1. **Start with test profile** for rapid iteration:
+1. **Start with quick profile** for rapid iteration:
    ```bash
    # Most common development command
-   snakemake --unlock && snakemake afbench --profile profiles/test
+   snakemake --unlock && snakemake afbench --profile profiles/quick
    ```
 
 2. **Switch to production** for final evaluation:
@@ -564,14 +688,14 @@ This creates a user-friendly interface for exploring model performance, tourname
 3. **Alternative: Full pipeline** (less common):
    ```bash
    # Complete pipeline including data generation and visualization
-   snakemake --profile profiles/test
+   snakemake --profile profiles/quick
    ```
 
 ### When to Use Each Profile
 
-#### Use Test Profile For:
+#### Use Quick Profile For:
 - **Development and debugging** - fast feedback loop
-- **Skill validation** - quickly test new evaluation scenarios
+- **Skill validation** - quickly verify new evaluation scenarios
 - **Pipeline testing** - verify workflow changes
 - **Cost management** - use cheaper/faster models during development
 
@@ -590,7 +714,7 @@ Each profile maintains separate cache files since they use different model/judge
 
 ### Current Model Pools
 
-#### Test Pool (4 models, 3 judges)
+#### Quick Pool (4 models, 3 judges)
 **Models:**
 - thedrummer/unslopnemo-12b
 - openai/gpt-oss-120b  
@@ -608,13 +732,13 @@ Each profile maintains separate cache files since they use different model/judge
 
 ### Managing Model/Judge Pools
 
-#### Adding Models to Test Environment
+#### Adding Models to Quick Environment
 ```bash
-# Edit the test model pool
-vim model_pools/test.csv
+# Edit the quick model pool
+vim model_pools/quick.csv
 
-# Edit the test judge pool  
-vim judge_pools/test.csv
+# Edit the quick judge pool  
+vim judge_pools/quick.csv
 ```
 
 #### Adding Models to Production Environment
@@ -631,13 +755,13 @@ vim judge_pools/production.csv
 ### Mixed Profile Usage
 
 ```bash
-# Develop with test profile
-snakemake --profile profiles/test data/skill_ratings.json
+# Develop with quick profile
+snakemake --profile profiles/quick data/skill_ratings.json
 
 # Generate production-quality plots from test data
 snakemake --profile profiles/production output/plots/summary_plot.png
 
 # Compare results between profiles
-snakemake --profile profiles/test data/tournaments.json
+snakemake --profile profiles/quick data/tournaments.json
 snakemake --profile profiles/production data/tournaments.json
 ```

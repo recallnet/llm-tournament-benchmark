@@ -1,7 +1,6 @@
 """Comprehensive tests for print_results_table.py to achieve 90%+ coverage."""
 
 import json
-import sys
 import tempfile
 from io import StringIO
 from pathlib import Path
@@ -72,7 +71,7 @@ class TestLoadSkillRatings:
             mock_path.return_value.exists.return_value = True
 
             # Mock open to raise an IOError
-            with patch("builtins.open", side_effect=IOError("Cannot read file")):
+            with patch("builtins.open", side_effect=OSError("Cannot read file")):
                 with pytest.raises(IOError):
                     load_skill_ratings()
 
@@ -396,7 +395,6 @@ class TestMainFunction:
         """Test module-level execution."""
         with patch("scripts.print_results_table.main") as mock_main:
             # Test the if __name__ == "__main__" condition
-            import scripts.print_results_table as results_module
 
             # Simulate module being run as main
             if "__main__" == "__main__":  # This simulates the condition in the module

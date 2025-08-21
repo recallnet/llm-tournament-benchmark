@@ -116,10 +116,13 @@ def test_conversation_cache_dependencies():
                     return False
 
         # Test 2: New model added - should be detected
-        models_data["models"].append({"id": "test/new-model", "provider": "test", "name": "New Test Model"})
+        if models_file.exists():
+            with open(models_file) as f:
+                models_data = json.load(f)
+            models_data["models"].append({"id": "test/new-model", "provider": "test", "name": "New Test Model"})
 
-        with open(models_file, "w") as f:
-            json.dump(models_data, f, indent=2)
+            with open(models_file, "w") as f:
+                json.dump(models_data, f, indent=2)
 
         # Load skills to calculate expected new conversations
         skills_file = scenario.test_data_dir / "loaded_skills.json"
@@ -315,11 +318,11 @@ def test_current_cache_state_analysis():
 
     # Load current configuration
     try:
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             current_models = {m["id"] for m in json.load(f)["models"]}
-        with open("data/loaded_judges.json") as f:
+        with open("data/testonly/loaded_judges.json") as f:
             current_judges = {j["id"] for j in json.load(f)["judges"]}
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             current_evals = {e["id"] for e in json.load(f)["evals"]}
 
         print(f"   📊 Current models: {len(current_models)}")
@@ -327,7 +330,7 @@ def test_current_cache_state_analysis():
         print(f"   📊 Current evals: {len(current_evals)}")
 
         # Analyze conversation cache
-        conv_files = list(Path("data/conversations").glob("*/*.json"))
+        conv_files = list(Path("data/testonly/conversations").glob("*/*.json"))
         print(f"   📊 Cached conversations: {len(conv_files)}")
 
         # Check cache validity by examining actual cached data
@@ -386,7 +389,7 @@ if __name__ == "__main__":
     test_results.append(("Current cache state", test_current_cache_state_analysis()))
 
     # Summary
-    print(f"\n📋 CACHE DEPENDENCY TEST SUMMARY:")
+    print("\n📋 CACHE DEPENDENCY TEST SUMMARY:")
     passed = 0
     for test_name, result in test_results:
         status = "✅ PASS" if result else "❌ FAIL"

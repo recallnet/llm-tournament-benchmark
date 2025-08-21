@@ -4,15 +4,16 @@ AFBench Snakemake workflow
 A modular data processing pipeline with rigorous QA standards.
 """
 
+import sys
 import pandas as pd
 from pathlib import Path
 
 # Configuration
 configfile: "config/config.yaml"
 
-# Define output directories
+# Define output directories  
 OUTPUT_DIR = Path("output")
-DATA_DIR = Path("data")
+DATA_DIR = Path(config.get("data_dir", "tests/data"))  # Default to tests/data for safety
 RESULTS_DIR = OUTPUT_DIR / "results"
 PLOTS_DIR = OUTPUT_DIR / "plots"
 
@@ -32,7 +33,7 @@ rule afbench:
     input:
         DATA_DIR / "skill_ratings.json"
     shell:
-        "python scripts/print_results_table.py"
+        "python scripts/print_results_table.py {DATA_DIR}"
 
 # Load model pool (first stage)
 rule load_models:
@@ -72,28 +73,106 @@ rule load_skills:
     script:
         "scripts/load_skills.py"
 
-# Execute conversations between models and evals
-rule execute_conversations:
+# Helper function to get model IDs for parallel execution
+def get_model_ids():
+    """Dynamically extract model IDs from loaded models file."""
+    models_file = DATA_DIR / "loaded_models.json"
+    if not models_file.exists():
+        return []
+    
+    import sys
+    sys.path.insert(0, "scripts")
+    from snakemake_utils import get_model_ids, sanitize_model_id_for_filename
+    
+    model_ids = get_model_ids(str(models_file))
+    # Return sanitized IDs for use in filenames
+    return [sanitize_model_id_for_filename(model_id) for model_id in model_ids]
+
+# PARALLEL VERSION: Execute conversations for each model separately (cache only)
+rule execute_conversations_for_model:
+    input:
+        models=DATA_DIR / "loaded_models.json",
+        skills=DATA_DIR / "loaded_skills.json", 
+        judges=DATA_DIR / "loaded_judges.json"
+    output:
+        # Use a marker file instead of the per-model JSON
+        DATA_DIR / "conversations_cache_{model_id}.done"
+    params:
+        # Convert sanitized model ID back to original for processing
+        original_model_id=lambda wildcards: wildcards.model_id.replace('_', '/', 1)
+    run:
+        import sys
+        sys.path.insert(0, "scripts")
+        from execute_conversations_single_model import execute_conversations_for_model_cache_only
+        
+        # Execute conversations and cache them (no per-model JSON output)
+        # Pass the profile-specific cache directories  
+        cache_dir = DATA_DIR / "conversations"
+        intermediary_cache_dir = DATA_DIR / "intermediaries"
+        
+        try:
+            # This function now includes retry logic and raises exceptions on failure
+            success = execute_conversations_for_model_cache_only(
+                str(input.models),
+                str(input.skills),
+                str(input.judges),
+                params.original_model_id,
+                str(cache_dir),
+                str(intermediary_cache_dir)
+            )
+            
+            # Only create marker file if successful (function returns True or raises exception)
+            if success:
+                with open(output[0], 'w') as f:
+                    f.write(f"Model {params.original_model_id} conversations cached successfully\n")
+            else:
+                # This should not happen anymore since function raises exceptions instead of returning False
+                raise RuntimeError(f"Model {params.original_model_id} execution failed without specific error")
+                
+        except Exception as e:
+            # Provide clear error message and fail the pipeline
+            error_msg = (f"\n💥 PIPELINE FAILED: Model execution failed for {params.original_model_id}\n"
+                        f"🔍 Error Details: {str(e)}\n"
+                        f"📋 This could indicate:\n"
+                        f"   - API authentication issues\n"
+                        f"   - Rate limiting from the model provider\n" 
+                        f"   - Model endpoint unavailability\n"
+                        f"   - Network connectivity problems\n\n"
+                        f"🛠️  Troubleshooting steps:\n"
+                        f"   1. Check API keys and authentication\n"
+                        f"   2. Verify model availability at OpenRouter\n"
+                        f"   3. Try running with fewer parallel jobs (-j 2)\n"
+                        f"   4. Check network connectivity\n")
+            
+            print(error_msg, file=sys.stderr)
+            raise RuntimeError(f"Model execution failed: {params.original_model_id}") from e
+
+# LEGACY VERSION: Original sequential execution (kept as backup)
+rule execute_conversations_legacy:
     input:
         models=DATA_DIR / "loaded_models.json",
         skills=DATA_DIR / "loaded_skills.json",
         judges=DATA_DIR / "loaded_judges.json"
     output:
-        DATA_DIR / "conversations.json"
+        DATA_DIR / "conversations_legacy.json"
     script:
         "scripts/execute_conversations.py"
 
-# Run Swiss tournaments for model evaluation
+# Run Swiss tournaments for model evaluation (direct cache mode)
 rule run_tournaments:
     input:
-        conversations=DATA_DIR / "conversations.json",
+        # Dynamically depend on conversation cache marker files for all models
+        cache_markers=lambda wildcards: [DATA_DIR / f"conversations_cache_{model_id}.done" 
+                                         for model_id in get_model_ids()],
         models=DATA_DIR / "loaded_models.json",
-        judges=DATA_DIR / "loaded_judges.json",
+        judges=DATA_DIR / "loaded_judges.json", 
         skills=DATA_DIR / "loaded_skills.json"
+    params:
+        conversations_dir=DATA_DIR / "conversations"
     output:
         DATA_DIR / "tournaments.json"
-    script:
-        "scripts/run_tournaments.py"
+    shell:
+        "python scripts/snakemake_tournament_wrapper.py {params.conversations_dir} {input.models} {input.judges} {input.skills} {output}"
 
 # Summarize tournaments with match history and rankings
 rule summarize_tournaments:
@@ -104,8 +183,8 @@ rule summarize_tournaments:
         skills=DATA_DIR / "loaded_skills.json"
     output:
         DATA_DIR / "tournament_summaries.json"
-    script:
-        "scripts/summarize_tournaments.py"
+    shell:
+        "python scripts/snakemake_summarize_wrapper.py {input.tournaments} {output}"
 
 # Fetch OpenRouter models data (depends on models/judges but doesn't invalidate cache)
 rule fetch_openrouter_models:
@@ -127,8 +206,8 @@ rule calculate_skill_ratings:
         skills=DATA_DIR / "loaded_skills.json"
     output:
         DATA_DIR / "skill_ratings.json"
-    script:
-        "scripts/calculate_skill_ratings.py"
+    shell:
+        "{sys.executable} scripts/snakemake_ratings_wrapper.py {input.summaries} {input.models} {input.judges} {input.skills} {output}"
 
 # Generate final results JSON with all skills (triggered by score updates)
 rule generate_final_results:

@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "racing_game",
+    "eval_name": "Voice-Controlled Racing Game",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-21T00:33:14.170064",
+    "cache_key": "c9eda650e0e61f34",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that creates a voice-controlled racing game.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Top-down racing track with curves and obstacles\n- Car speed controlled by microphone volume (louder = faster)\n- Web Audio API for microphone access with graceful permission handling\n- Visual volume meter showing microphone input level\n- Lap timing system with personal best tracking\n- Crash detection with realistic physics (speed affects severity)\n- \"Start Race\" button and race completion celebration\n- Mute/unmute toggle for testing\n- Smooth 60 FPS performance\n- No external libraries beyond Web Audio API\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "// Initialize race track\nvar canvas = document.getElementById(canvasId)\nvar ctx = canvas.getContext(\"2d\")\nvar trackImage = new Image()\ntrackImage.src = \"track.png\"\nvar carImage = new Image()\ncarImage.src = \"car.png\"\nvar lap = 0\nvar bestLap = Infinity\nvar startTime = 0\n\n// Access microphone\nnavigator.mediaDevices.getUserMedia({audio: true})\n  .then(function(stream) {\n    var mediaRecorder = new MediaRecorder(stream)\n    mediaRecorder.onstart = function() {-record()}\n    mediaRecorder.start()\n  })\n  .catch(function(err) {console.log(err.name+\": \"+err.message)})\n\n// Draw race track\nfunction drawTrack() {\n  ctx.drawImage(trackImage, 0, 0, canvas.width, canvas.height)\n}\n\n// Animate car movement\nwindow.addEventListener(\"keydown\", function(e) {\n  if (e.code === \"Space\") {\n    if (!startTime) startTime = performance.now()\n    mediaRecorder.start()\n  }\n})\n\n// Update car position based on microphone volume\nfunction updateCar() {\n  mediaRecorder.ondataavailable = function(e) {\n    var audioContext = new AudioContext()\n    var audioData = audioContext.decodeAudioData(e.data)\n    var volume = getRMS(audioData)\n\n    // Map volume to car speed range\n    var carSpeed = volume * 10\n\n    // Update car position\n    var car = document.getElementById(\"car\")\n    car.style.left = car.offsetLeft + carSpeed + \"px\"\n    car.style.top = car.offsetTop + \"px\"\n\n    // Determine current lap\n    if (car.getBoundingClientRect().left > canvas.width) {\n      lap++\n      document.getElementById(\"lap\").innerText = lap\n      mediaRecorder.stop()\n\n      // Update personal best time\n      var lapTime = performance.now() - startTime\n      if (lapTime < bestLap) {\n        bestLap = lapTime\n        document.getElementById(\"best\").innerText = bestLap.toFixed(2)\n      }\n\n      // Show game over message\n      alert(\"Congratulations! You finished in \" + lapTime.toFixed(2) + \" seconds with a personal best of \" + bestLap.toFixed(2) + \" seconds.\")\n    } else if (car.getBoundingClientRect().bottom > canvas.height || car.getBoundingClientRect().top < 0) {\n      // Handle crashing into wall\n      alert(\"Crash! Better luck next time.\")\n      startTime = 0\n      mediaRecorder.stop()\n    }\n  }\n}\n\n// Calculate RMS of audio data\nfunction getRMS(audioData) {\n  var sum = 0\n  for (var i = 0; i < audioData.length; i++) {\n    var value = Math.abs(audioData[i])\n    sum += Math.pow(value, 2)\n  }\n  var rms = Math.sqrt(sum / audioData.length)\n  return rms\n}\n\n// Start race on button click\ndocument.getElementById(\"start\").addEventListener(\"click\", function() {\n  // Start recording audio\n  mediaRecorder.start()\n\n  // Reset lap counter\n  lap = 0\n  document.getElementById(\"lap\").innerText = lap\n\n  // Reset start time\n  startTime = 0\n})\n\n// Mute/unmute microphone on button click\ndocument.getElementById(\"mute\").addEventListener(\"click\", function() {\n  var stream = mediaRecorder.stream\n  var audioTracks = stream.getAudioTracks()\n  var muted = false\n  for (var i = 0; i < audioTracks.length; i++) {\n    if (audioTracks[i].enabled) {\n      audioTracks[i].enabled = false\n      muted = true\n    } else {\n      audioTracks[i].enabled = true\n      muted = false\n    }\n  }\n  this.innerText = muted ? \"Unmute\" : \"Mute\"\n})\n\n// Draw track and car every frame\nfunction gameLoop() {\n  drawTrack()\n  updateCar()\n  requestAnimationFrame(gameLoop)\n}\n\ngameLoop()"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

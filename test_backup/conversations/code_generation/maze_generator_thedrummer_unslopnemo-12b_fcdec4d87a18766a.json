@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "maze_generator",
+    "eval_name": "Maze Generator with A* Solver",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-20T23:13:01.317668",
+    "cache_key": "fcdec4d87a18766a",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that generates and solves mazes with step-by-step visualization.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Generates maze using recursive division algorithm\n- Solves maze using A* search algorithm\n- Step-by-step visualization of both generation and solving process\n- Visual indicators for different states (walls, paths, current search, solution)\n- No external libraries, works in most browsers\n- Clean, efficient code with proper error handling\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "```javascript\nfunction generateMaze(canvasId, width=500, height=500) {\n  const canvas = document.getElementById(canvasId);\n  const ctx = canvas.getContext('2d');\n  canvas.width = width;\n  canvas.height = height;\n\n  class Cell {\n    constructor(x, y) {\n      this.x = x;\n      this.y = y;\n      this.visited = false;\n      this.walls = [true, true, true, true]; // N, E, S, W\n    }\n  }\n\n  const grid = Array.from({length: Math.floor((height-2)/2)}, (_, i) => (\n    Array.from({length: Math.floor((width-2)/2)}, (_, j) => new Cell(2*j+1, 2*i+1))\n  ));\n\n  function draw(x, y, color) {\n    ctx.fillStyle = color;\n    ctx.fillRect(x*2, y*2, 2, 2);\n  }\n\n  function carve(i, j, direction) {\n    const [x1, y1] = [i, j];\n    const [x2, y2] = [\n      direction === 0 ? x1-2 : direction === 2 ? x1+2 : x1,  // N: x-2, S: x+2\n      direction === 1 ? y1-2 : direction === 3 ? y1+2 : y1  // E: y-2, W: y+2\n    ];\n    const cell1 = grid[x1][y1];\n    const cell2 = grid[x2][y2];\n    const wallIndex = {\n      0: 0, 1: 1, 2: 3, 3: 2 // N: 0, E: 1, S: 2, W: 3\n    }[direction];\n    cell1.walls[wallIndex] = false;\n    cell2.walls[wallIndex] = false;\n    draw(i*2, j*2, 'black');\n  }\n\n  function isValid(x, y) {\n    return x >= 0 && y >= 0 && x < grid.length && y < grid[0].length;\n  }\n\n  function heuristic(x1, y1, x2, y2) {\n    return Math.abs(x1 - x2) + Math.abs(y1 - y2);\n  }\n\n  function reconstructPath(cameFrom, current, start, end) {\n    let path = [end];\n    while (current !== start) {\n      current = cameFrom[current];\n      path.unshift(current);\n    }\n    return path;\n  }\n\n  function solveMaze(x, y) {\n    const start = [grid[0][0], grid[0][0]];\n    grid.forEach(row => row[0].visited = true);\n    const openSet = [start];\n    const cameFrom = new Array(grid.length).fill().map(() => new Array(grid[0].length).fill(null));\n\n    while (openSet.length > 0) {\n      openSet.sort((a, b) => heuristic(a[0].x, a[0].y, x, y) - heuristic(b[0].x, b[0].y, x, y));\n      const current = openSet.shift();\n      const [i, j] = [current[0].x, current[0].y];\n      draw(i, j, 'red');\n      if (current[0] === grid[grid.length-1][grid[0].length-1]) {\n        const path = reconstructPath(cameFrom, current[0], start[0], current[0]);\n        path.forEach(([x, y]) => draw(x, y, 'blue'));\n        break;\n      }\n      current[0].visited = true;\n\n      for (let [xi, yi] of [[i-2, j], [i+2, j], [i, j-2], [i, j+2]]) {\n        if (isValid(xi, yi) && !grid[xi][yi].visited && grid[xi][yi].walls[0] === grid[i][j].walls[2]) {\n         cameFrom[xi][yi] = current;\n          openSet.push([[xi, yi], heuristic(xi, yi, x, y)]);\n        }\n      }\n    }\n  }\n\n  function drawMaze() {\n    grid.forEach((row, i) => {\n      row.forEach((cell, j) => {\n        draw(j, i, cell.walls[0] ? 'black' : 'white');\n        draw(j, i, cell.walls[1] ? 'black' : 'white');\n        draw(j, i, cell.walls[2] ? 'black' : 'white');\n        draw(j, i, cell.walls[3] ? 'black' : 'white');\n      });\n    });\n    draw(0, 0, 'white');\n    draw(0, 0, 'white');\n    draw(grid.length-1, grid[0].length-1, 'white');\n    draw(grid.length-1, grid[0].length-1, 'white');\n  }\n\n  function generate() {\n    function recursiveDivision(x, y) {\n      if (!isValid(x, y)) return;\n      if (Math.abs(x - grid.length-1) === 0 && Math.abs(y - grid[0].length-1) === 0) return;\n\n      if (Math.random() < 0.5) {\n        carve(x, y, 0);\n        recursiveDivision(x-1, y);\n      }\n\n      if (Math.random() < 0.5) {\n        carve(x, y, 1);\n        recursiveDivision(x, y-1);\n      }\n    }\n    grid.forEach(row => row.forEach(cell => carve(cell.x, cell.y)));\n    recursiveDivision(Math.floor(Math.random() * grid.length), Math.floor(Math.random() * grid[0].length));\n  }\n\n  generate();\n  drawMaze();\n\n  setTimeout(() => {\n    solveMaze(width - 2, height - 2);\n  }, 1000);\n}\n\ngenerateMaze('myCanvas');\n```"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

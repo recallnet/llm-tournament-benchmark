@@ -6,12 +6,12 @@ Print a nicely formatted table of model performance by skill.
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 
-def load_skill_ratings() -> Dict[str, Any]:
+def load_skill_ratings(data_dir: str) -> dict[str, Any]:
     """Load skill ratings data."""
-    ratings_file = Path("data/skill_ratings.json")
+    ratings_file = Path(data_dir) / "skill_ratings.json"
     if not ratings_file.exists():
         print("❌ No skill ratings found. Run the pipeline first.")
         sys.exit(1)
@@ -20,7 +20,7 @@ def load_skill_ratings() -> Dict[str, Any]:
         return json.load(f)
 
 
-def format_results_table(ratings_data: Dict[str, Any]) -> None:
+def format_results_table(ratings_data: dict[str, Any]) -> None:
     """Print a nicely formatted table of model performance."""
     skill_ratings = ratings_data.get("skill_ratings", {})
 
@@ -138,7 +138,14 @@ def format_results_table(ratings_data: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        ratings_data = load_skill_ratings()
+        # Require data directory as command line argument
+        if len(sys.argv) < 2:
+            raise ValueError(
+                "🚨 SAFETY: print_results_table.py requires explicit data directory.\n"
+                "Usage: python print_results_table.py <data_dir>"
+            )
+        data_dir = sys.argv[1]
+        ratings_data = load_skill_ratings(data_dir)
         format_results_table(ratings_data)
     except Exception as e:
         print(f"❌ Error printing results table: {e}")

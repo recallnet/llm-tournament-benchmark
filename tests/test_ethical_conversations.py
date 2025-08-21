@@ -6,7 +6,6 @@ Test just the ethical_loopholes conversation generation.
 import json
 import sys
 import time
-from pathlib import Path
 
 # Add scripts to path
 sys.path.insert(0, "scripts")
@@ -23,13 +22,13 @@ def test_ethical_conversation_generation():
         print("✅ Successfully imported conversation classes")
 
         # Load data
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             models_data = json.load(f)
 
-        with open("data/loaded_judges.json") as f:
+        with open("data/testonly/loaded_judges.json") as f:
             judges_data = json.load(f)
 
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills_data = json.load(f)
 
         models = models_data["models"]

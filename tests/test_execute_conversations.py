@@ -1,16 +1,14 @@
 """Comprehensive tests for execute_conversations.py to achieve 90%+ coverage."""
 
 import json
-import os
 import tempfile
-import time
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, mock_open, patch
+from unittest.mock import Mock, patch
 
 import pytest
 import requests
 
-from scripts.execute_conversations import ConversationExecutor, cleanup_stale_cache, execute_all_conversations, main
+from scripts.execute_conversations import ConversationExecutor, cleanup_stale_cache
 
 
 class TestConversationExecutorInit:
@@ -46,8 +44,8 @@ class TestConversationExecutorInit:
             with patch("pathlib.Path.mkdir") as mock_mkdir:
                 executor = ConversationExecutor()
 
-                assert executor.cache_dir == Path("data/conversations")
-                assert executor.intermediary_cache_dir == Path("data/intermediaries")
+                assert executor.cache_dir == Path("data/testonly/conversations")
+                assert executor.intermediary_cache_dir == Path("data/testonly/intermediaries")
                 assert mock_mkdir.call_count >= 2
 
 

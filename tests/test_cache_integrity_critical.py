@@ -266,7 +266,7 @@ class TestCacheSecurityViolations:
                         str(resolved_cache_dir)
                     ), f"SECURITY VIOLATION: Cache path {resolved_cache} escapes cache directory {resolved_cache_dir}!"
 
-                except (OSError, ValueError) as e:
+                except (OSError, ValueError):
                     # Acceptable if OS rejects the malicious path
                     pass
 

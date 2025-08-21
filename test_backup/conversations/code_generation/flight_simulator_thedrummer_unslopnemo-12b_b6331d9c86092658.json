@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "flight_simulator",
+    "eval_name": "Flight Simulator with Realistic Bugs",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-20T23:11:18.173295",
+    "cache_key": "b6331d9c86092658",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that implements a flight simulator with intentionally realistic aviation bugs.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Renders 3D-perspective flight view with horizon, terrain, and HUD\n- HUD displays: speed, altitude, heading, fuel\n- Aircraft controls: throttle, pitch, roll, yaw\n- Intentional realistic bugs: instrument lag during high G-forces, altimeter stickiness at certain altitudes, compass deviation near magnetic anomalies, engine power fluctuation during steep climbs\n- Visual indicators when bugs affect instruments\n- Smooth 60 FPS performance\n- No external libraries, works in all major browsers\n- Code must clearly document that bugs are intentional features\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "// Intentional Buggy Flight Simulator\nfunction flightSim(canvasID) {\n  const canvas = document.getElementById(canvasID);\n  const ctx = canvas.getContext('2d');\n  const width = canvas.width = 500;\n  const height = canvas.height = 500;\n\n  let pitch = 0, roll = 0, yaw = 0; // Current spatial orientation\n  let spd = 0, alt = 0, head = 0; // Current flight state\n  let throttle = 0, gear = 1; // Control inputs\n\n  // Intentionally buggy instrument models\n  const altBug = Math.random() * 100 | 0; // Random alt bug on startup\n  const headingBug = 360 * Math.random() | 0; // Random heading bug on startup\n  const powerFluc = Math.random() < 0.5 ? 1 : -1; // Random power fluctuation direction\n\n  function drawHUD() {\n    ctx.font = '16px Arial';\n    ctx.textBaseline = 'bottom';\n\n    // Buggy instruments\n    const alt = spd >= 100 ? alt + altBug : alt; // Alt bug above 100 kts\n    const heading = spd > 200 & head % 90 == 0 ? head + headingBug : head; // Heading bug north, east, south, west\n    const power = throttle * 100 + Math.sin(spd / 100) * powerFluc; // Power fluctuation during climb\n\n    ctx.fillStyle = '#fff';\n    ctx.fillText(`SPeed: ${spd.toFixed(0)} kt`, 10, 30);\n    ctx.fillText(`ALtitude: ${alt.toFixed(0)} ft`, 10, 60);\n    ctx.fillText(`HeadIng: ${heading.toFixed(0)}\u00b0`, 10, 90);\n    ctx.fillText(`ThrotTle: ${throttle.toFixed(2)}`, 10, 120);\n    ctx.fillText(`Fuel: ${(alt * 0.5).toFixed(0)} gal`, 10, 150);\n    ctx.fillText(`Power: ${power < 0 ? 'Bogged' : power.toFixed(0)}%`, 10, 180);\n  }\n\n  function updateSimulation(delta) {\n    // Buggy instruments update slower than actual flight state\n    alt += (spd / 10000 - alt / 10) * delta;\n    heading += (spd / 10 - heading / 5) * delta;\n    powerFluc += (spd / 100) * delta;\n\n    // Intentional realistic physics\n    const g = 9.81;\n    const i = 0.01;\n    spd += (gear < 2 ? throttle * 0.02 : 0) * delta;  // Throttle based on gear-down/gear-up\n    alt += spd * delta;  // Descend on zero throttle\n    heading += Math.atan2(roll, (1 + 1 / Math.abs(pitch))) * 0.9 * delta; // Turn based on roll and pitch\n    pitch += -yaw * 0.03 * delta; // Intended pitch from yaw\n\n    // Intentional physics bugs\n    if (pitch > 30) alt = Math.max(0, alt - 100 * delta); // Unintentional pitch limit and loss of altitude\n    if (spd > 400) { spd *= 0.99; alt += -75 * g * delta; } // Bogus high-speed performance loss\n    if (gear == 1) { spd = Math.max(0, spd - 10 * delta); alt += 75 * g * delta; } // Bogus gear-related power loss\n  }\n\n  function drawTerrain() {\n    ctx.fillStyle = `hsl(${50 - (alt / 8000) * 100}deg,30%,50%)`;\n    ctx.fillRect(0, height / 2, width, height);\n\n    ctx.fillStyle = `hsl(${50 - (alt / 3000) | 0}deg,20%,40%)`;\n    ctx.fillRect(0, height / 2, width, height / 2);\n  }\n\n  function draw Cockpit() {\n    // Slightly misaligned gauges for intentional datameter bugs\n    ctx.fillStyle = 'tan';\n    ctx.fillRect(0, 0, 500, 100);\n\n    ctx.save();\n    ctx.translate(200, 50);\n    ctx.rotate(-pitch - yaw * 2);\n    drawTerrain();\n    ctx.restore();\n\n    ctx.save();\n    ctx.translate(180, 120);\n    ctx.rotate(-yaw);\n    ctx.fillStyle = 'cornflowerblue';\n    ctx.fillRect(0, 0, 40, -10);\n    ctx.fillStyle = '#000';\n    if (pitch > 45 || alt > 50000) ctx.fillStyle = 'red';\n    ctx.strokeStyle = '#666';\n    ctx.lineWidth = 3;\n    ctx.lineCap = 'round';\n    ctx.lineJoin = 'round';\n    ctx.beginPath();\n    ctx.arc(0, 0, 30, 0, Math.PI * 2);\n    ctx.stroke();\n    ctx.fillStyle = '#666';\n    ctx.fill();\n    ctx.clip();\n    ctx.gradient = ctx.createLinearGradient(0, 0, 0, 30);\n    ctx.gradient.addColorStop(0, '#fff');\n    ctx.gradient.addColorStop(1, 'lightyellow');\n    ctx.fillStyle = ctx.gradient;\n    ctx.fillRect(0, 0, 30, -30);\n    drawHUD();\n  }\n\n  function animate(timestamp) {\n    const delta = timestamp - lastTime;\n    updateSimulation(delta);\n    drawCockpit();\n    lastTime = timestamp;\n    requestAnimationFrame(animate);\n  }\n  const lastTime = performance.now();\n  animate(lastTime);\n}\n\nflightSim('flight-simulator')"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

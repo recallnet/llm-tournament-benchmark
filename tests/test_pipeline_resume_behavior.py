@@ -5,7 +5,6 @@ This validates Snakemake's caching and resume capabilities.
 """
 
 import json
-import time
 from pathlib import Path
 
 
@@ -14,14 +13,14 @@ def test_conversation_cache_state():
     print("🧪 Testing conversation cache state for resume...")
 
     # Count existing conversation files
-    conversation_files = list(Path("data/conversations").glob("*/*.json"))
+    conversation_files = list(Path("data/testonly/conversations").glob("*/*.json"))
     print(f"📊 Found {len(conversation_files)} cached conversation files")
 
     # Load models and skills to calculate expected total
-    with open("data/loaded_models.json") as f:
+    with open("data/testonly/loaded_models.json") as f:
         models = json.load(f)["models"]
 
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills = json.load(f)["evals"]
 
     total_expected = len(models) * len(skills)
@@ -44,7 +43,7 @@ def test_snakemake_resume_efficiency():
     print("\n🧪 Testing Snakemake resume efficiency...")
 
     # Check if conversations.json exists and is valid
-    conv_file = Path("data/conversations.json")
+    conv_file = Path("data/testonly/conversations.json")
     if conv_file.exists():
         try:
             with open(conv_file) as f:
@@ -74,7 +73,7 @@ def test_tournament_resume_readiness():
     print("\n🧪 Testing tournament resume readiness...")
 
     # Check tournament files
-    tournament_files = list(Path("data/tournaments").glob("*/*.json"))
+    tournament_files = list(Path("data/testonly/tournaments").glob("*/*.json"))
     print(f"📊 Found {len(tournament_files)} tournament files")
 
     # Count tournaments by skill
@@ -86,7 +85,7 @@ def test_tournament_resume_readiness():
     print(f"📊 Skills with tournaments: {sorted(skills_with_tournaments)}")
 
     # Check if tournaments.json exists
-    tournaments_json = Path("data/tournaments.json")
+    tournaments_json = Path("data/testonly/tournaments.json")
     if tournaments_json.exists():
         print("✅ tournaments.json exists - may skip tournament generation")
         return True
@@ -103,7 +102,7 @@ def test_expected_resume_behavior():
     snakemake_efficient = test_snakemake_resume_efficiency()
     tournament_ready = test_tournament_resume_readiness()
 
-    print(f"\n📋 Resume Analysis:")
+    print("\n📋 Resume Analysis:")
     print(f"   Conversation cache: {cache_type}")
     print(f"   Snakemake efficiency: {'✅ efficient' if snakemake_efficient else '⚠️ may rerun'}")
     print(f"   Tournament readiness: {'✅ ready' if tournament_ready else '⏸️ needs generation'}")
@@ -117,7 +116,7 @@ def test_expected_resume_behavior():
         print("   📋 Print results table")
         estimated_time = "2-5 minutes"
     elif cache_type == "partial":
-        cached_count = len(list(Path("data/conversations").glob("*/*.json")))
+        cached_count = len(list(Path("data/testonly/conversations").glob("*/*.json")))
         remaining = 88 - cached_count
         print("\n🎯 EXPECTED RESUME BEHAVIOR:")
         print(f"   ⏸️ Resume conversation generation ({remaining} remaining)")
@@ -146,12 +145,12 @@ def test_cache_invalidation_scenarios():
 
     # Check if model pool changed
     try:
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             current_models = set(model["id"] for model in json.load(f)["models"])
 
         # Check conversation cache for different models
         cached_models = set()
-        for conv_file in Path("data/conversations").glob("*/*.json"):
+        for conv_file in Path("data/testonly/conversations").glob("*/*.json"):
             if "_" in conv_file.stem:
                 model_part = conv_file.stem.split("_")[-2]  # Extract model from filename
                 cached_models.add(model_part)
@@ -167,12 +166,12 @@ def test_cache_invalidation_scenarios():
 
     # Check if skills changed
     try:
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             current_skills = set(skill["id"] for skill in json.load(f)["evals"])
 
         # Check conversation cache for different skills
         cached_skills = set()
-        for conv_file in Path("data/conversations").glob("*/*.json"):
+        for conv_file in Path("data/testonly/conversations").glob("*/*.json"):
             skill_dir = conv_file.parent.name
             cached_skills.add(skill_dir)
 
@@ -201,7 +200,7 @@ if __name__ == "__main__":
     cache_type, estimated_time = test_expected_resume_behavior()
     cache_valid = test_cache_invalidation_scenarios()
 
-    print(f"\n📋 RESUME READINESS SUMMARY:")
+    print("\n📋 RESUME READINESS SUMMARY:")
     print(f"   Cache type: {cache_type}")
     print(f"   Cache valid: {'✅ yes' if cache_valid else '⚠️ issues detected'}")
     print(f"   Estimated resume time: {estimated_time}")

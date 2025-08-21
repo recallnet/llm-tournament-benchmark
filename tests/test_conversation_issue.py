@@ -4,7 +4,6 @@ Test why ethical_loopholes conversations aren't being created.
 """
 
 import json
-from pathlib import Path
 
 
 def test_conversation_data():
@@ -12,7 +11,7 @@ def test_conversation_data():
     print("🔍 Testing conversation execution data...")
 
     # Check loaded skills
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills_data = json.load(f)
 
     skills = skills_data.get("skills", {})
@@ -38,10 +37,10 @@ def test_conversation_data():
         print(f"  - {eval_id}: {eval_name}")
 
     # Check models and judges
-    with open("data/loaded_models.json") as f:
+    with open("data/testonly/loaded_models.json") as f:
         models_data = json.load(f)
 
-    with open("data/loaded_judges.json") as f:
+    with open("data/testonly/loaded_judges.json") as f:
         judges_data = json.load(f)
 
     model_count = len(models_data.get("models", []))

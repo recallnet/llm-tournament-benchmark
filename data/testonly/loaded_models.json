@@ -1,0 +1,30 @@
+{
+  "pool_info": {
+    "name": "testonly",
+    "path": "model_pools/testonly.csv",
+    "model_count": 1,
+    "timestamp": "2025-08-20T17:50:53.366302"
+  },
+  "statistics": {
+    "authors": {
+      "OpenAI": 1
+    },
+    "avg_context_window": 8192.0,
+    "avg_max_tokens": 1000.0,
+    "context_window_range": {
+      "min": 8192,
+      "max": 8192
+    }
+  },
+  "models": [
+    {
+      "id": "openai/gpt-oss-20b",
+      "author": "OpenAI",
+      "slug": "gpt-oss-20b",
+      "context_window": 8192,
+      "pricing": "input:0.0001",
+      "endpoint": "openrouter",
+      "max_tokens": 1000
+    }
+  ]
+}

@@ -2,13 +2,13 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 
 class FinalResultsGenerator:
     """Handles generation of final results from loaded skills data."""
 
-    def load_individual_skill_files(self, loaded_skills_data: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
+    def load_individual_skill_files(self, loaded_skills_data: dict[str, Any]) -> dict[str, dict[str, Any]]:
         """Load individual skill configuration files.
 
         Args:
@@ -38,7 +38,7 @@ class FinalResultsGenerator:
 
         return skills
 
-    def validate_evalconfig_schema(self, skill: Dict[str, Any]) -> bool:
+    def validate_evalconfig_schema(self, skill: dict[str, Any]) -> bool:
         """Validate that a skill configuration matches EvalConfigTiny schema.
 
         Args:
@@ -95,7 +95,7 @@ class FinalResultsGenerator:
         except (TypeError, KeyError):
             return False
 
-    def generate_final_results(self, loaded_skills_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def generate_final_results(self, loaded_skills_data: dict[str, Any]) -> list[dict[str, Any]]:
         """Generate final results by aggregating all skill configurations.
 
         Args:
@@ -127,9 +127,17 @@ def main():
         skills_path = Path(snakemake.input.skills)
         output_path = Path(snakemake.output[0])
     else:
-        # Called directly for testing
-        skills_path = Path("data/loaded_skills.json")
-        output_path = Path("data/final_results.json")
+        # Called directly - MUST provide data_dir via environment variable
+        data_dir_env = os.getenv("AFBENCH_DATA_DIR")
+        if not data_dir_env:
+            raise ValueError(
+                "🚨 SAFETY: generate_final_results.py requires explicit data directory.\n"
+                "Set AFBENCH_DATA_DIR environment variable or run via Snakemake."
+            )
+
+        data_dir = Path(data_dir_env)
+        skills_path = data_dir / "loaded_skills.json"
+        output_path = data_dir / "final_results.json"
 
     print("Generating final results from loaded skills...")
 

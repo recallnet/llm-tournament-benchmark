@@ -14,10 +14,10 @@ def analyze_tournament_execution():
 
     # Check input files
     required_files = [
-        "data/conversations.json",
-        "data/loaded_models.json",
-        "data/loaded_judges.json",
-        "data/loaded_skills.json",
+        "data/testonly/conversations.json",
+        "data/testonly/loaded_models.json",
+        "data/testonly/loaded_judges.json",
+        "data/testonly/loaded_skills.json",
     ]
 
     for file_path in required_files:
@@ -45,7 +45,7 @@ def analyze_tournament_execution():
                         skill = eval_data.get("_metadata", {}).get("skill", "unknown")
                         skills[skill] = skills.get(skill, 0) + 1
 
-                    print(f"   🎯 Skills breakdown:")
+                    print("   🎯 Skills breakdown:")
                     for skill, count in skills.items():
                         print(f"      - {skill}: {count} evals")
 

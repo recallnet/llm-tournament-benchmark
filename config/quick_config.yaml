@@ -1,0 +1,48 @@
+# AFBench Quick Configuration
+# Overrides config.yaml for quick development/testing
+
+# Data directory - isolated quick data
+data_dir: "data/quick"
+
+# Model pool configuration - use quick pool
+model_pool:
+  default_pool: "quick"
+  pools_dir: "model_pools"
+
+# Judge pool configuration - use quick pool  
+judge_pool:
+  default_pool: "quick"
+  pools_dir: "judge_pools"
+
+# Skills configuration  
+skills:
+  skills_dir: "skills"
+  selected_skills: []  # Load all skills to use all generated conversations
+
+# Faster data generation for testing
+n_samples: 100
+random_seed: 42
+
+# Test-friendly processing parameters
+processing:
+  remove_outliers: true
+  outlier_threshold: 3.0
+  normalize: true
+
+# Analysis parameters
+analysis:
+  statistical_tests: true
+  correlation_analysis: true
+  significance_level: 0.05
+
+# Test plotting parameters
+plotting:
+  figure_size: [8, 5]
+  dpi: 150
+  style: "seaborn-v0_8"
+
+# Report parameters
+report:
+  include_plots: true
+  format: "json"
+  timestamp: true

@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "conways_game_of_life",
+    "eval_name": "Conway's Game of Life with Emojis",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-20T23:11:42.952417",
+    "cache_key": "c9df7f0f216c92d6",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that implements Conway's Game of Life with advanced features.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Renders Conway's Game of Life on the provided canvas\n- Uses emojis to represent cells with different emojis for different generations\n- Includes famous patterns: Glider, Blinker, Gosper Gun, Pulsar (selectable via dropdown)\n- Speed control slider (1-10 generations per second)\n- Click-to-toggle cells for custom patterns\n- \"Randomize\" and \"Clear\" buttons\n- Aging system where cells change emojis based on survival time\n- Death animation with fade-out effect\n- Smooth 60 FPS performance\n- No external libraries, works in all major browsers\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function conwayGameOfLife(canvasId, gridSize=50, cellSize=10, emojis=['\ud83c\udf31','\ud83c\udf3f','\ud83c\udf43','\ud83c\udf32','\ud83c\udf33','\ud83c\udf34','\ud83c\udf35','\ud83c\udf36','\ud83c\udf37','\ud83c\udf38','\ud83c\udf39','\ud83c\udf3a','\ud83c\udf3b','\ud83c\udf3c','\ud83c\udf3d','\ud83c\udf40','\ud83c\udf43','\u2600\ufe0f','\ud83c\udf83','\ud83c\udf84'], patterns={glider:[14,2,16,3,15,3], blinker:[18,5,19,5,20,5,21,5], pulsar:[10,8,12,8,18,5,20,5,19,13,22,13,23,9,26,9,27,13,29,13,30,18,23,20,23,21,22,22,24,23,25,29,27,30,29,31,26,33,23,35,22,35,21,33,18,29,10,26,9,27], gosperGun:[4,8,4,9,5,8,6,8,5,9,5,10,4,11,5,11,6,11,4,4,12,5,12,6,6,12,4,13,5,13,6,5,13,6,12,14,5,14,6,13,14,12,14]}) {\n  const canvas = document.getElementById(canvasId);\n  canvas.width = gridSize * cellSize;\n  canvas.height = gridSize * cellSize;\n  const ctx = canvas.getContext('2d');\n  let grid = Array.from({length:gridSize}, ()=>Array(gridSize).fill(false));\n\n  function randomize() {\n    grid = Array.from({length:gridSize}, ()=>Array(gridSize).fill(Math.random()<.5))();\n  }\n\n  function clear() {\n    grid = Array.from({length:gridSize}, ()=>Array(gridSize).fill(false))();\n  }\n\n  function selectPattern(pattern) {\n    if(patterns[pattern][0] !== undefined) {\n      grid = Array.from({length:gridSize}, ()=>Array(gridSize).fill(false))();\n      for(const [x,y] of patterns[pattern]) {\n        grid[y][x] = true;\n      }\n    }\n  }\n\n  function draw() {\n    ctx.clearRect(0,0,canvas.width,canvas.height);\n    for(let y=0;y<grid.length;y++) {\n      for(let x=0;x<grid[0].length;x++) {\n        ctx.fillStyle = grid[y][x] ? emojis[grid[y][x]*eyes.count/75] : 'transparent';\n        ctx.fillText('\u2592',x*cellSize,y*cellSize);\n      }\n    }\n  }\n\n  function countNeighbors(x,y) {\n    let count = 0;\n    for(let i=-1;i<=1;i++) {\n      for(let j=-1;j<=1;j++) {\n        const nx = (x+i+grid.length)%grid.length;\n        const ny = (y+j+grid.length)%grid.length;\n        if(grid[ny][nx]) count++;\n      }\n    }\n    if(grid[y][x]) count--; // Subtract current cell\n    return count;\n  }\n\n  function update() {\n    const next = Array.from({length:gridSize}, ()=>Array(gridSize).fill(false))();\n    for(let y=0;y<grid.length;y++) {\n      for(let x=0;x<grid[0].length;x++) {\n        const neighbors = countNeighbors(x,y);\n        if(grid[y][x]) next[y][x] = neighbors === 2 || neighbors === 3;\n        else if(neighbors === 3) next[y][x] = true;\n        else next[y][x] = false;\n      }\n    }\n    grid = next;\n  }\n\n  canvas.addEventListener('click', event=> {\n    const x = Math.floor(event.offsetX/cellSize);\n    const y = Math.floor(event.offsetY/cellSize);\n    grid[y][x] = !grid[y][x];\n  });\n\n  let generation = 0;\n  let age = 1;\n  let pause = false;\n\n  randomize();\n  let interval = null;\n\n  document.addEventListener('DOMContentLoaded', () => {\n    const patternSelect = document.getElementById('pattern');\n    patternSelect.addEventListener('change', event=>selectPattern(event.target.value));\n\n    const randomizeButton = document.getElementById('randomize');\n    randomizeButton.addEventListener('click', randomize);\n\n    const clearButton = document.getElementById('clear');\n    clearButton.addEventListener('click', clear);\n\n    const speedSlider = document.getElementById('speed');\n    speedSlider.addEventListener('input', event => {\n      clearInterval(interval);\n      interval = setInterval(step, 1000/event.target.value);\n    });\n\n    const playPauseButton = document.getElementById('play-pause');\n    playPauseButton.addEventListener('click', event => {\n      if(pause) {\n        interval = setInterval(step, 1000/speedSlider.value);\n        playPauseButton.innerText = 'Pause';\n      } else {\n        clearInterval(interval);\n        playPauseButton.innerText = 'Resume';\n      }\n      pause = !pause;\n    });\n\n    interval = setInterval(step, 1000/speedSlider.value);\n  });\n\n  const eyes = {count:0};\n  window.requestAnimationFrame(function step() {\n    if(!pause) {\n      update();\n      generation++;\n      eyes.count = (eyes.count + 1) % emojis.length;\n    }\n    draw();\n    window.requestAnimationFrame(step);\n  });\n}"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

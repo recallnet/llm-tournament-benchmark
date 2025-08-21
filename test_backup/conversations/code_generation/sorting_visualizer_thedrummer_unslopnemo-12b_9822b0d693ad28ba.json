@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "sorting_visualizer",
+    "eval_name": "Sorting Algorithms Visualizer",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-20T23:12:36.929567",
+    "cache_key": "9822b0d693ad28ba",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that creates a comprehensive sorting algorithms visualizer.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Implement 5 sorting algorithms: Bubble, Quick, Merge, Heap, Radix\n- Visual bars with color coding: red (comparing), yellow (swapping), green (sorted), blue (pivot)\n- Algorithm selection dropdown and speed control slider\n- Toggle between step-by-step and continuous modes\n- Real-time complexity analysis display (O-notation)\n- Scramble button with patterns: Random, Reverse, Nearly Sorted\n- Call stack depth visualization for recursive algorithms\n- Real-time comparison and swap counters\n- Working area highlighting for divide-and-conquer\n- Smooth 60 FPS performance, no external libraries\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function sortVisualizer(canvasId) {\n  const canvas = document.getElementById(canvasId);\n  const ctx = canvas.getContext('2d');\n  const Wid = canvas.width = 500;\n  const Hgt = canvas.height = 500;\n  const Max = 200;\n  const Brc = 4;\n  let bars;\n\n  // Generate random bars\n  function generateBars(n, defaultSortType = 'random') {\n    //...\n  }\n\n  // Draw bars on canvas\n  function drawBars(arrayLength, barHeight) {\n    //...\n  }\n\n  // Implement sorting algorithms\n  function bubbleSort(array, comparisons, swaps, step = 0) {\n    //...\n  }\n  function quickSort(array, left, right, comparisons, swaps, stack, step = 0) {\n    //...\n  }\n  function mergeSort(array, merge, comparisons, swaps, step = 0) {\n    //...\n  }\n  function heapSort(array, heap, comparisons, swaps, step = 0) {\n    //...\n  }\n  function radixSort(array, Mantissa, comparisons, swaps, step = 0) {\n    //...\n  }\n\n  // UI elements\n  const algorithms = {\n    Bubble: bubbleSort,\n    Quick: quickSort,\n    Merge: mergeSort,\n    Heap: heapSort,\n    Radix: radixSort\n  };\n  let sortType = 'Bubble';\n  let arraySize = 50, stepMode = true, speed = 0.2;\n\n  // UI interactions\n  document.addEventListener('DOMContentLoaded', () => {\n    //...\n  });\n  document.querySelector('#scramble').addEventListener('click', () => {\n    //...\n  });\n  document.querySelector('#step').addEventListener('click', () => {\n    //...\n  });\n  document.querySelector('#continuous').addEventListener('click', () => {\n    //...\n  });\n  document.querySelector('#slower').addEventListener('click', () => {\n    //...\n  });\n  document.querySelector('#faster').addEventListener('click', () => {\n    //...\n  });\n  document.querySelector('#reset').addEventListener('click', () => {\n    //...\n  });\n  document.querySelector('#size').addEventListener('input', () => {\n    //...\n  });\n  document.querySelector('#algo').addEventListener('change', e => {\n    //...\n  });\n\n  // Sorting animation loop\n  let comparisons = 0, swaps = 0, stack = [], main;\n  function sortFocus(step = 0) {\n    //...\n  }\n  function sortStep() {\n    //...\n  }\n  function sortContinue() {\n    //...\n  }\n  function animateSort() {\n    //...\n  }\n\n  // Initial setup and start sorting\n  generateBars(arraySize, sortType);\n  animateSort();\n\n  return {\n    generateBars,\n    bubbleSort,\n    quickSort,\n    mergeSort,\n    heapSort,\n    radixSort,\n    stepSort: sortFocus,\n    continuousSort: animateSort\n  };\n}"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

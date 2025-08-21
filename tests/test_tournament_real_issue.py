@@ -4,7 +4,6 @@ Test the real tournament issue with actual data.
 """
 
 import json
-import time
 from pathlib import Path
 
 
@@ -13,7 +12,7 @@ def test_actual_tournament_bottleneck():
     print("🔍 Analyzing actual tournament data...")
 
     # Check the size of conversations.json
-    conv_file = Path("data/conversations.json")
+    conv_file = Path("data/testonly/conversations.json")
     if not conv_file.exists():
         print("❌ conversations.json not found")
         return False
@@ -25,7 +24,7 @@ def test_actual_tournament_bottleneck():
     print(f"📊 {conv_count} conversations to process")
 
     # Check skills data
-    skills_file = Path("data/loaded_skills.json")
+    skills_file = Path("data/testonly/loaded_skills.json")
     with open(skills_file) as f:
         skills_data = json.load(f)
 
@@ -38,12 +37,12 @@ def test_actual_tournament_bottleneck():
         print(f"  {skill_name}: {eval_count} evals")
 
     # Calculate expected tournament complexity
-    models_file = Path("data/loaded_models.json")
+    models_file = Path("data/testonly/loaded_models.json")
     with open(models_file) as f:
         models_data = json.load(f)
 
     model_count = len(models_data["models"])
-    judge_count = len(json.load(open("data/loaded_judges.json"))["judges"])
+    judge_count = len(json.load(open("data/testonly/loaded_judges.json"))["judges"])
 
     print(f"📊 {model_count} models, {judge_count} judges")
 
@@ -56,15 +55,15 @@ def test_actual_tournament_bottleneck():
     print(f"📊 Expected ~{total_evals * expected_matches_per_eval} total matches")
 
     # Check current tournament files
-    tournament_files = list(Path("data/tournaments").rglob("*.json"))
+    from .test_utils_judge_cache import get_judge_cache_dir
+
+    judge_cache_dir = get_judge_cache_dir()
+    tournament_files = list(judge_cache_dir.rglob("*.json"))
     print(f"📊 Found {len(tournament_files)} existing tournament files")
 
     # Check if we're missing the ethical_loopholes skill
-    ethical_files = (
-        list(Path("data/tournaments/ethical_loopholes").glob("*.json"))
-        if Path("data/tournaments/ethical_loopholes").exists()
-        else []
-    )
+    ethical_loopholes_dir = judge_cache_dir / "ethical_loopholes"
+    ethical_files = list(ethical_loopholes_dir.glob("*.json")) if ethical_loopholes_dir.exists() else []
     print(f"📊 Found {len(ethical_files)} ethical_loopholes tournament files")
 
     if len(ethical_files) == 0:

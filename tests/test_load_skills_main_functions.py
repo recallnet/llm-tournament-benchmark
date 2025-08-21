@@ -1,7 +1,6 @@
 """Additional tests specifically for load_skills main function to improve coverage."""
 
 import json
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch

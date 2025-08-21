@@ -5,8 +5,9 @@ Test to isolate the tournament hanging issue.
 
 import json
 import signal
-import time
 from pathlib import Path
+
+from .test_utils_judge_cache import get_judge_cache_dir
 
 
 def test_tournament_script_timeout():
@@ -15,10 +16,10 @@ def test_tournament_script_timeout():
 
     # Check if required input files exist
     required_files = [
-        "data/conversations.json",
-        "data/loaded_models.json",
-        "data/loaded_judges.json",
-        "data/loaded_skills.json",
+        "data/testonly/conversations.json",
+        "data/testonly/loaded_models.json",
+        "data/testonly/loaded_judges.json",
+        "data/testonly/loaded_skills.json",
     ]
 
     missing_files = []
@@ -31,14 +32,14 @@ def test_tournament_script_timeout():
         raise AssertionError(f"Missing required files: {missing_files}")
 
     # Check the size/complexity of conversations.json
-    with open("data/conversations.json") as f:
+    with open("data/testonly/conversations.json") as f:
         conversations = json.load(f)
 
     conv_count = len(conversations.get("conversations", []))
     print(f"📊 Found {conv_count} conversations to process")
 
     # Check for potential infinite loop conditions
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills_data = json.load(f)
 
     total_evals = skills_data["load_info"]["total_evals"]
@@ -47,11 +48,10 @@ def test_tournament_script_timeout():
     print(f"📊 Expected ~{expected_tournaments} tournament matches for {total_evals} evals")
 
     # Check current tournament files
-    tournament_files = list(Path("data/tournaments").rglob("*.json"))
+    tournament_files = list(get_judge_cache_dir().rglob("*.json"))
     print(f"📊 Found {len(tournament_files)} existing tournament files")
 
     # Look for signs of infinite loops in tournament script
-    import scripts.run_tournaments as tournament_module
 
     # Test timeout mechanism
     print("⏱️ Testing tournament script with timeout...")

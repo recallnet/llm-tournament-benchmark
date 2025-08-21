@@ -3,9 +3,7 @@
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch
-
-import pytest
+from unittest.mock import patch
 
 from scripts.summarize_tournaments import calculate_match_result, create_tournament_summary, load_judge_cache_files, main
 
@@ -302,7 +300,6 @@ class TestMainFunctionComprehensive:
         """Test module-level execution (line 308)."""
         with patch("scripts.summarize_tournaments.main") as mock_main:
             # Test the if __name__ == "__main__" condition
-            import scripts.summarize_tournaments as summary_module
 
             # Simulate module being run as main
             if "__main__" == "__main__":  # This simulates the condition in the module

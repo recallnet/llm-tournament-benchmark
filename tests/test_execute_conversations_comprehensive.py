@@ -1,15 +1,9 @@
 """Comprehensive tests for execute_conversations.py to achieve 90%+ coverage."""
 
 import json
-import os
 import tempfile
-import time
-from datetime import datetime
 from pathlib import Path
-from unittest.mock import MagicMock, Mock, call, mock_open, patch
-
-import pytest
-import requests
+from unittest.mock import Mock, patch
 
 from scripts.execute_conversations import ConversationExecutor, cleanup_stale_cache, execute_all_conversations, main
 
@@ -437,17 +431,16 @@ class TestMainFunction:
 
             # Verify main function called execute_all_conversations with expected paths
             mock_execute.assert_called_once_with(
-                Path("data/loaded_models.json"),
-                Path("data/loaded_skills.json"),
-                Path("data/loaded_judges.json"),
-                Path("data/conversations.json"),
+                Path("data/testonly/loaded_models.json"),
+                Path("data/testonly/loaded_skills.json"),
+                Path("data/testonly/loaded_judges.json"),
+                Path("data/testonly/conversations.json"),
             )
 
     def test_main_module_execution(self):
         """Test module-level execution."""
         with patch("scripts.execute_conversations.main") as mock_main:
             # Test the if __name__ == "__main__" condition
-            import scripts.execute_conversations as exec_module
 
             # Simulate module being run as main
             if "__main__" == "__main__":  # This simulates the condition in the module

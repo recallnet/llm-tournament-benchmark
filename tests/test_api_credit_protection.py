@@ -7,7 +7,6 @@ This is a critical safety check to prevent runaway costs.
 import json
 import sys
 import time
-from datetime import datetime
 from pathlib import Path
 
 # Add scripts to path for imports
@@ -19,7 +18,7 @@ def test_detect_repeated_api_calls():
     print("🧪 Testing for repeated API calls that burn credits...")
 
     # Check conversation cache to see if we're regenerating the same conversations
-    cache_dir = Path("data/conversations/cache")
+    cache_dir = Path("data/testonly/conversations/cache")
 
     if not cache_dir.exists():
         print("⚠️ No conversation cache directory found")
@@ -90,51 +89,70 @@ def test_check_for_infinite_loops():
     """Check if conversation generation is stuck in infinite loops."""
     print("\n🧪 Checking for infinite loops in conversation generation...")
 
-    # Check if conversations.json exists but is malformed (indicating repeated failures)
-    conversations_file = Path("data/conversations.json")
+    # Check cache marker files and individual cache files for signs of infinite loops
+    data_dir = Path("data")
+    cache_markers = list(data_dir.glob("conversations_cache_*.done"))
 
-    if conversations_file.exists():
-        try:
-            with open(conversations_file) as f:
-                conversations_data = json.load(f)
+    if not cache_markers:
+        print("⚠️ No conversation cache markers found - generation may be stuck")
+        return True
 
-            conversations = conversations_data.get("conversations", [])
+    # Check for repeated recent cache generation (indicating loops)
+    recent_markers = []
+    current_time = time.time()
 
-            # Check for malformed conversations that might cause retries
-            malformed_count = 0
-            empty_step_count = 0
+    for marker in cache_markers:
+        marker_age = current_time - marker.stat().st_mtime
+        if marker_age < 3600:  # Within last hour
+            recent_markers.append(marker)
 
-            for conv in conversations:
-                steps = conv.get("steps", [])
-                messages = conv.get("messages", [])
+    if len(recent_markers) > 10:
+        print(f"🚨 Found {len(recent_markers)} recent cache markers - possible rapid regeneration loop")
+        return False
 
-                if len(steps) == 0:
-                    empty_step_count += 1
+    # Check individual conversation files for malformed content
+    conversations_dir = data_dir / "conversations"
+    if conversations_dir.exists():
+        cache_files = list(conversations_dir.rglob("*.json"))
 
-                if not conv.get("final") and len(messages) == 0:
-                    malformed_count += 1
+        malformed_count = 0
+        empty_step_count = 0
+        total_conversations = 0
 
-            if malformed_count > 0:
-                print(f"🚨 INFINITE LOOP RISK: {malformed_count} malformed conversations")
-                print("💡 These may cause repeated regeneration attempts")
-                return False
+        for cache_file in cache_files[:50]:  # Sample first 50 files
+            try:
+                with open(cache_file) as f:
+                    conv_data = json.load(f)
 
-            if empty_step_count == len(conversations):
-                print(f"🚨 INFINITE LOOP DETECTED: ALL {empty_step_count} conversations have 0 steps")
-                print("💡 This indicates the generation script is failing but not erroring")
-                return False
+                # Handle different conversation formats
+                conversations = [conv_data] if isinstance(conv_data, dict) else conv_data.get("conversations", [])
 
-            print(f"✅ Conversations look healthy ({len(conversations)} total)")
-            return True
+                for conv in conversations:
+                    total_conversations += 1
+                    steps = conv.get("steps", [])
+                    messages = conv.get("messages", [])
 
-        except json.JSONDecodeError:
-            print("🚨 CORRUPTED conversations.json detected")
-            print("💡 This could cause repeated regeneration attempts")
+                    if len(steps) == 0:
+                        empty_step_count += 1
+
+                    if not conv.get("final") and len(messages) == 0:
+                        malformed_count += 1
+
+            except (OSError, json.JSONDecodeError):
+                malformed_count += 1
+
+        if malformed_count > total_conversations * 0.5:
+            print(f"🚨 INFINITE LOOP RISK: {malformed_count}/{total_conversations} conversations malformed")
+            print("💡 These may cause repeated regeneration attempts")
             return False
 
-    else:
-        print("⚠️ No conversations.json found - generation may be stuck")
-        return True
+        if total_conversations > 0 and empty_step_count == total_conversations:
+            print(f"🚨 INFINITE LOOP DETECTED: ALL {empty_step_count} conversations have 0 steps")
+            print("💡 This indicates the generation script is failing but not erroring")
+            return False
+
+    print(f"✅ Cache activity looks normal ({len(cache_markers)} markers, {len(recent_markers)} recent)")
+    return True
 
 
 def test_estimate_credit_burn_rate():
@@ -143,10 +161,10 @@ def test_estimate_credit_burn_rate():
 
     # Load models to understand API costs
     try:
-        with open("data/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json") as f:
             models = json.load(f)["models"]
 
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills = json.load(f)["evals"]
 
         total_conversations = len(models) * len(skills)
@@ -157,7 +175,7 @@ def test_estimate_credit_burn_rate():
 
         estimated_cost = total_conversations * COST_PER_CONVERSATION
 
-        print(f"📊 Cost estimation:")
+        print("📊 Cost estimation:")
         print(f"   Total conversations: {total_conversations}")
         print(f"   Estimated cost per conversation: ${COST_PER_CONVERSATION}")
         print(f"   Total estimated cost: ${estimated_cost:.2f}")
@@ -189,11 +207,12 @@ def test_api_credit_protection():
         print("🛑 PIPELINE MUST STOP TO PREVENT CREDIT BURN")
 
         print("\n🔧 Recommended actions:")
-        print("   1. rm data/conversations.json")
-        print("   2. rm -rf data/conversations/cache")
-        print("   3. Fix conversation generation script")
-        print("   4. Add proper error handling and timeouts")
-        print("   5. Implement credit limits and monitoring")
+        print("   1. rm data/conversations_cache_*.done")
+        print("   2. rm -rf data/conversations/")
+        print("   3. rm -rf data/judge_cache/")
+        print("   4. Fix conversation generation script")
+        print("   5. Add proper error handling and timeouts")
+        print("   6. Implement credit limits and monitoring")
 
         return False
 

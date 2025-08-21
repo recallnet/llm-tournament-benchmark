@@ -3,7 +3,6 @@
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -266,8 +265,9 @@ class TestSkillRatingCalculator:
         with open(cache_path, "w") as f:
             f.write("invalid json content")
 
-        result = calculator._load_cached_ratings(cache_path)
-        assert result is None
+        cached_data, was_corrupted = calculator._load_cached_ratings(cache_path)
+        assert cached_data is None
+        assert was_corrupted is True
         assert not cache_path.exists()  # Should be cleaned up
 
     def test_cleanup_filename_without_underscore(

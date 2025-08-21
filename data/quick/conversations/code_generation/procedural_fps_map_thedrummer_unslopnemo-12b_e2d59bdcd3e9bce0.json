@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "procedural_fps_map",
+    "eval_name": "Procedural FPS Map Generator",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-21T00:32:15.594765",
+    "cache_key": "e2d59bdcd3e9bce0",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that generates procedural top-down FPS maps.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Generates procedural FPS maps with rooms, corridors, spawn points, weapon pickups\n- Color scheme: black walls, gray floors, green spawn points, red weapon pickups\n- Maps must be tactically interesting and playable (not random noise)\n- Include minimap legend and \"Generate New Map\" button\n- Flood-fill algorithm ensures all areas are reachable\n- Smooth performance targeting 60 FPS during generation\n- No external libraries, works in all major browsers\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function generateMap(canvasId, w = 500, h = 500) {\n  const canvas = document.getElementById(canvasId);\n  canvas.width = w;\n  canvas.height = h;\n  const ctx = canvas.getContext(\"2d\");\n  ctx.fillStyle = \"black\";\n  const map = Array.from({ length: h }, () => new Array(w).fill(0));\n\n  const directions = [[0, -1], [0, 1], [-1, 0], [1, 0]];\n\n  function carvePath(x, y, len) {\n    let dx = 0;\n    let dy = 0;\n    for (let i = 1; i < len; i++) {\n      const dir = Math.floor(Math.random() * 4);\n      [dx, dy] = directions[dir];\n      carve(x + dx, y + dy);\n      carve(x + i * dx, y + i * dy);\n    }\n  }\n\n  function carve(x, y) {\n    if (x >= 0 && x < w && y >= 0 && y < h && map[y][x] === 0) {\n      map[y][x] = 1;\n      ctx.fillRect(x, y, 1, 1);\n    }\n  }\n\n  function floodFill(x, y, target) {\n    const stack = [[x, y]];\n    while (stack.length > 0) {\n      const [xx, yy] = stack.pop();\n      map[yy][xx] = target;\n      for (const [dx, dy] of directions) {\n        const newX = xx + dx;\n        const newY = yy + dy;\n        if (newX >= 0 && newX < w && newY >= 0 && newY < h && map[newY][newX] === 0) {\n          stack.push([newX, newY]);\n        }\n      }\n    }\n  }\n\n  function generate() {\n    ctx.clearRect(0, 0, w, h);\n    for (let i = 0; i < 10; i++) {\n      carve(Math.floor(Math.random() * w), Math.floor(Math.random() * h), Math.floor(Math.random() * 20) + 1);\n    }\n    for (let i = 0; i < 5; i++) {\n      floodFill(Math.floor(Math.random() * w), Math.floor(Math.random() * h), 2);\n    }\n    for (let i = 0; i < 5; i++) {\n      floodFill(Math.floor(Math.random() * w), Math.floor(Math.random() * h), 3);\n    }\n  }\n\n  generate();\n\n  const button = document.createElement(\"button\");\n  button.innerHTML = \"Generate New Map\";\n  button.onclick = generate;\n  document.body.appendChild(button);\n}\n\ngenerateMap(\"mapCanvas\");"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

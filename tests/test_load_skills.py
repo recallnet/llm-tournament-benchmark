@@ -1,13 +1,11 @@
 """Comprehensive tests for load_skills.py to achieve 90%+ coverage."""
 
 import json
-import os
 import re
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, mock_open, patch
+from unittest.mock import Mock, patch
 
-import jsonschema
 import pytest
 
 from scripts.load_skills import (

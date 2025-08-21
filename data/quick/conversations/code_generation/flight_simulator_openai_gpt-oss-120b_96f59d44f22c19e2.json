@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "flight_simulator",
+    "eval_name": "Flight Simulator with Realistic Bugs",
+    "model_id": "openai/gpt-oss-120b",
+    "model_slug": "gpt-oss-120b",
+    "model_author": "OpenAI",
+    "timestamp": "2025-08-21T00:25:40.923994",
+    "cache_key": "96f59d44f22c19e2",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that implements a flight simulator with intentionally realistic aviation bugs.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Renders 3D-perspective flight view with horizon, terrain, and HUD\n- HUD displays: speed, altitude, heading, fuel\n- Aircraft controls: throttle, pitch, roll, yaw\n- Intentional realistic bugs: instrument lag during high G-forces, altimeter stickiness at certain altitudes, compass deviation near magnetic anomalies, engine power fluctuation during steep climbs\n- Visual indicators when bugs affect instruments\n- Smooth 60 FPS performance\n- No external libraries, works in all major browsers\n- Code must clearly document that bugs are intentional features\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function startFlightSim(canvasId){const canvas=document.getElementById(canvasId);if(!canvas)return;canvas.width=500;canvas.height=500;const ctx=canvas.getContext('2d');const keys={};window.addEventListener('keydown',e=>keys[e]=true);window.addEventListener('keyup',e=>keys[e.code]=false);const toRad=deg=>deg*Math.PI/180;const toDeg=rad=>rad*180/Math.PI;const lerp=(a,b,t)=>a+(b-a)*t;const aircraft={x:0,y:0,z:5000,vx:0,vy:0,vz:0,pitch:0,roll:0,yaw:0,throttle:0.5,fuel:1000};const display={speed:0,altitude:0,heading=0,fuel:0};let lastTime=performance.now();let altStuck=false;let altStuckTimer=0;let highGTimer=0;function update(dt){const maxThrust=200;let engineFactor=1;if(Math.abs(aircraft.pitch)>15){engineFactor=0.8+Math.random()*0.4;}let thrust=aircraft.throttle*maxThrust*engineFactor;let accelX=Math.cos(toRad(aircraft.yaw))*Math.cos(toRad(aircraft.pitch))*thrust;let accel=Math.sin(toRad(aircraft.yaw))*Math.cos(toRad(aircraft.pitch))*thrust;let accelZ=Math.sin(toRad(aircraft.pitch))*thrust-9.81;let oldVx=aircraft.vx,oldVy=aircraft.vy,oldVz=aircraft.vz;aircraft.vx+=accelX*dt;aircraft.vy+=accelY*dt;aircraft.vz+=accelZ*dt;aircraft.x+=aircraft.vx*dt;aircraft.y+=aircraft.vy*dt;aircraft.z+=aircraft.vz*dt;if(aircraft.z<0){aircraft.z=0;aircraft.vz=0;}aircraft.fuel-=aircraft.throttle*dt*0.5;if(aircraft.fuel<0)aircraft.fuel=0;if(keys['ArrowUp'])aircraft.pitch+=30*dt;if(keys['ArrowDown'])aircraft.pitch-=30*dt;if(keys['ArrowLeft'])aircraft.roll-=30*dt;if(keys['ArrowRight'])aircraft.roll+=30*dt;if(keys['KeyA'])aircraft.yaw+=30*dt;if(keys['KeyD'])aircraft.yaw-=30*dt;if(keys['KeyW'])aircraft.throttle=Math.min(1,aircraft.throttle+0.5*dt);if(keys['KeyS'])aircraft.throttle=Math.max(0,aircraft.throttle-0.5*dt);aircraft.pitch=Math.max(-45,Math.min(45,aircraft.pitch));aircraft.roll=Math.max(-45,Math.min(45,aircraft.roll));let speed=Math.sqrt(aircraft.vx**2+aircraft.vy**2+aircraft.vz**2);let accelMag=Math.sqrt((aircraft.vx-oldVx)**2+(aircraft.vy-oldVy)**2+(aircraft.vz-oldVz)**2)/dt;let gForce=accelMag/9.81;let lagFactor=0.1;if(gForce>2){lagFactor=0.02;highGTimer=30;}letLag=highGTimer>0?0.02:0.1;display.speed=lerp(display.speed,speed,displayLag);if(!altStuck||altStuckTimer<=0){let targetAlt=aircraft.z;let diff=Math.abs(targetAlt-Math.round(targetAlt/1000)*1000);if(diff<5){altStuck=true;altStuckTimer=30;}display.altitude=lerp(display.altitude,targetAlt,displayLag);}else{altStuckTimer--;if(altStuckTimer<=0)Stuck=false;}let heading=toDeg(aircraft.yaw)%360;if(heading<0)heading+=360;if(aircraft.x>2000&&aircraft.x<3000){heading+=15*Math.sin(performance.now()/500);display.heading=lerp(display.heading,heading,0.05);}else{display.heading=lerp(display.heading,heading,displayLag);}display.fuel=lerp(display.fuel,aircraft.fuel,displayLag);if(highGTimer>0)highGTimer--;}function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);const horizonY=canvas.height/2+aircraft.pitch*2;ctx.fillStyle='#87CEEB';ctx.fillRect(0,0,canvas.width,horizonY);ctx.fillStyle='#228B22';ctx.fillRect(0,horizonY,canvas.width,canvas.height-horizonY);ctx.strokeStyle='#FFFFFFctx.beginPath();ctx.moveTo0,horizonY);ctx.lineTo(canvas.width,horizonY);ctx.stroke();ctx.fillStyle='rgba(139,69,19,0.5)';for(let i=-5;i<5;i++){let sx=canvas.width/2+aircraft.roll*5+i*50;let sy=horizonY+Math.tan(toRad(aircraft.pitch))*i*30;ctx.beginPath();ctx.arc(sx,sy,30,0,2*Math.PI);ctx.fill();}ctx.fillStyle='#000';ctx.font='14px monospace';ctx.textAlign='left';ctx.fillText('SPD: '+display.speed.toFixed(1)+' m/s',10,20);ctx.fillText('ALT: '+display.altitude.toFixed(0)+' m',10,40);ctx.fillText('HDG: '+display.heading.toFixed(0)+'\u00b0',10,60);ctx.fillText('FUEL: '+display.fuel.toFixed(0)+' L',10,80);if(highGTimer>0){ctx.fillStyle='red';ctx.fillText('HIGH G-LAG',10,100);}if(altStuck){ctx.fillStyle='orange';ctx.fillText('ALT STICKY',10,120);}if(aircraft.x>2000&&aircraft.x<3000){ctx.fillStyle='orange';ctx.fillText('COMPASS ANOMALY',10,140);}if(Math.abs(aircraft.pitch)>15){ctx.fillStyle='orange';ctx.fillText('ENGINE FLUCT',10,160);}requestAnimationFrame(loop);}function loop(ts){let dt=(ts-lastTime)/1000;lastTime=ts;update(dt);draw();}requestAnimationFrame(loop);}"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

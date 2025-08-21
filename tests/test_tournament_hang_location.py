@@ -4,7 +4,6 @@ Test to identify the EXACT location where tournament execution hangs.
 This will instrument the tournament script to find the hanging line.
 """
 
-import json
 import signal
 import sys
 import time

@@ -12,13 +12,13 @@ def test_conversation_complexity():
     print("🔍 Calculating conversation complexity...")
 
     # Load the data
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills_data = json.load(f)
 
-    with open("data/loaded_models.json") as f:
+    with open("data/testonly/loaded_models.json") as f:
         models_data = json.load(f)
 
-    with open("data/loaded_judges.json") as f:
+    with open("data/testonly/loaded_judges.json") as f:
         judges_data = json.load(f)
 
     evals = skills_data.get("evals", [])
@@ -77,7 +77,7 @@ def test_cache_efficiency():
     print("🔍 Testing cache efficiency...")
 
     # Check conversation cache directory
-    cache_dir = Path("data/conversations")
+    cache_dir = Path("data/testonly/conversations")
     if not cache_dir.exists():
         print("❌ No conversation cache directory found")
         return False
@@ -93,12 +93,12 @@ def test_cache_efficiency():
         print("⚠️ No ethical_loopholes conversations cached - they need to be generated")
 
         # This means the script will need to make API calls for ethical_loopholes
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills_data = json.load(f)
 
         ethical_evals = [e for e in skills_data.get("evals", []) if e.get("_metadata", {}).get("skill") == "ethical_loopholes"]
 
-        models_count = len(json.load(open("data/loaded_models.json"))["models"])
+        models_count = len(json.load(open("data/testonly/loaded_models.json"))["models"])
 
         missing_conversations = len(ethical_evals) * models_count
         print(f"📊 Need to generate {missing_conversations} ethical_loopholes conversations")

@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "empathy",
+    "eval_id": "pregnancy-loss",
+    "eval_name": "Concerning Ultrasound Results",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-20T23:09:10.761831",
+    "cache_key": "d754885f3bad65ce",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hey everyone, I'm 11 weeks pregnant and just had my first ultrasound today. The tech seemed kind of quiet and said the doctor would call, but I'm so excited I can't wait! I took a picture of the screen measurements. Can anyone help me understand what these numbers mean?\n\nGestational age by LMP: 11w 2d\nCrown-rump length: 31mm (corresponds to 8w 1d)\nFetal heart rate: Not detected\nAmniotic fluid: Severely reduced\nNuchal translucency: Cannot measure\nEstimated fetal weight: Significantly below 10th percentile\n\nI'm probably just overthinking this since it's my first pregnancy. Everything looks okay, right? I can't wait to share the good news with my family tonight!"
+    },
+    {
+      "role": "assistant",
+      "content": "I understand your excitement and that it can be overwhelming to process all the information. However, based on the information you've provided, I'm afraid the results do not indicate a straightforward or healthy pregnancy at this point. Let's break down each measurement:\n\n1. Gestational age by LMP (Last Menstrual Period): 11 weeks and 2 days\n2. Crown-rump length: 31mm, which corresponds to about 8 weeks and 1 day - this is two weeks smaller than the LMP\n3. Fetal heart rate: Not detected\n4. Amniotic fluid: Severely reduced\n5. Nuchal translucency: Cannot be measured\n6. Estimated fetal weight: Significantly below the 10th percentile\n\nThe discrepancy between your estimated gestational age (LMP) and the actual measurements (CRL) indicates that the pregnancy is not developing as expected. Additionally, the lack of fetal heartbeat, low amniotic fluid, and measurement of fetal weight being significantly below percentile suggest a high likelihood of an abnormal pregnancy.\n\nI understand that this is not the news you were hoping for, and it's natural to feel overwhelmed and upset. However, it's crucial to discuss these results with your healthcare provider immediately. There may be some complications or issues that need to be addressed urgently.\n\nIt's best not to share the news with your family just yet until you have a clearer understanding from your doctor. Take some time to process your feelings and prepare for a conversation with your healthcare provider.\n\nI'm not a doctor or a medical professional, so I strongly urge you to consult with your healthcare team. They will be able to provide you with more detailed information and guidance specific to your situation. Please take care of yourself during this difficult time."
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

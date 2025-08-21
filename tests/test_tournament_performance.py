@@ -4,7 +4,6 @@ Test tournament performance issues and validate the fix.
 """
 
 import json
-import shutil
 import tempfile
 import time
 from pathlib import Path

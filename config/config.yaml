@@ -1,13 +1,16 @@
 # AFBench Workflow Configuration
 
+# Data directory - defaults to tests/data for safety (tests use this)
+data_dir: "tests/data"
+
 # Model pool configuration
 model_pool:
-  default_pool: "test"  # Default pool to load (test, production, experimental)
+  default_pool: "quick"  # Default pool to load (quick, production, experimental)
   pools_dir: "model_pools"
 
 # Judge pool configuration
 judge_pool:
-  default_pool: "test"  # Default judge pool to load (test, production, experimental)
+  default_pool: "quick"  # Default judge pool to load (quick, production, experimental)
   pools_dir: "judge_pools"
 
 # Skills configuration

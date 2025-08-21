@@ -11,28 +11,37 @@ import sys
 import tempfile
 from pathlib import Path
 
+from .test_utils_judge_cache import get_judge_cache_dir
+
 # Add scripts to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
 
 
-def test_conversation_cache_key_consistency():
+def test_conversation_cache_key_consistency(isolated_conversations_cache):
     """Test that conversation cache keys are consistent and properly invalidated."""
     print("🔍 Testing conversation cache key consistency...")
 
-    # Load real data
-    try:
-        with open("data/loaded_models.json") as f:
-            models_data = json.load(f)
-        with open("data/loaded_skills.json") as f:
-            skills_data = json.load(f)
-    except FileNotFoundError:
-        print("   ⚠️ Test data not found - skipping")
-        return True
+    # Create minimal test data
+    models_data = {
+        "models": [
+            {"id": "test/model-1", "slug": "test-model-1", "endpoint": "openrouter"},
+            {"id": "test/model-2", "slug": "test-model-2", "endpoint": "openrouter"},
+        ]
+    }
+
+    skills_data = {
+        "evals": [
+            {"id": "eval-1", "chain": [{"prompt": "Test prompt 1"}]},
+            {"id": "eval-2", "chain": [{"prompt": "Test prompt 2"}]},
+        ]
+    }
 
     from execute_conversations import ConversationExecutor
 
-    # Test cache key generation
-    executor = ConversationExecutor(Path("data/conversations"), Path("data/intermediaries"))
+    # Test cache key generation with isolated directories
+    executor = ConversationExecutor(
+        isolated_conversations_cache["conversations"], isolated_conversations_cache["intermediaries"]
+    )
 
     model = models_data["models"][0]
     eval_data = skills_data["evals"][0]
@@ -79,7 +88,7 @@ def test_tournament_cache_key_dependencies():
 
     try:
         # Check if we have tournament data
-        tournament_files = list(Path("data/tournaments").glob("*/*.json"))
+        tournament_files = list(get_judge_cache_dir().glob("*/*.json"))
         if not tournament_files:
             print("   ⚠️ No tournament files to test - skipping")
             return True
@@ -103,20 +112,16 @@ def test_tournament_cache_key_dependencies():
         return False
 
 
-def test_skill_ratings_cache_key_dependencies():
+def test_skill_ratings_cache_key_dependencies(isolated_skill_cache):
     """Test that skill ratings cache keys depend on tournament data."""
     print("\n🔍 Testing skill ratings cache key dependencies...")
 
-    try:
-        with open("data/loaded_models.json") as f:
-            models_data = json.load(f)
-        with open("data/loaded_judges.json") as f:
-            judges_data = json.load(f)
-        with open("data/loaded_skills.json") as f:
-            skills_data = json.load(f)
-    except FileNotFoundError:
-        print("   ⚠️ Test data not found - skipping")
-        return True
+    # Create test data
+    models_data = {"models": [{"id": "test/model-1", "slug": "test-model-1"}]}
+
+    judges_data = {"judges": [{"id": "test/judge-1", "slug": "test-judge-1"}]}
+
+    skills_data = {"evals": [{"id": "eval-1", "chain": [{"prompt": "Test prompt 1"}]}]}
 
     # Test with mock tournament data
     mock_tournament_summaries = {
@@ -125,7 +130,7 @@ def test_skill_ratings_cache_key_dependencies():
 
     from calculate_skill_ratings import SkillRatingCalculator
 
-    calculator = SkillRatingCalculator(Path("data/skill_ratings"))
+    calculator = SkillRatingCalculator(isolated_skill_cache)
 
     # Generate cache key
     key1 = calculator._generate_cache_key(
@@ -153,12 +158,27 @@ def test_skill_ratings_cache_key_dependencies():
     return True
 
 
-def test_cache_file_naming_consistency():
+def test_cache_file_naming_consistency(isolated_conversations_cache):
     """Test that cache file names are consistent with their content."""
     print("\n🔍 Testing cache file naming consistency...")
 
+    # Create a mock conversation file to test naming consistency
+    test_metadata = {"cache_key": "abc123", "model_id": "test/model", "eval_id": "eval-test"}
+    test_conv_data = {"conversation": [{"role": "user", "content": "test"}], "metadata": test_metadata}
+
+    # Create test file in isolated cache
+    test_skill_dir = isolated_conversations_cache["conversations"] / "test-skill"
+    test_skill_dir.mkdir()
+    test_filename = (
+        f"{test_metadata['eval_id']}_{test_metadata['model_id'].replace('/', '_')}_{test_metadata['cache_key']}.json"
+    )
+    test_file = test_skill_dir / test_filename
+
+    with open(test_file, "w") as f:
+        json.dump(test_conv_data, f)
+
     # Check conversation cache files
-    conv_files = list(Path("data/conversations").glob("*/*.json"))
+    conv_files = list(isolated_conversations_cache["conversations"].glob("*/*.json"))
     if not conv_files:
         print("   ⚠️ No conversation files to test - skipping")
         return True
@@ -196,30 +216,23 @@ def test_cache_invalidation_propagation():
     """Test that changes properly propagate through the pipeline."""
     print("\n🔍 Testing cache invalidation propagation...")
 
-    # Create a test scenario with temporary modified data
+    # Create a test scenario with temporary data
     with tempfile.TemporaryDirectory() as temp_dir:
         temp_path = Path(temp_dir)
 
-        # Copy original data
-        try:
-            shutil.copy("data/loaded_skills.json", temp_path / "skills_original.json")
-            shutil.copy("data/loaded_skills.json", temp_path / "skills_modified.json")
-        except FileNotFoundError:
-            print("   ⚠️ Skills data not found - skipping")
-            return True
+        # Create original test data
+        skills_data = {"evals": [{"id": "eval-1", "chain": [{"prompt": "Original prompt"}]}]}
 
-        # Modify the skills file
-        with open(temp_path / "skills_modified.json") as f:
-            skills_data = json.load(f)
+        # Save original
+        with open(temp_path / "skills_original.json", "w") as f:
+            json.dump(skills_data, f, indent=2)
 
-        # Modify first eval prompt
-        if skills_data["evals"]:
-            first_eval = skills_data["evals"][0]
-            if "chain" in first_eval and first_eval["chain"]:
-                first_eval["chain"][0]["prompt"] += " [TEST MODIFICATION]"
+        # Modify the skills data
+        skills_data_modified = skills_data.copy()
+        skills_data_modified["evals"][0]["chain"][0]["prompt"] += " [TEST MODIFICATION]"
 
         with open(temp_path / "skills_modified.json", "w") as f:
-            json.dump(skills_data, f, indent=2)
+            json.dump(skills_data_modified, f, indent=2)
 
         # Compare file hashes (simulating cache key generation)
         with open(temp_path / "skills_original.json", "rb") as f:
@@ -229,7 +242,7 @@ def test_cache_invalidation_propagation():
             modified_hash = hashlib.sha256(f.read()).hexdigest()[:8]
 
         if original_hash == modified_hash:
-            print(f"   ❌ File hashes should differ after modification")
+            print("   ❌ File hashes should differ after modification")
             return False
 
         print(f"   ✅ File hash changes: {original_hash} -> {modified_hash}")
@@ -237,27 +250,32 @@ def test_cache_invalidation_propagation():
     return True
 
 
-def test_cache_collision_prevention():
+def test_cache_collision_prevention(isolated_conversations_cache):
     """Test that different inputs don't produce the same cache keys."""
     print("\n🔍 Testing cache collision prevention...")
 
     # Test different model-eval combinations produce different keys
     from execute_conversations import ConversationExecutor
 
-    try:
-        with open("data/loaded_models.json") as f:
-            models_data = json.load(f)
-        with open("data/loaded_skills.json") as f:
-            skills_data = json.load(f)
-    except FileNotFoundError:
-        print("   ⚠️ Test data not found - skipping")
-        return True
+    # Create test data with multiple models and evals
+    models_data = {
+        "models": [
+            {"id": "test/model-1", "slug": "test-model-1", "endpoint": "openrouter"},
+            {"id": "test/model-2", "slug": "test-model-2", "endpoint": "openrouter"},
+        ]
+    }
 
-    if len(models_data["models"]) < 2 or len(skills_data["evals"]) < 2:
-        print("   ⚠️ Need at least 2 models and 2 evals for collision testing - skipping")
-        return True
+    skills_data = {
+        "evals": [
+            {"id": "eval-1", "chain": [{"prompt": "Test prompt 1"}]},
+            {"id": "eval-2", "chain": [{"prompt": "Test prompt 2"}]},
+            {"id": "eval-3", "chain": [{"prompt": "Test prompt 3"}]},
+        ]
+    }
 
-    executor = ConversationExecutor(Path("data/conversations"), Path("data/intermediaries"))
+    executor = ConversationExecutor(
+        isolated_conversations_cache["conversations"], isolated_conversations_cache["intermediaries"]
+    )
 
     # Generate cache keys for different combinations
     cache_keys = set()
@@ -299,7 +317,7 @@ if __name__ == "__main__":
             results.append((test_name, False))
 
     # Summary
-    print(f"\n📋 CACHE ID CONSISTENCY TEST SUMMARY:")
+    print("\n📋 CACHE ID CONSISTENCY TEST SUMMARY:")
     passed = 0
     for test_name, result in results:
         status = "✅ PASS" if result else "❌ FAIL"

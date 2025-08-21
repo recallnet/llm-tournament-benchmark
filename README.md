@@ -23,6 +23,36 @@ AFBench is an advanced AI model evaluation pipeline that:
 - **Skill Rating**: OpenSkill-based rating system for model capabilities
 - **Static Site Generation**: Web interface for results review
 
+## Pipeline Data Flow
+
+AFBench follows a multi-stage pipeline architecture:
+
+1. **Configuration Loading**: Load model pools, judge pools, and skill definitions
+   - Input: `model_pools/*.csv`, `judge_pools/*.csv`, `skills/*/*.json`
+   - Output: `data/loaded_models.json`, `data/loaded_judges.json`, `data/loaded_skills.json`
+
+2. **Parallel Conversation Execution**: Generate model conversations with evaluation scenarios
+   - Input: Configuration data from stage 1
+   - Output: `data/conversations/skill/eval_model_hash.json` (cached individual files)
+   - Markers: `data/conversations_cache_model.done`
+
+3. **Tournament Execution**: Run Swiss-system tournaments between models
+   - Input: Conversation cache files and configuration data
+   - Output: `data/tournaments.json`
+
+4. **Tournament Summarization**: Aggregate match results and rankings
+   - Input: `data/tournaments.json` and configuration data 
+   - Output: `data/tournament_summaries.json`
+
+5. **Skill Rating Calculation**: Compute OpenSkill Bradley-Terry ratings
+   - Input: `data/tournament_summaries.json` and configuration data
+   - Output: `data/skill_ratings.json`
+
+**Cache Management**: The pipeline maintains sophisticated caching:
+- `data/conversations/`: Individual conversation results (prevents re-execution)
+- `data/judge_cache/`: Judge decision cache (prevents re-evaluation)  
+- `data/skill_ratings/`: Rating calculation cache (prevents re-computation)
+
 ## Quick Start
 
 ```bash
@@ -92,14 +122,25 @@ pre-commit install  # One-time setup (included in setup_qa.sh)
 │   ├── code_generation/    # Programming tasks
 │   ├── document_summarization/ # Summarization tasks  
 │   ├── persuasiveness/     # Communication tasks
-│   └── respect_no_em_dash_requests/ # Constraint tasks
+│   ├── empathy/            # Empathy assessment tasks
+│   ├── harm_avoidance/     # Safety evaluation tasks
+│   ├── hidden_messages/    # Hidden message detection
+│   └── ethical_loopholes/  # Ethical reasoning tasks
 ├── model_pools/            # AI model configurations
 ├── judge_pools/            # Judge model configurations
 ├── scripts/                # Pipeline processing scripts
-├── data/                   # Generated evaluation data
+├── data/                   # Generated evaluation data and cache
+│   ├── conversations/      # Individual conversation cache files
+│   ├── intermediaries/     # Intermediate processing cache
+│   ├── judge_cache/        # Judge decision cache
+│   ├── skill_ratings/      # Skill rating calculation cache
+│   ├── loaded_*.json       # Pipeline configuration data
+│   ├── tournaments.json    # Tournament results
+│   ├── tournament_summaries.json  # Match history and rankings
+│   └── skill_ratings.json # Final model skill ratings
 ├── output/                 # Analysis results and plots
 ├── site/                   # Static site for results review
-├── tests/                  # Test suite
+├── tests/                  # Test suite with safety guards
 ├── pyproject.toml          # Project configuration and QA settings
 ├── Snakefile              # Main workflow definition
 ├── requirements.txt        # Runtime dependencies

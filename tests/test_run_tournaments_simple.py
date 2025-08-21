@@ -1,11 +1,6 @@
 """Simple focused tests to increase run_tournaments.py coverage."""
 
-import json
-import tempfile
-from pathlib import Path
-from unittest.mock import MagicMock, Mock, patch
-
-import pytest
+from unittest.mock import Mock, patch
 
 from scripts.run_tournaments import JudgeExecutor, SwissTournament, TournamentMatch
 
@@ -52,27 +47,35 @@ class TestSimpleCoverage:
         assert match1.model_a_id == "model_z"
         assert match1.model_b_id == "model_a"
 
-    @patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"OPENROUTER_API_KEY": "test-key"})
     def test_judge_executor_cache_key_generation(self):
         """Test judge cache key generation."""
         executor = JudgeExecutor()
 
-        # Test cache key consistency
-        key1 = executor._generate_judge_cache_key("judge_1", "model_a", "model_b", "eval_1", "skill_1", "view_content")
-        key2 = executor._generate_judge_cache_key("judge_1", "model_a", "model_b", "eval_1", "skill_1", "view_content")
+        # Create a test match and eval config
+        match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
+        eval_config = {"id": "test_eval", "prompt": "test prompt"}
+        final_prompt = "test prompt content"
+
+        # Test cache key consistency using the actual method signature
+        key1 = executor._generate_judge_cache_key_with_prompt(match, "judge_1", final_prompt, eval_config)
+        key2 = executor._generate_judge_cache_key_with_prompt(match, "judge_1", final_prompt, eval_config)
 
         assert key1 == key2
         assert len(key1) == 16  # Should be 16 character hash
 
-    @patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"OPENROUTER_API_KEY": "test-key"})
     def test_judge_executor_cache_path(self):
         """Test cache path generation."""
         executor = JudgeExecutor()
 
-        cache_path = executor._get_judge_cache_path("skill_1", "cache_key_123")
+        # Create a mock match
+        match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
+        cache_path = executor._get_judge_cache_path(match, "judge_1", "cache_key_123")
 
         assert "skill_1" in str(cache_path)
         assert "cache_key_123" in str(cache_path)
+        assert "judge_1" in str(cache_path)
         assert cache_path.suffix == ".json"
 
     def test_tournament_scoring_edge_cases(self):
@@ -88,7 +91,7 @@ class TestSimpleCoverage:
         match.add_judge_result("judge_1", "TIE", [], "It's a tie")
         match.calculate_result()
 
-        tournament.update_scores([match])
+        tournament.update_scores(match)
 
         # Both models should get 0.5 points for a tie
         assert tournament.scores["model_a"] == 0.5
@@ -121,26 +124,26 @@ class TestSimpleCoverage:
         result = match.calculate_result()
         assert result == "TIE"  # TIE should win with 2 votes
 
-    @patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"OPENROUTER_API_KEY": "test-key"})
     def test_judge_vote_parsing_edge_cases(self):
         """Test judge vote parsing with various formats."""
         executor = JudgeExecutor()
 
-        # Test vote parsing with different formats
+        # Test vote parsing with the actual format expected by the parser
         test_cases = [
-            ("**Vote: B**\nExplanation here", "B"),
-            ("Vote: a (case insensitive)", "A"),
-            ("I think model A is better", "A"),
-            ("Model B wins this round", "B"),
-            ("This is a tie between both", "TIE"),
+            ("MY VOTE IS FOR: B", "B"),
+            ("MY VOTE IS FOR: A", "A"),
+            ("MY VOTE IS FOR: TIE", "TIE"),
+            ("Some text... MY VOTE IS FOR: A ... more text", "A"),
+            ("Some text... MY VOTE IS FOR: B ... more text", "B"),
             ("No clear vote here", "TIE"),  # Default fallback
         ]
 
         for response_text, expected_vote in test_cases:
-            vote, explanation = executor._parse_judge_vote(response_text)
+            vote = executor._parse_judge_vote(response_text)
             assert vote == expected_vote
 
-    @patch.dict("os.environ", {"OPENAI_API_KEY": "test-key"})
+    @patch.dict("os.environ", {"OPENROUTER_API_KEY": "test-key"})
     def test_judge_executor_initialization(self):
         """Test JudgeExecutor initialization edge cases."""
         executor = JudgeExecutor()
@@ -152,7 +155,7 @@ class TestSimpleCoverage:
         assert executor.api_key == "test-key"
 
         # Base URL should be set
-        assert "openai" in executor.base_url.lower()
+        assert "openrouter" in executor.base_url.lower()
 
     def test_tournament_to_dict_serialization(self):
         """Test tournament serialization to dict."""
@@ -172,13 +175,13 @@ class TestSimpleCoverage:
         data = tournament.to_dict()
 
         # Check all expected fields are present
-        expected_fields = {"tournament_id", "skill_id", "eval_id", "models", "scores", "rounds", "status"}
+        expected_fields = {"tournament_id", "skill_id", "eval_id", "model_ids", "scores", "rounds", "completed"}
         assert set(data.keys()) >= expected_fields
 
         # Check data integrity
         assert data["skill_id"] == "skill_1"
         assert data["eval_id"] == "eval_1"
-        assert len(data["models"]) == 2
+        assert len(data["model_ids"]) == 2
         assert "model_a" in data["scores"]
 
 

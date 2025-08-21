@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "procedural_fps_map",
+    "eval_name": "Procedural FPS Map Generator",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-20T23:11:01.148213",
+    "cache_key": "e2d59bdcd3e9bce0",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that generates procedural top-down FPS maps.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Generates procedural FPS maps with rooms, corridors, spawn points, weapon pickups\n- Color scheme: black walls, gray floors, green spawn points, red weapon pickups\n- Maps must be tactically interesting and playable (not random noise)\n- Include minimap legend and \"Generate New Map\" button\n- Flood-fill algorithm ensures all areas are reachable\n- Smooth performance targeting 60 FPS during generation\n- No external libraries, works in all major browsers\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function generateMap(canvasId) {\n  const canvas = document.getElementById(canvasId);\n  const ctx = canvas.getContext(\"2d\");\n  const width = 500;\n  const height = 500;\n  const map = Array.from({ length: height }, () =>\n    Array(width).fill(0)\n  );\n  const prio = [];\n\n  function floodFill(x, y) {\n    if (\n      x < 0 ||\n      x >= width ||\n      y < 0 ||\n      y >= height ||\n      map[y][x] !== 0\n    )\n      return;\n    map[y][x] = -1;\n    floodFill(x + 1, y);\n    floodFill(x - 1, y);\n    floodFill(x, y + 1);\n    floodFill(x, y - 1);\n  }\n\n  function makeRoom(x, y, width, height) {\n    for (let i = 0; i < width; i++) {\n      for (let j = 0; j < height; j++) {\n        map[y][x + i] = 0;\n        map[y + j][x] = 0;\n      }\n    }\n    map[y][x] = -1;\n    map[y + height - 1][x] = -1;\n    map[y][x + width - 1] = -1;\n    map[y + height - 1][x + width - 1] = -1;\n  }\n\n  function makeCorridor(x1, y1, x2, y2) {\n    map[y1][x1] = -1;\n    map[y2][x1] = -1;\n    map[y1][x2] = -1;\n    map[y2][x2] = -1;\n    floodFill(x1, y1);\n    floodFill(x2, y1);\n    floodFill(x1, y2);\n    floodFill(x2, y2);\n  }\n\n  function makeSpawn(x, y) {\n    map[y][x] = 2;\n  }\n\n  function makeWeapon(x, y) {\n    map[y][x] = 3;\n  }\n\n  let startX = Math.floor(Math.random() * 20) * 25;\n  let startY = Math.floor(Math.random() * 20) * 25;\n  makeRoom(startX, startY, 50, 50);\n  let spawns = [[startX + 25, startY + 25]];\n  for (let i = 0; i < 10; i++) {\n    let x = Math.floor(Math.random() * 20) * 25;\n    let y = Math.floor(Math.random() * 20) * 25;\n    if (map[y + 25][x + 25] === 0) {\n      makeRoom(x, y, 50, 50);\n      spawns.push([x + 25, y + 25]);\n      for (let j = 0; j < i; j++) {\n        makeCorridor(\n          x + Math.floor(Math.random() * 25),\n          y + Math.floor(Math.random() * 25),\n          spawns[j][0],\n          spawns[j][1]\n        );\n      }\n    }\n    makeSpawn(Math.floor(Math.random() * 25) * 25, Math.floor(Math.random() * 25) * 25);\n    makeWeapon(Math.floor(Math.random() * 25) * 25, Math.floor(Math.random() * 25) * 25);\n  }\n  for (let x = 0; x < width; x++) {\n    for (let y = 0; y < height; y++) {\n      if (map[y][x] === 0) map[y][x] = 1;\n      if (map[y][x] === 1) {\n        ctx.fillStyle = \"gray\";\n        ctx.fillRect(x, y, 1, 1);\n      }\n      if (map[y][x] === -1) {\n        ctx.fillStyle = \"black\";\n        ctx.fillRect(x, y, 1, 1);\n      }\n      if (map[y][x] === 2) {\n        ctx.fillStyle = \"green\";\n        ctx.fillRect(x, y, 1, 1);\n      }\n      if (map[y][x] === 3) {\n        ctx.fillStyle = \"red\";\n        ctx.fillRect(x, y, 1, 1);\n      }\n    }\n  }\n  document.getElementById(\"legend\").innerText =\n    \"Floor: Gray\\nWall: Black\\nGren: Green\\nWpn: Red\";\n  document.getElementById(\"generate\").onclick = () => {\n    generateMap(canvasId);\n  };\n}\n\ngenerateMap(\"fps-map\");"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

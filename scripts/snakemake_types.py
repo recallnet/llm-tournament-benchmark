@@ -1,23 +1,23 @@
 """Type stubs for Snakemake global objects."""
 
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any
 
 
 class SnakemakeInput:
     """Snakemake input object with dynamic attributes."""
 
-    def __getattr__(self, name: str) -> Union[str, Path, List[str]]:
+    def __getattr__(self, name: str) -> str | Path | list[str]:
         return ""
 
 
 class SnakemakeOutput:
     """Snakemake output object with dynamic attributes."""
 
-    def __getitem__(self, index: int) -> Union[str, Path]:
+    def __getitem__(self, index: int) -> str | Path:
         return ""
 
-    def __getattr__(self, name: str) -> Union[str, Path, List[str]]:
+    def __getattr__(self, name: str) -> str | Path | list[str]:
         return ""
 
 
@@ -43,7 +43,7 @@ class SnakemakeObject:
     params: SnakemakeParams
     config: SnakemakeConfig
     threads: int
-    resources: Dict[str, Any]
+    resources: dict[str, Any]
 
     def __init__(self) -> None:
         self.input = SnakemakeInput()

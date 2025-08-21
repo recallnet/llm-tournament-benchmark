@@ -6,8 +6,8 @@ This test should pass after we fix the underlying issue.
 
 import json
 import subprocess
-import sys
-from pathlib import Path
+
+from .test_utils_judge_cache import get_judge_cache_dir
 
 
 def test_tournament_directory_creation():
@@ -15,14 +15,14 @@ def test_tournament_directory_creation():
     print("🧪 Testing tournament directory creation for all skills...")
 
     # Load all skills
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills_data = json.load(f)
 
     all_skills = list(skills_data["skills"].keys())
     print(f"📊 All loaded skills: {all_skills}")
 
     # Check if tournament directories exist for all skills
-    tournaments_base = Path("data/tournaments")
+    tournaments_base = get_judge_cache_dir()
     missing_dirs = []
 
     for skill in all_skills:
@@ -47,10 +47,10 @@ def test_skill_ratings_completeness():
     print("🧪 Testing skill ratings completeness...")
 
     # Load skills and ratings
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills_data = json.load(f)
 
-    with open("data/skill_ratings.json") as f:
+    with open("data/testonly/skill_ratings.json") as f:
         ratings_data = json.load(f)
 
     all_skills = set(skills_data["skills"].keys())
@@ -97,7 +97,7 @@ def test_results_table_includes_all_skills():
         print(output[:500] + "..." if len(output) > 500 else output)
 
         # Load expected skills
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills_data = json.load(f)
 
         all_skills = list(skills_data["skills"].keys())
@@ -133,11 +133,11 @@ def create_missing_tournament_directories():
     print("🔧 Creating missing tournament directories...")
 
     # Load all skills
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills_data = json.load(f)
 
     all_skills = list(skills_data["skills"].keys())
-    tournaments_base = Path("data/tournaments")
+    tournaments_base = get_judge_cache_dir()
 
     for skill in all_skills:
         skill_tournament_dir = tournaments_base / skill

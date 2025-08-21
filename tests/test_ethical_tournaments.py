@@ -5,8 +5,9 @@ This test should isolate the root cause and verify our fix.
 """
 
 import json
-import sys
 from pathlib import Path
+
+from .test_utils_judge_cache import get_judge_cache_dir
 
 
 def test_ethical_tournaments_missing():
@@ -14,7 +15,7 @@ def test_ethical_tournaments_missing():
     print("🧪 Testing ethical_loopholes tournament generation issue...")
 
     # 1. Verify ethical_loopholes conversations exist
-    ethical_convs_path = Path("data/conversations/ethical_loopholes")
+    ethical_convs_path = Path("data/testonly/conversations/ethical_loopholes")
     if not ethical_convs_path.exists():
         print("❌ FAIL: ethical_loopholes conversations directory doesn't exist")
         return False
@@ -32,7 +33,7 @@ def test_ethical_tournaments_missing():
         print(f"⚠️  WARNING: Expected {expected_conversations} conversations, found {len(ethical_conv_files)}")
 
     # 3. Verify ethical_loopholes skill is in loaded skills
-    with open("data/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json") as f:
         skills_data = json.load(f)
 
     if "ethical_loopholes" not in skills_data["skills"]:
@@ -43,7 +44,7 @@ def test_ethical_tournaments_missing():
     print(f"✅ ethical_loopholes skill has {ethical_skill['eval_count']} evals")
 
     # 4. Check if tournaments exist
-    tournaments_path = Path("data/tournaments/ethical_loopholes")
+    tournaments_path = get_judge_cache_dir() / "ethical_loopholes"
     if not tournaments_path.exists():
         print("❌ FAIL: ethical_loopholes tournaments directory doesn't exist")
         return False
@@ -57,7 +58,7 @@ def test_ethical_tournaments_missing():
         return False
 
     # 5. Check if skill ratings include ethical_loopholes
-    with open("data/skill_ratings.json") as f:
+    with open("data/testonly/skill_ratings.json") as f:
         ratings_data = json.load(f)
 
     if "ethical_loopholes" not in ratings_data["skill_ratings"]:
@@ -118,14 +119,14 @@ def test_snakemake_rule_coverage():
             print("⚠️  WARNING: Snakefile may not dynamically handle all skills")
 
         # Load skills and check if all are represented
-        with open("data/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json") as f:
             skills_data = json.load(f)
 
         all_skills = list(skills_data["skills"].keys())
         print(f"📊 All skills: {all_skills}")
 
         # Check tournament output files
-        tournament_files = list(Path("data/tournaments").iterdir())
+        tournament_files = list(get_judge_cache_dir().iterdir())
         existing_skills = [p.name for p in tournament_files if p.is_dir()]
         print(f"📊 Skills with tournament directories: {existing_skills}")
 

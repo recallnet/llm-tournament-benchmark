@@ -1,0 +1,11 @@
+# AFBench Test-Only Profile
+# Usage: Only for automated tests - not for user runbooks
+
+# Minimal execution settings for tests
+cores: 1
+keep-going: false
+printshellcmds: false
+
+# Test-only environment overrides
+configfiles:
+  - config/testonly_config.yaml
