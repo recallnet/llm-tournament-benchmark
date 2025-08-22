@@ -148,6 +148,9 @@ def show_data_freshness_sidebar(data):
 
 def show_models_page(data):
     """Display models overview and details."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent / "site" / "utils"))
     from github_issue_helper import issue_reporter
 
     st.header("🤖 Models")
@@ -286,6 +289,9 @@ def show_models_page(data):
 
 def show_judges_page(data):
     """Display judges overview and details."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent / "site" / "utils"))
     from github_issue_helper import issue_reporter
 
     st.header("⚖️ Judges")
@@ -326,6 +332,9 @@ def show_judges_page(data):
 
 def show_skills_page(data):
     """Display skills overview and evaluation details."""
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent / "site" / "utils"))
     from github_issue_helper import issue_reporter
 
     st.header("🎯 Skills")

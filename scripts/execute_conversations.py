@@ -107,6 +107,8 @@ class ConversationExecutor:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
+            "HTTP-Referer": "https://recall.network/",
+            "X-Title": "Recall Network"
         }
 
         payload = {"model": model_id, "messages": messages}

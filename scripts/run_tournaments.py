@@ -11,6 +11,7 @@ import os
 import random
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -469,6 +470,8 @@ class JudgeExecutor:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
+            "HTTP-Referer": "https://recall.network/",
+            "X-Title": "Recall Network"
         }
         payload = {"model": model_id, "messages": messages}
 
@@ -1150,44 +1153,10 @@ def main_with_cache_dir_data_driven(
                         )
                         match.timestamp = datetime.utcnow().isoformat()
 
-                        # Execute judges for this match
-                        for i, judge in enumerate(judges):
-                            try:
-                                vote, conversation, explanation = (
-                                    judge_executor.execute_judge_decision(
-                                        match,
-                                        judge,
-                                        eval_data,
-                                        conversations_cache_dir,
-                                        {},  # Empty intermediaries for now
-                                    )
-                                )
-                                match.add_judge_result(
-                                    judge["id"], vote, conversation, explanation
-                                )
-
-                                # Check for early consensus after 2nd judge
-                                if i == 1 and match.check_early_consensus():
-                                    print(
-                                        f"         🎯 Early consensus reached: {vote}"
-                                    )
-                                    break
-
-                            except Exception as e:
-                                print(f"         ❌ Judge {judge['id']} failed: {e}")
-                                error_conversation = [
-                                    {
-                                        "role": "user",
-                                        "content": "[JUDGE_EXECUTION_ERROR]",
-                                    },
-                                    {"role": "assistant", "content": f"Error: {e}"},
-                                ]
-                                match.add_judge_result(
-                                    judge["id"],
-                                    "TIE",
-                                    error_conversation,
-                                    f"Error: {e}",
-                                )
+                        # Execute judges for this match with parallel optimization
+                        self._execute_judges_for_match(
+                            match, judges, judge_executor, eval_data, conversations_cache_dir
+                        )
 
                         # Calculate match result
                         match.calculate_result()
