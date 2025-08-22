@@ -29,7 +29,9 @@ class TestSimpleCoverage:
         # Test bye award to lowest scoring model
         if len(pairings) == 1:
             paired_models = {pairings[0][0], pairings[0][1]}
-            unpaired = [m for m in ["model_a", "model_b", "model_c"] if m not in paired_models]
+            unpaired = [
+                m for m in ["model_a", "model_b", "model_c"] if m not in paired_models
+            ]
             if unpaired:
                 # Lowest score should get bye
                 bye_candidate = unpaired[0]
@@ -58,8 +60,12 @@ class TestSimpleCoverage:
         final_prompt = "test prompt content"
 
         # Test cache key consistency using the actual method signature
-        key1 = executor._generate_judge_cache_key_with_prompt(match, "judge_1", final_prompt, eval_config)
-        key2 = executor._generate_judge_cache_key_with_prompt(match, "judge_1", final_prompt, eval_config)
+        key1 = executor._generate_judge_cache_key_with_prompt(
+            match, "judge_1", final_prompt, eval_config
+        )
+        key2 = executor._generate_judge_cache_key_with_prompt(
+            match, "judge_1", final_prompt, eval_config
+        )
 
         assert key1 == key2
         assert len(key1) == 16  # Should be 16 character hash
@@ -108,7 +114,12 @@ class TestSimpleCoverage:
 
         # Test with sufficient rounds but tied leaders
         tournament.rounds = [[], [], []]  # 3 rounds
-        tournament.scores = {"model_0": 3.0, "model_1": 3.0, "model_2": 1.0, "model_3": 0.0}  # Tied leader
+        tournament.scores = {
+            "model_0": 3.0,
+            "model_1": 3.0,
+            "model_2": 1.0,
+            "model_3": 0.0,
+        }  # Tied leader
         # Should not be complete due to tie
         assert not tournament.is_tournament_complete()
 
@@ -175,7 +186,15 @@ class TestSimpleCoverage:
         data = tournament.to_dict()
 
         # Check all expected fields are present
-        expected_fields = {"tournament_id", "skill_id", "eval_id", "model_ids", "scores", "rounds", "completed"}
+        expected_fields = {
+            "tournament_id",
+            "skill_id",
+            "eval_id",
+            "model_ids",
+            "scores",
+            "rounds",
+            "completed",
+        }
         assert set(data.keys()) >= expected_fields
 
         # Check data integrity
@@ -193,7 +212,9 @@ class TestMainFunctionSimple:
     @patch("json.load")
     @patch("json.dump")
     @patch("builtins.print")
-    def test_main_direct_mode_insufficient_models(self, mock_print, mock_json_dump, mock_json_load, mock_open, mock_path):
+    def test_main_direct_mode_insufficient_models(
+        self, mock_print, mock_json_dump, mock_json_load, mock_open, mock_path
+    ):
         """Test main function in direct mode with insufficient models."""
         # Mock data loading - only 1 model
         mock_json_load.side_effect = [
@@ -213,4 +234,6 @@ class TestMainFunctionSimple:
             main()
 
         # Should print insufficient models message
-        mock_print.assert_any_call("⚠️  Need at least 2 models for tournaments - skipping")
+        mock_print.assert_any_call(
+            "⚠️  Need at least 2 models for tournaments - skipping"
+        )

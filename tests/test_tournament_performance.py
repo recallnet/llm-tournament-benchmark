@@ -59,7 +59,12 @@ def test_cache_validation_performance():
                 eval_id = metadata.get("eval_id")
 
                 # Validation checks (same as original)
-                if model_a in valid_models and model_b in valid_models and judge_id in valid_judges and eval_id in valid_evals:
+                if (
+                    model_a in valid_models
+                    and model_b in valid_models
+                    and judge_id in valid_judges
+                    and eval_id in valid_evals
+                ):
                     files_processed += 1
 
             except (OSError, json.JSONDecodeError):
@@ -72,12 +77,20 @@ def test_cache_validation_performance():
         performance_ok = elapsed_time < 0.5
 
         if not performance_ok:
-            print(f"❌ PERFORMANCE ISSUE: {elapsed_time:.3f}s is too slow for {num_files} files")
-            print(f"   This would take {elapsed_time * 4:.1f}s for 400 files (current benchmark size)")
+            print(
+                f"❌ PERFORMANCE ISSUE: {elapsed_time:.3f}s is too slow for {num_files} files"
+            )
+            print(
+                f"   This would take {elapsed_time * 4:.1f}s for 400 files (current benchmark size)"
+            )
         else:
-            print(f"✅ Performance acceptable: {elapsed_time:.3f}s for {num_files} files")
+            print(
+                f"✅ Performance acceptable: {elapsed_time:.3f}s for {num_files} files"
+            )
 
-        assert performance_ok, f"Performance issue: {elapsed_time:.3f}s is too slow for {num_files} files"
+        assert (
+            performance_ok
+        ), f"Performance issue: {elapsed_time:.3f}s is too slow for {num_files} files"
 
 
 def test_optimized_cache_validation():
@@ -92,9 +105,6 @@ def test_optimized_cache_validation():
 
         # Create files with predictable names that can be filtered without opening
         num_files = 100
-        valid_models = {"model_a", "model_b"}
-        valid_judges = {"judge_0", "judge_1", "judge_2"}
-        valid_evals = {"test_eval", "invalid_eval"}  # Mix of valid and invalid
 
         for i in range(num_files):
             # Some files have invalid eval names that can be filtered by filename
@@ -124,13 +134,15 @@ def test_optimized_cache_validation():
                 # Only load files that pass filename filtering
                 try:
                     with open(cache_file) as f:
-                        cached_data = json.load(f)
+                        json.load(f)
                     files_processed += 1
                 except (OSError, json.JSONDecodeError):
                     pass
 
         elapsed_time = time.time() - start_time
-        print(f"⏱️ OPTIMIZED: Processed {files_processed} valid files in {elapsed_time:.3f} seconds")
+        print(
+            f"⏱️ OPTIMIZED: Processed {files_processed} valid files in {elapsed_time:.3f} seconds"
+        )
 
         performance_ok = elapsed_time < 0.2  # Stricter threshold for optimized version
 

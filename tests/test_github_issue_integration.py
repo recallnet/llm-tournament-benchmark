@@ -30,12 +30,16 @@ class MockSessionState(dict):
 
 streamlit_mock = MagicMock()
 streamlit_mock.session_state = MockSessionState()
-streamlit_mock.columns = lambda n: [MagicMock() for _ in range(len(n) if isinstance(n, list) else n)]
+streamlit_mock.columns = lambda n: [
+    MagicMock() for _ in range(len(n) if isinstance(n, list) else n)
+]
 streamlit_mock.button = MagicMock(return_value=False)
 streamlit_mock.text_input = MagicMock(return_value="Test Issue Title")
 streamlit_mock.text_area = MagicMock(return_value="Test issue description")
 streamlit_mock.expander = MagicMock(
-    return_value=MagicMock(__enter__=MagicMock(return_value=MagicMock()), __exit__=MagicMock())
+    return_value=MagicMock(
+        __enter__=MagicMock(return_value=MagicMock()), __exit__=MagicMock()
+    )
 )
 sys.modules["streamlit"] = streamlit_mock
 
@@ -143,7 +147,11 @@ class TestGitHubIssueIntegration:
 
         # Add JSON data
         sample_json = {
-            "model_info": {"id": "thedrummer/unslopnemo-12b", "author": "TheDrummer", "ratings": {"harm_avoidance": 1652.8}}
+            "model_info": {
+                "id": "thedrummer/unslopnemo-12b",
+                "author": "TheDrummer",
+                "ratings": {"harm_avoidance": 1652.8},
+            }
         }
         reporter.capture_json_data("Model Details", sample_json)
 
@@ -155,7 +163,11 @@ class TestGitHubIssueIntegration:
         print(f"Generated issue title: {issue_content['title']}")
         print("\nGenerated issue body preview:")
         print(f"{'='*50}")
-        print(issue_content["body"][:500] + "..." if len(issue_content["body"]) > 500 else issue_content["body"])
+        print(
+            issue_content["body"][:500] + "..."
+            if len(issue_content["body"]) > 500
+            else issue_content["body"]
+        )
         print(f"{'='*50}")
 
         # Verify content
@@ -220,12 +232,16 @@ class TestGitHubIssueIntegration:
         print(f"Models context: {path1}")
 
         # Test Tournaments page
-        reporter.update_context("Tournaments", selected_skill="harm_avoidance", selected_match="match_123")
+        reporter.update_context(
+            "Tournaments", selected_skill="harm_avoidance", selected_match="match_123"
+        )
         path2 = reporter.get_context_path()
         print(f"Tournaments context: {path2}")
 
         # Test Skills page
-        reporter.update_context("Skills", selected_skill="code_generation", selected_eval="eval_456")
+        reporter.update_context(
+            "Skills", selected_skill="code_generation", selected_eval="eval_456"
+        )
         path3 = reporter.get_context_path()
         print(f"Skills context: {path3}")
 

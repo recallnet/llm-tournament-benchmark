@@ -25,7 +25,9 @@ def test_conversation_cache_state():
 
     total_expected = len(models) * len(skills)
     print(f"📊 Expected total: {total_expected} conversations")
-    print(f"📊 Progress: {len(conversation_files)}/{total_expected} ({len(conversation_files)/total_expected*100:.1f}%)")
+    print(
+        f"📊 Progress: {len(conversation_files)}/{total_expected} ({len(conversation_files)/total_expected*100:.1f}%)"
+    )
 
     if len(conversation_files) == total_expected:
         print("✅ All conversations cached - should skip generation entirely")
@@ -90,7 +92,9 @@ def test_tournament_resume_readiness():
         print("✅ tournaments.json exists - may skip tournament generation")
         return True
     else:
-        print("⏸️ tournaments.json missing - will generate from individual tournament files")
+        print(
+            "⏸️ tournaments.json missing - will generate from individual tournament files"
+        )
         return False
 
 
@@ -104,8 +108,12 @@ def test_expected_resume_behavior():
 
     print("\n📋 Resume Analysis:")
     print(f"   Conversation cache: {cache_type}")
-    print(f"   Snakemake efficiency: {'✅ efficient' if snakemake_efficient else '⚠️ may rerun'}")
-    print(f"   Tournament readiness: {'✅ ready' if tournament_ready else '⏸️ needs generation'}")
+    print(
+        f"   Snakemake efficiency: {'✅ efficient' if snakemake_efficient else '⚠️ may rerun'}"
+    )
+    print(
+        f"   Tournament readiness: {'✅ ready' if tournament_ready else '⏸️ needs generation'}"
+    )
 
     # Predict what will happen on resume
     if cache_type == "complete" and snakemake_efficient:
@@ -152,14 +160,20 @@ def test_cache_invalidation_scenarios():
         cached_models = set()
         for conv_file in Path("data/testonly/conversations").glob("*/*.json"):
             if "_" in conv_file.stem:
-                model_part = conv_file.stem.split("_")[-2]  # Extract model from filename
+                model_part = conv_file.stem.split("_")[
+                    -2
+                ]  # Extract model from filename
                 cached_models.add(model_part)
 
         if cached_models - current_models:
-            scenarios.append("Stale model cache detected - some cached conversations for removed models")
+            scenarios.append(
+                "Stale model cache detected - some cached conversations for removed models"
+            )
 
         if current_models - cached_models:
-            scenarios.append("New models detected - will need conversations for new models")
+            scenarios.append(
+                "New models detected - will need conversations for new models"
+            )
 
     except Exception as e:
         scenarios.append(f"Cannot analyze model cache: {e}")
@@ -176,10 +190,14 @@ def test_cache_invalidation_scenarios():
             cached_skills.add(skill_dir)
 
         if cached_skills - current_skills:
-            scenarios.append("Stale skill cache detected - some cached conversations for removed skills")
+            scenarios.append(
+                "Stale skill cache detected - some cached conversations for removed skills"
+            )
 
         if current_skills - cached_skills:
-            scenarios.append("New skills detected - will need conversations for new skills")
+            scenarios.append(
+                "New skills detected - will need conversations for new skills"
+            )
 
     except Exception as e:
         scenarios.append(f"Cannot analyze skill cache: {e}")

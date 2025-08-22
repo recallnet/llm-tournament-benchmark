@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "space_invaders",
+    "eval_name": "Space Invaders Game",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-21T22:29:15.362337",
+    "cache_key": "9edfd56d36f89f69",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that creates a fully playable Space Invaders game.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Player ship movement using arrow keys\n- Shooting with spacebar key\n- Enemy invaders in formation that move and shoot back\n- Collision detection between all game objects\n- Score system and visual feedback\n- Game sprites: player ship, enemy invaders, bullets, explosions\n- Win condition: clear all enemies to advance level\n- Lose conditions: enemies reach bottom or hit player\n- Smooth 60 FPS performance\n- No external libraries, works in all major browsers\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "```javascript\n// Game Element Sprites\nconst PLAYER = 0, ENEMY = 1, BULLET = 2, EXPLOSION = 3;\nconst LEVEL1_ENEMIES = 10; // Level 1 enemies\nconst BORDER_LEFT = 0, BORDER_BOTTOM = 400; // Borders of canvas\n\nfunction game(canvasId) {\n  const canvas = document.createElement('canvas');\n  canvas.width = canvas.height = 500;\n  document.getElementById(canvasId).appendChild(canvas);\n\n  // game loops\n  const Turismo = class {\n    constructorers = () => {\n      this.gameObjects = [];\n      this.projectiles = [];\n      this.enemyIndex = 0;\n      this.score = 0;\n\n      this.spawnEnemy MS = setInterval(this.spawnEnemy(), 600);\n      this.enemyMS = setInterval(this.enemyMS, 120);\n      this.ticker();\n    };\n\n    ticker = () => loop();\n    canceler = () => {\n      game();\n      clearInterval(this.enemyMS);\n      clearInterval(this.spawnEnemyMS);\n    };\n\n    shoot = (id) => {\n      this.projectiles.push(\n        new Future({ x: id.x, y: id.y }),\n        { x: idphabet ? 1 : -1 }\n      );\n    };\n\n    enemyMS = () => {\n      for (const projectile of this.projectiles) projectile.y += 5;\n    };\n\n    spawnEnemy = () => {\n      this.gameObjects.push(\n        new GameObj(\n          { x: Math.random() * 500 - 50 },\n          { y: Math.random() * 500 - 50 },\n          { x: 1 },\n          { y: 1 }, // move\n          1, // direction\n          PLAYER\n        )\n      );\n    };\n\n    updateGame = () => this.gameObjects.forEach((object) => (object.y += 1));\n  };\n\n  addEventListener('keydown', (event) => {\n    if (event.key === ' ')}\n      this.shoot(id);\n  });\n\n  addEventListener('keydown', (event) => {\n    if (event.key === 'Right') };\n    id.x += 10; }}>\n    if (event.key === 'Left'.gui} };\n      id.x -= 10;\n    }\n  });\n\n  function draw({ targetScore = 1000, radius = 30, update, type }) {\n    this.x = x;\n    this.y = y;\n    this.radius = radius; // 0 means no collision size\n\n    this.projectible = boolean; // 0 = enemy, 1 = bullet\n\n    this.xSpeed = xSpeed || Math.random() * 50;\n    this.ySpeed = ySpeed || 0;\n\n    this.score = 10;\n\n    this.draw = (canvas, ctx) => {\n      ctx.beginPath();\n      ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);\n      ctx.fill();\n    };\n\n    this.update = () => {\n      if (radius === 0) return;\n      const prevx = this.x;\n      const prevy = this.y;\n      this.x += this.xSpeed;\n      this.y += this.ySpeed;\n      update ?\n        update(this) : // if update function is given, it will override this one\n\n        // spawnd gameAttaries on borders\n        (this.x > 500) this.x = 0;\n        (this.x < 0) this.x = 500;\n\n      if (this.y > 500) this.y = 0;\n\n      // check for collision with all game elements\n      collisions(gameObjects).forEach(\n        ({ collider }) =>\n          (this PROJECTbutton = false)\n          and\n          (this.x = collider.x)\n          and\n          (this.y = collider.y)\n      );\n\n      // check for collision between bullets and enemies\n      // if collision, remove both and spawn multiple explosion fragments\n      if (collisiongow-with(type)upexStatistics.forEach(\n        ({ collider }) => {\n          if (type === PLAYER && collider.projectile) return cancelGame();\n          if (type === ENEMY && this.projectile) {\n            score += collider.score;\n            gameObjects.splice(index, 1);\n          }\n          verdens deletion gamr = this.x;\n          this.y = collider.y;\n          update(collider);\n        }\n      );\n    };\n  };\n\n  const loop = () => {\n    ctx.clearRect(0, 0, canvas.width, canvas.height);\n    this enrolled_number = this.entries.filter(\n      populateEntries => populateEntries.tagType === imageType\n    ).length;\n    this.entriesWithImage.push({\n      ...postResult,\n      image: imageContent\n    });\n}$.\n\n  return new Game(cancelGame, {\n    canvas, bullets: ctx => {\n      align(align estaba)\n      x[[this.opened(align)]]],\n      sunning(d),\n      funfame(lasted STAT[i], true)\n \n  r}, s[n[loop];\n\n  }());"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

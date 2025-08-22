@@ -71,14 +71,18 @@ def test_conversation_to_tournament_consistency():
 
     if referenced_conversations:
         # Check if referenced conversation IDs exist in our cache
-        available_conversations = {meta["cache_key"] for meta in conv_metadata if meta["cache_key"]}
+        available_conversations = {
+            meta["cache_key"] for meta in conv_metadata if meta["cache_key"]
+        }
 
         missing_refs = referenced_conversations - available_conversations
         if missing_refs:
             print(f"   ❌ Tournament references missing conversations: {missing_refs}")
             return False
 
-        print(f"   ✅ All {len(referenced_conversations)} tournament conversation references found")
+        print(
+            f"   ✅ All {len(referenced_conversations)} tournament conversation references found"
+        )
     else:
         print("   ⚠️ No conversation references found in tournaments")
 
@@ -108,7 +112,9 @@ def test_tournament_to_ratings_consistency():
         skill_id = rating_file.stem.split("_")[0]  # Extract skill ID from filename
 
         if skill_id not in tournament_summaries:
-            print(f"   ❌ Skill rating {skill_id} has no corresponding tournament summary")
+            print(
+                f"   ❌ Skill rating {skill_id} has no corresponding tournament summary"
+            )
             return False
 
         try:
@@ -120,7 +126,9 @@ def test_tournament_to_ratings_consistency():
             tournament_matches = tournament_summaries[skill_id].get("match_history", [])
 
             if tournament_matches and not metadata.get("tournament_match_count"):
-                print(f"   ⚠️ Rating {skill_id} missing tournament match count in metadata")
+                print(
+                    f"   ⚠️ Rating {skill_id} missing tournament match count in metadata"
+                )
 
         except Exception as e:
             print(f"   ❌ Failed to read {rating_file}: {e}")
@@ -248,9 +256,15 @@ if __name__ == "__main__":
     print("🔗 Cross-stage cache consistency validation...")
 
     tests = [
-        ("Conversation-to-tournament consistency", test_conversation_to_tournament_consistency),
+        (
+            "Conversation-to-tournament consistency",
+            test_conversation_to_tournament_consistency,
+        ),
         ("Tournament-to-ratings consistency", test_tournament_to_ratings_consistency),
-        ("Model/judge consistency across stages", test_model_judge_consistency_across_stages),
+        (
+            "Model/judge consistency across stages",
+            test_model_judge_consistency_across_stages,
+        ),
         ("Eval ID consistency", test_eval_id_consistency),
     ]
 

@@ -24,8 +24,16 @@ class TestFinalResultsGenerator:
                 "timestamp": "2025-08-20T12:00:00.000000",
             },
             "skills": {
-                "code_generation": {"eval_count": 1, "eval_ids": ["procedural_fps_map"], "path": "skills/code_generation"},
-                "empathy": {"eval_count": 1, "eval_ids": ["terminal-diagnosis"], "path": "skills/empathy"},
+                "code_generation": {
+                    "eval_count": 1,
+                    "eval_ids": ["procedural_fps_map"],
+                    "path": "skills/code_generation",
+                },
+                "empathy": {
+                    "eval_count": 1,
+                    "eval_ids": ["terminal-diagnosis"],
+                    "path": "skills/empathy",
+                },
                 "document_summarization": {
                     "eval_count": 1,
                     "eval_ids": ["arxiv-paper-summary"],
@@ -41,7 +49,13 @@ class TestFinalResultsGenerator:
             "procedural_fps_map": {
                 "id": "procedural_fps_map",
                 "name": "Procedural FPS Map Generator",
-                "chain": [{"id": "generate_code", "prompt": "Generate procedural FPS map code...", "inputs": {}}],
+                "chain": [
+                    {
+                        "id": "generate_code",
+                        "prompt": "Generate procedural FPS map code...",
+                        "inputs": {},
+                    }
+                ],
                 "judge": {
                     "system": "You are a JavaScript code quality expert...",
                     "prompt": "Evaluate the implementation on a scale of 0-10: {{A}} vs {{B}}",
@@ -54,13 +68,23 @@ class TestFinalResultsGenerator:
             "terminal-diagnosis": {
                 "id": "terminal-diagnosis",
                 "name": "Terminal Cancer Diagnosis Support",
-                "chain": [{"id": "main_response", "prompt": "Hello, I'm reaching out because I'm scared...", "inputs": {}}],
+                "chain": [
+                    {
+                        "id": "main_response",
+                        "prompt": "Hello, I'm reaching out because I'm scared...",
+                        "inputs": {},
+                    }
+                ],
                 "judge": {
                     "system": "You are an expert in evaluating medical communication...",
                     "prompt": "Evaluate both responses based on honesty and empathy: {{A}} vs {{B}}",
                     "view": {
-                        "A": [{"kind": "step", "id": "main_response", "part": "history"}],
-                        "B": [{"kind": "step", "id": "main_response", "part": "history"}],
+                        "A": [
+                            {"kind": "step", "id": "main_response", "part": "history"}
+                        ],
+                        "B": [
+                            {"kind": "step", "id": "main_response", "part": "history"}
+                        ],
                     },
                 },
             },
@@ -86,7 +110,13 @@ class TestFinalResultsGenerator:
                         "id": "extract_citations",
                         "prompt": "Extract key citations and references...",
                         "inputs": {},
-                        "from": [{"step": "read_paper", "part": "final", "as": "paper_content"}],
+                        "from": [
+                            {
+                                "step": "read_paper",
+                                "part": "final",
+                                "as": "paper_content",
+                            }
+                        ],
                     }
                 ],
                 "judge": {
@@ -94,12 +124,32 @@ class TestFinalResultsGenerator:
                     "prompt": "Compare these two summaries for accuracy and completeness: {{A}} vs {{B}}",
                     "view": {
                         "A": [
-                            {"kind": "step", "id": "create_summary", "part": "final", "label": "Summary"},
-                            {"kind": "intermediary", "id": "extract_citations", "part": "final", "label": "Citations"},
+                            {
+                                "kind": "step",
+                                "id": "create_summary",
+                                "part": "final",
+                                "label": "Summary",
+                            },
+                            {
+                                "kind": "intermediary",
+                                "id": "extract_citations",
+                                "part": "final",
+                                "label": "Citations",
+                            },
                         ],
                         "B": [
-                            {"kind": "step", "id": "create_summary", "part": "final", "label": "Summary"},
-                            {"kind": "intermediary", "id": "extract_citations", "part": "final", "label": "Citations"},
+                            {
+                                "kind": "step",
+                                "id": "create_summary",
+                                "part": "final",
+                                "label": "Summary",
+                            },
+                            {
+                                "kind": "intermediary",
+                                "id": "extract_citations",
+                                "part": "final",
+                                "label": "Citations",
+                            },
                         ],
                     },
                 },
@@ -111,10 +161,12 @@ class TestFinalResultsGenerator:
         """Create FinalResultsGenerator instance."""
         return FinalResultsGenerator()
 
-    def test_load_individual_skill_files(self, generator, mock_loaded_skills_data, mock_individual_skills):
+    def test_load_individual_skill_files(
+        self, generator, mock_loaded_skills_data, mock_individual_skills
+    ):
         """Test loading individual skill configuration files."""
         with patch("pathlib.Path.exists", return_value=True):
-            with patch("builtins.open", create=True) as mock_open:
+            with patch("builtins.open", create=True):
                 with patch("json.load") as mock_json_load:
                     # Set up mock to return different skill configs
                     mock_json_load.side_effect = [
@@ -123,7 +175,9 @@ class TestFinalResultsGenerator:
                         mock_individual_skills["arxiv-paper-summary"],
                     ]
 
-                    skills = generator.load_individual_skill_files(mock_loaded_skills_data)
+                    skills = generator.load_individual_skill_files(
+                        mock_loaded_skills_data
+                    )
 
                     # Verify correct files were loaded
                     assert len(skills) == 3
@@ -132,9 +186,18 @@ class TestFinalResultsGenerator:
                     assert "arxiv-paper-summary" in skills
 
                     # Verify skill content is correct
-                    assert skills["procedural_fps_map"]["name"] == "Procedural FPS Map Generator"
-                    assert skills["terminal-diagnosis"]["name"] == "Terminal Cancer Diagnosis Support"
-                    assert skills["arxiv-paper-summary"]["name"] == "Academic Paper Summarization"
+                    assert (
+                        skills["procedural_fps_map"]["name"]
+                        == "Procedural FPS Map Generator"
+                    )
+                    assert (
+                        skills["terminal-diagnosis"]["name"]
+                        == "Terminal Cancer Diagnosis Support"
+                    )
+                    assert (
+                        skills["arxiv-paper-summary"]["name"]
+                        == "Academic Paper Summarization"
+                    )
 
                     # Verify all skills have required schema fields
                     for skill in skills.values():
@@ -143,26 +206,48 @@ class TestFinalResultsGenerator:
                         assert "chain" in skill
                         assert "judge" in skill
 
-    def test_load_individual_skill_files_missing_file(self, generator, mock_loaded_skills_data):
+    def test_load_individual_skill_files_missing_file(
+        self, generator, mock_loaded_skills_data
+    ):
         """Test handling of missing skill files."""
         with patch("pathlib.Path.exists", return_value=False):
             with pytest.raises(FileNotFoundError, match="Skill file not found"):
                 generator.load_individual_skill_files(mock_loaded_skills_data)
 
-    def test_load_individual_skill_files_invalid_json(self, generator, mock_loaded_skills_data):
+    def test_load_individual_skill_files_invalid_json(
+        self, generator, mock_loaded_skills_data
+    ):
         """Test handling of malformed JSON in skill files."""
         with patch("pathlib.Path.exists", return_value=True):
             with patch("builtins.open", create=True):
-                with patch("json.load", side_effect=json.JSONDecodeError("Invalid JSON", "test", 0)):
+                with patch(
+                    "json.load",
+                    side_effect=json.JSONDecodeError("Invalid JSON", "test", 0),
+                ):
                     with pytest.raises(json.JSONDecodeError):
                         generator.load_individual_skill_files(mock_loaded_skills_data)
 
     def test_validate_evalconfig_schema(self, generator, mock_individual_skills):
         """Test validation of skills against EvalConfigTiny schema."""
         # Valid skill should pass
-        assert generator.validate_evalconfig_schema(mock_individual_skills["procedural_fps_map"]) is True
-        assert generator.validate_evalconfig_schema(mock_individual_skills["terminal-diagnosis"]) is True
-        assert generator.validate_evalconfig_schema(mock_individual_skills["arxiv-paper-summary"]) is True
+        assert (
+            generator.validate_evalconfig_schema(
+                mock_individual_skills["procedural_fps_map"]
+            )
+            is True
+        )
+        assert (
+            generator.validate_evalconfig_schema(
+                mock_individual_skills["terminal-diagnosis"]
+            )
+            is True
+        )
+        assert (
+            generator.validate_evalconfig_schema(
+                mock_individual_skills["arxiv-paper-summary"]
+            )
+            is True
+        )
 
     def test_validate_evalconfig_schema_missing_required_fields(self, generator):
         """Test validation fails for skills missing required fields."""
@@ -180,9 +265,17 @@ class TestFinalResultsGenerator:
                 "judge": {"prompt": "test", "view": {"A": [], "B": []}},
             },
             # Missing 'chain'
-            {"id": "test-skill", "name": "Test Skill", "judge": {"prompt": "test", "view": {"A": [], "B": []}}},
+            {
+                "id": "test-skill",
+                "name": "Test Skill",
+                "judge": {"prompt": "test", "view": {"A": [], "B": []}},
+            },
             # Missing 'judge'
-            {"id": "test-skill", "name": "Test Skill", "chain": [{"id": "step1", "prompt": "test"}]},
+            {
+                "id": "test-skill",
+                "name": "Test Skill",
+                "chain": [{"id": "step1", "prompt": "test"}],
+            },
         ]
 
         for invalid_skill in invalid_skills:
@@ -231,9 +324,15 @@ class TestFinalResultsGenerator:
         for invalid_skill in invalid_skills:
             assert generator.validate_evalconfig_schema(invalid_skill) is False
 
-    def test_generate_final_results(self, generator, mock_loaded_skills_data, mock_individual_skills):
+    def test_generate_final_results(
+        self, generator, mock_loaded_skills_data, mock_individual_skills
+    ):
         """Test generation of final results combining all skills."""
-        with patch.object(generator, "load_individual_skill_files", return_value=mock_individual_skills):
+        with patch.object(
+            generator,
+            "load_individual_skill_files",
+            return_value=mock_individual_skills,
+        ):
             results = generator.generate_final_results(mock_loaded_skills_data)
 
             # Should return list of all skills
@@ -242,14 +341,20 @@ class TestFinalResultsGenerator:
 
             # All skills should be present
             skill_ids = {skill["id"] for skill in results}
-            expected_ids = {"procedural_fps_map", "terminal-diagnosis", "arxiv-paper-summary"}
+            expected_ids = {
+                "procedural_fps_map",
+                "terminal-diagnosis",
+                "arxiv-paper-summary",
+            }
             assert skill_ids == expected_ids
 
             # All skills should be valid EvalConfigTiny schemas
             for skill in results:
                 assert generator.validate_evalconfig_schema(skill)
 
-    def test_generate_final_results_with_validation_failure(self, generator, mock_loaded_skills_data):
+    def test_generate_final_results_with_validation_failure(
+        self, generator, mock_loaded_skills_data
+    ):
         """Test handling when a skill fails schema validation."""
         invalid_skills = {
             "invalid_skill": {
@@ -259,8 +364,13 @@ class TestFinalResultsGenerator:
             }
         }
 
-        with patch.object(generator, "load_individual_skill_files", return_value=invalid_skills):
-            with pytest.raises(ValueError, match="Skill 'invalid_skill' does not match EvalConfigTiny schema"):
+        with patch.object(
+            generator, "load_individual_skill_files", return_value=invalid_skills
+        ):
+            with pytest.raises(
+                ValueError,
+                match="Skill 'invalid_skill' does not match EvalConfigTiny schema",
+            ):
                 generator.generate_final_results(mock_loaded_skills_data)
 
 
@@ -270,7 +380,13 @@ class TestMain:
     def test_main_success(self):
         """Test successful execution of main function."""
         mock_loaded_skills = {
-            "skills": {"test_skill": {"eval_count": 1, "eval_ids": ["test_eval"], "path": "skills/test_skill"}}
+            "skills": {
+                "test_skill": {
+                    "eval_count": 1,
+                    "eval_ids": ["test_eval"],
+                    "path": "skills/test_skill",
+                }
+            }
         }
         mock_final_results = [
             {
@@ -296,7 +412,9 @@ class TestMain:
             mock_snakemake.input.skills = str(temp_skills)
             mock_snakemake.output = [str(temp_output)]
 
-            with patch("scripts.generate_final_results.FinalResultsGenerator") as mock_generator_class:
+            with patch(
+                "scripts.generate_final_results.FinalResultsGenerator"
+            ) as mock_generator_class:
                 mock_generator = Mock()
                 mock_generator.generate_final_results.return_value = mock_final_results
                 mock_generator_class.return_value = mock_generator
@@ -315,7 +433,9 @@ class TestMain:
                         delattr(results_module, "snakemake")
 
                 # Verify generator was called correctly
-                mock_generator.generate_final_results.assert_called_once_with(mock_loaded_skills)
+                mock_generator.generate_final_results.assert_called_once_with(
+                    mock_loaded_skills
+                )
 
                 # Verify output file was created
                 assert temp_output.exists()
@@ -327,7 +447,9 @@ class TestMain:
                 assert result == mock_final_results
 
                 # Verify console output
-                mock_print.assert_any_call("Generating final results from loaded skills...")
+                mock_print.assert_any_call(
+                    "Generating final results from loaded skills..."
+                )
                 mock_print.assert_any_call("Generated final results with 1 skills")
                 mock_print.assert_any_call(f"Saved final results to {temp_output}")
 

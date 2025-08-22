@@ -7,7 +7,6 @@ when tests are running, preventing costly cache destruction.
 
 import os
 from pathlib import Path
-from typing import NoReturn
 
 
 class ProductionDataAccessError(Exception):
@@ -42,7 +41,9 @@ def check_production_data_access(path: str | Path, operation: str = "access") ->
     ]
 
     for prod_path in production_paths:
-        if prod_path.exists() and (path_obj == prod_path or prod_path in path_obj.parents):
+        if prod_path.exists() and (
+            path_obj == prod_path or prod_path in path_obj.parents
+        ):
             raise ProductionDataAccessError(
                 f"BLOCKED: Test attempted {operation} on production data path: {path_obj}\n"
                 f"Production data access is forbidden during testing to prevent data loss.\n"
@@ -50,7 +51,9 @@ def check_production_data_access(path: str | Path, operation: str = "access") ->
             )
 
 
-def block_production_file_access(filepath: str | Path, operation: str = "file access") -> None:
+def block_production_file_access(
+    filepath: str | Path, operation: str = "file access"
+) -> None:
     """
     Block access to production data files during testing.
 

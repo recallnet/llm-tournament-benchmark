@@ -18,7 +18,6 @@ import os
 import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -49,7 +48,12 @@ class TestTournamentRestartDetection:
 
             # Simulate the exact scenario: conversations for ALL skills exist
             skills = ["harm_avoidance", "code_generation", "empathy", "hidden_messages"]
-            evals_per_skill = {"harm_avoidance": 5, "code_generation": 7, "empathy": 7, "hidden_messages": 10}
+            evals_per_skill = {
+                "harm_avoidance": 5,
+                "code_generation": 7,
+                "empathy": 7,
+                "hidden_messages": 10,
+            }
             models = ["openai/gpt-4", "claude-3", "llama-2"]
 
             # Create conversation files for ALL skills (like we had)
@@ -60,23 +64,37 @@ class TestTournamentRestartDetection:
 
                 for eval_num in range(evals_per_skill[skill]):
                     for model in models:
-                        conv_file = skill_dir / f"eval_{eval_num}_{model.replace('/', '_')}.json"
+                        conv_file = (
+                            skill_dir
+                            / f"eval_{eval_num}_{model.replace('/', '_')}.json"
+                        )
                         conv_file.write_text(
                             json.dumps(
                                 {
-                                    "metadata": {"skill_id": skill, "eval_id": f"eval_{eval_num}", "model_id": model},
+                                    "metadata": {
+                                        "skill_id": skill,
+                                        "eval_id": f"eval_{eval_num}",
+                                        "model_id": model,
+                                    },
                                     "messages": [{"role": "user", "content": "test"}],
                                 }
                             )
                         )
                         total_conversations += 1
 
-            print(f"Created {total_conversations} conversation files across {len(skills)} skills")
+            print(
+                f"Created {total_conversations} conversation files across {len(skills)} skills"
+            )
 
             # Simulate the bug: tournaments.json exists but ONLY has harm_avoidance
             incomplete_tournaments = {
                 "tournaments": [
-                    {"skill_id": "harm_avoidance", "eval_id": "eval_0", "model_ids": models, "completed": True}
+                    {
+                        "skill_id": "harm_avoidance",
+                        "eval_id": "eval_0",
+                        "model_ids": models,
+                        "completed": True,
+                    }
                     # Missing: code_generation, empathy, hidden_messages tournaments!
                 ]
             }
@@ -118,7 +136,9 @@ class TestTournamentRestartDetection:
                     processed_tournaments.add(tournament["skill_id"])
 
             # This is the key detection logic that's broken
-            unprocessed_skills = set(conversations_by_skill.keys()) - processed_tournaments
+            unprocessed_skills = (
+                set(conversations_by_skill.keys()) - processed_tournaments
+            )
 
             print(f"Conversations by skill: {conversations_by_skill}")
             print(f"Processed tournaments: {processed_tournaments}")
@@ -126,10 +146,20 @@ class TestTournamentRestartDetection:
 
             # THE BUG: The current system doesn't do this detection!
             # It only processes what's in loaded_skills.json, ignoring existing conversations
-            assert len(conversations_by_skill) == 4, "Should have conversations for 4 skills"
-            assert len(processed_tournaments) == 1, "Should have tournaments for 1 skill"
-            assert len(unprocessed_skills) == 3, "Should detect 3 skills need processing"
-            assert unprocessed_skills == {"code_generation", "empathy", "hidden_messages"}
+            assert (
+                len(conversations_by_skill) == 4
+            ), "Should have conversations for 4 skills"
+            assert (
+                len(processed_tournaments) == 1
+            ), "Should have tournaments for 1 skill"
+            assert (
+                len(unprocessed_skills) == 3
+            ), "Should detect 3 skills need processing"
+            assert unprocessed_skills == {
+                "code_generation",
+                "empathy",
+                "hidden_messages",
+            }
 
             # The fix: tournament system should process unprocessed_skills
             # instead of just blindly following loaded_skills.json
@@ -140,7 +170,7 @@ class TestTournamentRestartDetection:
         where it left off, not restart from beginning or get stuck.
         """
         with tempfile.TemporaryDirectory() as tmp_dir:
-            data_dir = Path(tmp_dir)
+            Path(tmp_dir)
 
             # Simulate restart scenario exactly as user described:
             # 1. "finish all tourny in one skill" - harm_avoidance complete

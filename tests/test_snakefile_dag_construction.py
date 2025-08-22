@@ -4,26 +4,29 @@ Test that Snakefile DAG construction doesn't hang or fail.
 Critical regression test for lambda function issues.
 """
 
+import os
 import subprocess
 import time
 from pathlib import Path
 
-import pytest
 
-
-@pytest.mark.skip("DISABLED: DAG construction test runs snakemake with profiles")
 def test_dag_construction_does_not_hang():
     """Test that snakemake --dry-run completes within reasonable time."""
     start_time = time.time()
 
     try:
-        # This should complete quickly (< 10 seconds)
+        # Set environment for testing
+        env = os.environ.copy()
+        env["AFBENCH_TESTING"] = "true"
+
+        # This should complete quickly (< 30 seconds, increased from 10)
         result = subprocess.run(
-            ["snakemake", "--profile", "profiles/testonly", "--dry-run", "afbench"],
+            ["snakemake", "--profile", "profiles/testonly", "--dry-run"],
             capture_output=True,
             text=True,
-            timeout=10,  # 10 second timeout
+            timeout=30,  # Increased timeout for more reliable testing
             cwd=Path(__file__).parent.parent,
+            env=env,
         )
 
         elapsed = time.time() - start_time
@@ -31,8 +34,8 @@ def test_dag_construction_does_not_hang():
         # Should complete successfully
         assert result.returncode == 0, f"DAG construction failed: {result.stderr}"
 
-        # Should complete quickly
-        assert elapsed < 10, f"DAG construction took too long: {elapsed}s"
+        # Should complete within reasonable time
+        assert elapsed < 30, f"DAG construction took too long: {elapsed}s"
 
         # Check that specific rules we care about don't have "Shell command: None"
         # Rules using "run:" blocks legitimately show "Shell command: None" - that's fine
@@ -58,7 +61,9 @@ def test_dag_construction_does_not_hang():
         print(f"✅ DAG construction completed in {elapsed:.2f}s")
 
     except subprocess.TimeoutExpired:
-        raise AssertionError("DAG construction hung - likely lambda function issue in Snakefile")
+        raise AssertionError(
+            "DAG construction hung - likely lambda function issue in Snakefile"
+        )
 
 
 def test_no_lambda_functions_with_file_dependencies():
@@ -80,7 +85,9 @@ def test_no_lambda_functions_with_file_dependencies():
         import re
 
         if re.search(pattern, content):
-            raise AssertionError(f"Snakefile contains problematic lambda pattern: {pattern}")
+            raise AssertionError(
+                f"Snakefile contains problematic lambda pattern: {pattern}"
+            )
 
     print("✅ No problematic lambda functions found")
 

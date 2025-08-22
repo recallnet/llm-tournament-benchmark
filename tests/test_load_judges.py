@@ -224,7 +224,9 @@ class TestLoadJudgePool:
                 f.write("invalid,csv\ncontent")
 
             # Mock pd.read_csv to raise an exception
-            with patch("pandas.read_csv", side_effect=pd.errors.EmptyDataError("No data")):
+            with patch(
+                "pandas.read_csv", side_effect=pd.errors.EmptyDataError("No data")
+            ):
                 with patch("builtins.print"):
                     with pytest.raises(pd.errors.EmptyDataError):
                         load_judge_pool(csv_path)
@@ -261,20 +263,25 @@ class TestLoadJudgePool:
                         load_judge_pool(csv_path)
 
                     # Check that error was printed
-                    mock_print.assert_any_call("Error loading judge pool 'test': General error")
+                    mock_print.assert_any_call(
+                        "Error loading judge pool 'test': General error"
+                    )
                     assert "General error" in str(exc_info.value)
 
 
 class TestMainFunction:
     """Test the main function."""
 
-    def create_mock_snakemake(self, output_path, pool_name="test", pools_dir="judge_pools"):
+    def create_mock_snakemake(
+        self, output_path, pool_name="test", pools_dir="judge_pools"
+    ):
         """Create a mock snakemake object."""
         mock_snakemake = Mock()
         mock_snakemake.output = [output_path]
-        mock_snakemake.params.get.side_effect = lambda key, default: {"pool_name": pool_name, "pools_dir": pools_dir}.get(
-            key, default
-        )
+        mock_snakemake.params.get.side_effect = lambda key, default: {
+            "pool_name": pool_name,
+            "pools_dir": pools_dir,
+        }.get(key, default)
         return mock_snakemake
 
     def test_main_pool_file_not_found(self):
@@ -283,7 +290,9 @@ class TestMainFunction:
             output_file = Path(temp_dir) / "output.json"
             pools_dir = Path(temp_dir) / "judge_pools"
 
-            mock_snakemake = self.create_mock_snakemake(output_path=str(output_file), pools_dir=str(pools_dir))
+            mock_snakemake = self.create_mock_snakemake(
+                output_path=str(output_file), pools_dir=str(pools_dir)
+            )
 
             # Add snakemake to the module's globals
             import scripts.load_judges as load_module
@@ -324,7 +333,9 @@ class TestMainFunction:
             output_file = Path(temp_dir) / "output.json"
 
             mock_snakemake = self.create_mock_snakemake(
-                output_path=str(output_file), pool_name="test_pool", pools_dir=str(pools_dir)
+                output_path=str(output_file),
+                pool_name="test_pool",
+                pools_dir=str(pools_dir),
             )
 
             # Add snakemake to the module's globals
@@ -390,7 +401,9 @@ class TestMainFunction:
             output_file = Path(temp_dir) / "output.json"
 
             mock_snakemake = self.create_mock_snakemake(
-                output_path=str(output_file), pool_name="mixed_pool", pools_dir=str(pools_dir)
+                output_path=str(output_file),
+                pool_name="mixed_pool",
+                pools_dir=str(pools_dir),
             )
 
             # Add snakemake to the module's globals
@@ -436,7 +449,9 @@ class TestMainFunction:
             output_file = Path(temp_dir) / "output.json"
 
             mock_snakemake = self.create_mock_snakemake(
-                output_path=str(output_file), pool_name="broken", pools_dir=str(pools_dir)
+                output_path=str(output_file),
+                pool_name="broken",
+                pools_dir=str(pools_dir),
             )
 
             # Add snakemake to the module's globals
@@ -478,7 +493,9 @@ class TestMainFunction:
             output_file = Path(temp_dir) / "output.json"
 
             mock_snakemake = self.create_mock_snakemake(
-                output_path=str(output_file), pool_name="single", pools_dir=str(pools_dir)
+                output_path=str(output_file),
+                pool_name="single",
+                pools_dir=str(pools_dir),
             )
 
             # Add snakemake to the module's globals
@@ -518,7 +535,11 @@ class TestMainFunction:
                     "author": ["author1", "author2", "author3"],
                     "slug": ["slug1", "slug2", "slug3"],
                     "context_window": [4000, 8000, 6000],
-                    "pricing": [0.001, 0.002, "input:0.003"],  # Mix of numeric and string
+                    "pricing": [
+                        0.001,
+                        0.002,
+                        "input:0.003",
+                    ],  # Mix of numeric and string
                     "endpoint": ["endpoint1", "endpoint2", "endpoint3"],
                     "max_tokens": [1000, 2000, 1500],
                 }
@@ -528,7 +549,9 @@ class TestMainFunction:
             output_file = Path(temp_dir) / "output.json"
 
             mock_snakemake = self.create_mock_snakemake(
-                output_path=str(output_file), pool_name="partial", pools_dir=str(pools_dir)
+                output_path=str(output_file),
+                pool_name="partial",
+                pools_dir=str(pools_dir),
             )
 
             # Add snakemake to the module's globals
@@ -546,7 +569,9 @@ class TestMainFunction:
 
                 # Should have pricing statistics based on the 2 numeric values
                 assert "avg_pricing" in result["statistics"]
-                assert result["statistics"]["avg_pricing"] == 0.0015  # (0.001 + 0.002) / 2
+                assert (
+                    result["statistics"]["avg_pricing"] == 0.0015
+                )  # (0.001 + 0.002) / 2
                 assert result["statistics"]["price_range"]["min"] == 0.001
                 assert result["statistics"]["price_range"]["max"] == 0.002
 
@@ -590,11 +615,22 @@ class TestEdgeCases:
 
     def test_all_required_columns_validation_comprehensive(self):
         """Test that all required columns are properly validated."""
-        required_columns = ["id", "author", "slug", "context_window", "pricing", "endpoint", "max_tokens"]
+        required_columns = [
+            "id",
+            "author",
+            "slug",
+            "context_window",
+            "pricing",
+            "endpoint",
+            "max_tokens",
+        ]
 
         # Test each missing column individually
         for missing_col in required_columns:
-            df_data = {col: [f"test_{col}"] if col != missing_col else [] for col in required_columns}
+            df_data = {
+                col: [f"test_{col}"] if col != missing_col else []
+                for col in required_columns
+            }
 
             # Provide proper data types for the columns that remain
             if "context_window" in df_data and df_data["context_window"]:

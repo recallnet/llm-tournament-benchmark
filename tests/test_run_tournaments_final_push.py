@@ -91,7 +91,9 @@ class TestFinalPushCoverage:
             valid_evals = [{"id": "eval_1", "_metadata": {"skill": "skill_1"}}]
 
             with patch("builtins.print"):
-                executor.cleanup_invalid_match_cache(valid_models, valid_judges, valid_evals)
+                executor.cleanup_invalid_match_cache(
+                    valid_models, valid_judges, valid_evals
+                )
 
             # All invalid cache files should be removed
             assert not invalid_model_b_cache.exists()
@@ -118,7 +120,9 @@ class TestFinalPushCoverage:
     @patch("json.load")
     @patch("json.dump")
     @patch("builtins.print")
-    def test_main_snakemake_integration_paths(self, mock_print, mock_json_dump, mock_json_load, mock_open):
+    def test_main_snakemake_integration_paths(
+        self, mock_print, mock_json_dump, mock_json_load, mock_open
+    ):
         """Test main function Snakemake integration paths (lines 601-605)."""
         # Mock snakemake object
         mock_snakemake = Mock()
@@ -140,7 +144,10 @@ class TestFinalPushCoverage:
         mock_open.return_value.__enter__.return_value = mock_file
 
         # Test Snakemake mode (lines 599-605)
-        with patch("scripts.run_tournaments.globals", return_value={"snakemake": mock_snakemake}):
+        with patch(
+            "scripts.run_tournaments.globals",
+            return_value={"snakemake": mock_snakemake},
+        ):
             try:
                 main()
             except Exception:
@@ -153,19 +160,35 @@ class TestFinalPushCoverage:
     @patch("json.load")
     @patch("json.dump")
     @patch("builtins.print")
-    def test_main_tournament_execution_paths(self, mock_print, mock_json_dump, mock_json_load, mock_open):
+    def test_main_tournament_execution_paths(
+        self, mock_print, mock_json_dump, mock_json_load, mock_open
+    ):
         """Test main function tournament execution paths."""
         # Mock sufficient models and data to trigger tournament execution
         mock_json_load.side_effect = [
             {  # conversations
                 "conversations": [
                     {
-                        "metadata": {"model_id": "model_a", "skill_id": "skill_1", "eval_id": "eval_1"},
-                        "messages": [{"role": "user", "content": "test"}, {"role": "assistant", "content": "response"}],
+                        "metadata": {
+                            "model_id": "model_a",
+                            "skill_id": "skill_1",
+                            "eval_id": "eval_1",
+                        },
+                        "messages": [
+                            {"role": "user", "content": "test"},
+                            {"role": "assistant", "content": "response"},
+                        ],
                     },
                     {
-                        "metadata": {"model_id": "model_b", "skill_id": "skill_1", "eval_id": "eval_1"},
-                        "messages": [{"role": "user", "content": "test"}, {"role": "assistant", "content": "response"}],
+                        "metadata": {
+                            "model_id": "model_b",
+                            "skill_id": "skill_1",
+                            "eval_id": "eval_1",
+                        },
+                        "messages": [
+                            {"role": "user", "content": "test"},
+                            {"role": "assistant", "content": "response"},
+                        ],
                     },
                 ]
             },
@@ -176,7 +199,11 @@ class TestFinalPushCoverage:
                     {
                         "id": "eval_1",
                         "_metadata": {"skill": "skill_1"},
-                        "judge": {"view": {"A": [], "B": []}, "prompt": "Compare {{A}} vs {{B}}", "system": "You are a judge"},
+                        "judge": {
+                            "view": {"A": [], "B": []},
+                            "prompt": "Compare {{A}} vs {{B}}",
+                            "system": "You are a judge",
+                        },
                     }
                 ]
             },
@@ -191,7 +218,9 @@ class TestFinalPushCoverage:
                 with patch("requests.post") as mock_post:
                     # Mock API response to prevent actual API calls
                     mock_response = Mock()
-                    mock_response.json.return_value = {"choices": [{"message": {"content": "MY VOTE IS FOR: A"}}]}
+                    mock_response.json.return_value = {
+                        "choices": [{"message": {"content": "MY VOTE IS FOR: A"}}]
+                    }
                     mock_response.raise_for_status.return_value = None
                     mock_post.return_value = mock_response
 

@@ -1,0 +1,19 @@
+{
+  "id": "test_eval",
+  "name": "Test Eval for Fault Testing",
+  "chain": [
+    {
+      "id": "test_prompt",
+      "prompt": "Say exactly: 'Test response for fault handling'",
+      "inputs": {}
+    }
+  ],
+  "judge": {
+    "system": "You are a test evaluation judge for fault handling tests.",
+    "prompt": "Evaluate if the response matches the expected text.\n\nExpected: 'Test response for fault handling'\n\nSolution A: {{A}}\nSolution B: {{B}}\n\nChoose A or B based on exact match accuracy.",
+    "view": {
+      "A": [{"kind": "step", "id": "test_prompt", "part": "final"}],
+      "B": [{"kind": "step", "id": "test_prompt", "part": "final"}]
+    }
+  }
+}

@@ -48,7 +48,9 @@ class TestCacheDataIntegrityCritical:
 
                 # Check required fields
                 required_fields = ["conversation", "metadata"]
-                missing_fields = [field for field in required_fields if field not in data]
+                missing_fields = [
+                    field for field in required_fields if field not in data
+                ]
 
                 if missing_fields:
                     corrupted_files.append(f"{judge_file}: missing {missing_fields}")
@@ -97,7 +99,9 @@ class TestCacheDataIntegrityCritical:
             # Call with explicit cache directory (as tests should do)
             summarize_main(tournaments_dir=expected_cache_dir, output_file=output_file)
 
-            print(f"✅ summarize_tournaments.py called successfully with path: {expected_cache_dir}")
+            print(
+                f"✅ summarize_tournaments.py called successfully with path: {expected_cache_dir}"
+            )
 
         # Test that Snakemake wrapper uses this directory
         wrapper_script = Path("scripts/snakemake_run_tournaments.py")
@@ -140,14 +144,18 @@ class TestCacheDataIntegrityCritical:
                         json.dump(file_data, f)
                     test_data[str(judge_file)] = file_data
 
-            print(f"✅ Created test cache with {len(test_data)} files across {len(skills)} skills")
+            print(
+                f"✅ Created test cache with {len(test_data)} files across {len(skills)} skills"
+            )
 
             # Perform the move
             shutil.move(str(old_cache), str(new_cache))
 
             # Verify no data loss
             moved_files = list(new_cache.rglob("*.json"))
-            assert len(moved_files) == len(test_data), f"Data loss: {len(test_data)} → {len(moved_files)}"
+            assert len(moved_files) == len(
+                test_data
+            ), f"Data loss: {len(test_data)} → {len(moved_files)}"
 
             # Verify file contents
             for moved_file in moved_files:
@@ -158,16 +166,24 @@ class TestCacheDataIntegrityCritical:
                 original_file = None
                 for orig_path, orig_data in test_data.items():
                     if (
-                        orig_data["metadata"]["skill"] == moved_data["metadata"]["skill"]
-                        and orig_data["metadata"]["match"] == moved_data["metadata"]["match"]
+                        orig_data["metadata"]["skill"]
+                        == moved_data["metadata"]["skill"]
+                        and orig_data["metadata"]["match"]
+                        == moved_data["metadata"]["match"]
                     ):
                         original_file = orig_path
                         break
 
-                assert original_file is not None, f"Couldn't find original data for {moved_file}"
-                assert moved_data == test_data[original_file], f"Data corruption in {moved_file}"
+                assert (
+                    original_file is not None
+                ), f"Couldn't find original data for {moved_file}"
+                assert (
+                    moved_data == test_data[original_file]
+                ), f"Data corruption in {moved_file}"
 
-            print(f"✅ Cache move preserved all {len(moved_files)} files with correct content")
+            print(
+                f"✅ Cache move preserved all {len(moved_files)} files with correct content"
+            )
 
     def test_detect_recent_data_loss(self, isolated_judge_cache):
         """Test to detect if recent operations caused data loss."""
@@ -185,11 +201,19 @@ class TestCacheDataIntegrityCritical:
             old_location = Path("data/testonly/tournaments")
             if old_location.exists():
                 old_files = list(old_location.rglob("*.json"))
-                print(f"🔍 Found {len(old_files)} files in old location: {old_location}")
+                print(
+                    f"🔍 Found {len(old_files)} files in old location: {old_location}"
+                )
                 if len(old_files) > 0:
-                    print("❌ CRITICAL: Judge cache files exist in old location but not new location!")
-                    print("This indicates incomplete migration or data loss during architecture change")
-                    pytest.fail("Data loss detected: files in old location but new location empty")
+                    print(
+                        "❌ CRITICAL: Judge cache files exist in old location but not new location!"
+                    )
+                    print(
+                        "This indicates incomplete migration or data loss during architecture change"
+                    )
+                    pytest.fail(
+                        "Data loss detected: files in old location but new location empty"
+                    )
 
             print("⚠️ Both old and new locations empty - may be fresh installation")
             return
@@ -206,8 +230,12 @@ class TestCacheDataIntegrityCritical:
             if conversation_cache.exists():
                 conv_files = list(conversation_cache.rglob("*.json"))
                 if len(conv_files) > 0:
-                    print(f"🔍 Found {len(conv_files)} conversation files - judge cache should exist")
-                    pytest.fail("Data loss: conversation cache exists but judge cache is empty")
+                    print(
+                        f"🔍 Found {len(conv_files)} conversation files - judge cache should exist"
+                    )
+                    pytest.fail(
+                        "Data loss: conversation cache exists but judge cache is empty"
+                    )
 
             print("⚠️ No conversation cache either - may be fresh installation")
             return
@@ -234,9 +262,13 @@ class TestCacheDataIntegrityCritical:
         if len(skills_found) == 1 and "harm_avoidance" in skills_found:
             print("⚠️ Only harm_avoidance in cache - may indicate incomplete processing")
         elif len(skills_found) < len(expected_skills) / 2:
-            print(f"⚠️ Only {len(skills_found)} skills in cache - may indicate data loss or incomplete processing")
+            print(
+                f"⚠️ Only {len(skills_found)} skills in cache - may indicate data loss or incomplete processing"
+            )
 
-        print(f"✅ Judge cache appears to contain {len(current_files)} files across {len(skills_found)} skills")
+        print(
+            f"✅ Judge cache appears to contain {len(current_files)} files across {len(skills_found)} skills"
+        )
 
     def test_cache_backup_and_restore_functionality(self, isolated_judge_cache):
         """Test cache backup and restore to prevent future data loss."""
@@ -250,7 +282,10 @@ class TestCacheDataIntegrityCritical:
 
             print(f"🔍 Testing backup of judge cache from: {judge_cache_dir}")
 
-            if not judge_cache_dir.exists() or len(list(judge_cache_dir.rglob("*.json"))) == 0:
+            if (
+                not judge_cache_dir.exists()
+                or len(list(judge_cache_dir.rglob("*.json"))) == 0
+            ):
                 print("⚠️ No judge cache to backup - creating test cache")
 
                 # Create minimal test cache
@@ -299,7 +334,9 @@ class TestCacheDataIntegrityCritical:
         # 1. Data preservation check
         if judge_cache_dir.exists():
             cache_files = list(judge_cache_dir.rglob("*.json"))
-            print(f"✅ 1. Data preservation: {len(cache_files)} files in {judge_cache_dir}")
+            print(
+                f"✅ 1. Data preservation: {len(cache_files)} files in {judge_cache_dir}"
+            )
         else:
             print(f"⚠️ 1. Data preservation: No cache directory at {judge_cache_dir}")
 
@@ -330,14 +367,18 @@ class TestCacheDataIntegrityCritical:
                 test_files_to_update.append(str(test_file))
 
         if test_files_to_update:
-            print(f"⚠️ 3. Test compatibility: {len(test_files_to_update)} test files need updates")
+            print(
+                f"⚠️ 3. Test compatibility: {len(test_files_to_update)} test files need updates"
+            )
         else:
             print("✅ 3. Test compatibility: No hardcoded cache paths in tests")
 
         # 4. Conflict detection
         tournaments_json = Path("data/testonly/tournaments.json")
         if str(judge_cache_dir) == str(tournaments_json.parent):
-            print("❌ 4. Conflict detection: Cache dir conflicts with tournaments.json location")
+            print(
+                "❌ 4. Conflict detection: Cache dir conflicts with tournaments.json location"
+            )
             pytest.fail("Architecture conflict detected")
         else:
             print("✅ 4. Conflict detection: No directory conflicts")
@@ -351,7 +392,9 @@ class TestCacheDataIntegrityCritical:
         print("- Test with sample data first")
 
         if not components_consistent or test_files_to_update:
-            pytest.fail("Architecture safety checklist failed - fix issues before proceeding")
+            pytest.fail(
+                "Architecture safety checklist failed - fix issues before proceeding"
+            )
 
         print("✅ Architecture safety checklist passed")
 

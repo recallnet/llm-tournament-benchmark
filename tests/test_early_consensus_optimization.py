@@ -23,11 +23,15 @@ class TestEarlyConsensusCore:
         match = TournamentMatch("test_match", "model_a", "model_b", "test_eval")
 
         # Add two judges voting A
-        match.add_judge_result("judge1", "A", {"conversation": "test1"}, "Explanation 1")
-        match.add_judge_result("judge2", "A", {"conversation": "test2"}, "Explanation 2")
+        match.add_judge_result(
+            "judge1", "A", {"conversation": "test1"}, "Explanation 1"
+        )
+        match.add_judge_result(
+            "judge2", "A", {"conversation": "test2"}, "Explanation 2"
+        )
 
         # Check early consensus
-        assert match.check_early_consensus() == True
+        assert match.check_early_consensus() is True
 
         # Calculate result (should be A)
         match.calculate_result()
@@ -43,11 +47,15 @@ class TestEarlyConsensusCore:
         match = TournamentMatch("test_match", "model_a", "model_b", "test_eval")
 
         # Add two judges voting B
-        match.add_judge_result("judge1", "B", {"conversation": "test1"}, "Explanation 1")
-        match.add_judge_result("judge2", "B", {"conversation": "test2"}, "Explanation 2")
+        match.add_judge_result(
+            "judge1", "B", {"conversation": "test1"}, "Explanation 1"
+        )
+        match.add_judge_result(
+            "judge2", "B", {"conversation": "test2"}, "Explanation 2"
+        )
 
         # Check early consensus
-        assert match.check_early_consensus() == True
+        assert match.check_early_consensus() is True
 
         # Calculate result (should be B)
         match.calculate_result()
@@ -63,11 +71,15 @@ class TestEarlyConsensusCore:
         match = TournamentMatch("test_match", "model_a", "model_b", "test_eval")
 
         # Add two judges voting TIE
-        match.add_judge_result("judge1", "TIE", {"conversation": "test1"}, "Explanation 1")
-        match.add_judge_result("judge2", "TIE", {"conversation": "test2"}, "Explanation 2")
+        match.add_judge_result(
+            "judge1", "TIE", {"conversation": "test1"}, "Explanation 1"
+        )
+        match.add_judge_result(
+            "judge2", "TIE", {"conversation": "test2"}, "Explanation 2"
+        )
 
         # Check early consensus
-        assert match.check_early_consensus() == True
+        assert match.check_early_consensus() is True
 
         # Calculate result (should be TIE)
         match.calculate_result()
@@ -83,14 +95,20 @@ class TestEarlyConsensusCore:
         match = TournamentMatch("test_match", "model_a", "model_b", "test_eval")
 
         # Add two judges with different votes
-        match.add_judge_result("judge1", "A", {"conversation": "test1"}, "Explanation 1")
-        match.add_judge_result("judge2", "B", {"conversation": "test2"}, "Explanation 2")
+        match.add_judge_result(
+            "judge1", "A", {"conversation": "test1"}, "Explanation 1"
+        )
+        match.add_judge_result(
+            "judge2", "B", {"conversation": "test2"}, "Explanation 2"
+        )
 
         # Check early consensus (should be False)
-        assert match.check_early_consensus() == False
+        assert match.check_early_consensus() is False
 
         # Add third judge
-        match.add_judge_result("judge3", "A", {"conversation": "test3"}, "Explanation 3")
+        match.add_judge_result(
+            "judge3", "A", {"conversation": "test3"}, "Explanation 3"
+        )
 
         # Calculate result (majority should win - A)
         match.calculate_result()
@@ -106,11 +124,15 @@ class TestEarlyConsensusCore:
         match = TournamentMatch("test_match", "model_a", "model_b", "test_eval")
 
         # Add judges with A vs TIE
-        match.add_judge_result("judge1", "A", {"conversation": "test1"}, "Explanation 1")
-        match.add_judge_result("judge2", "TIE", {"conversation": "test2"}, "Explanation 2")
+        match.add_judge_result(
+            "judge1", "A", {"conversation": "test1"}, "Explanation 1"
+        )
+        match.add_judge_result(
+            "judge2", "TIE", {"conversation": "test2"}, "Explanation 2"
+        )
 
         # Check early consensus (should be False)
-        assert match.check_early_consensus() == False
+        assert match.check_early_consensus() is False
 
         # Need third judge to break tie
         assert len(match.judge_votes) == 2
@@ -122,10 +144,12 @@ class TestEarlyConsensusCore:
         match = TournamentMatch("test_match", "model_a", "model_b", "test_eval")
 
         # Only one judge so far
-        match.add_judge_result("judge1", "A", {"conversation": "test1"}, "Explanation 1")
+        match.add_judge_result(
+            "judge1", "A", {"conversation": "test1"}, "Explanation 1"
+        )
 
         # Check early consensus (should be False - need at least 2)
-        assert match.check_early_consensus() == False
+        assert match.check_early_consensus() is False
 
 
 class TestEarlyConsensusIntegration:
@@ -137,11 +161,15 @@ class TestEarlyConsensusIntegration:
 
         # Create match and verify consensus logic always works
         match = TournamentMatch("model_a", "model_b", "test_eval", "test_skill")
-        match.add_judge_result("judge1", "A", {"conversation": "test1"}, "Explanation 1")
-        match.add_judge_result("judge2", "A", {"conversation": "test2"}, "Explanation 2")
+        match.add_judge_result(
+            "judge1", "A", {"conversation": "test1"}, "Explanation 1"
+        )
+        match.add_judge_result(
+            "judge2", "A", {"conversation": "test2"}, "Explanation 2"
+        )
 
         # Should always detect consensus
-        assert match.check_early_consensus() == True
+        assert match.check_early_consensus() is True
 
     def test_early_consensus_default_behavior(self):
         """Test that early consensus is the default behavior."""
@@ -159,8 +187,12 @@ class TestEarlyConsensusIntegration:
 
         for vote1, vote2, expected_consensus in scenarios:
             match = TournamentMatch("model_a", "model_b", "test_eval", "test_skill")
-            match.add_judge_result("judge1", vote1, {"conversation": "test1"}, "Explanation 1")
-            match.add_judge_result("judge2", vote2, {"conversation": "test2"}, "Explanation 2")
+            match.add_judge_result(
+                "judge1", vote1, {"conversation": "test1"}, "Explanation 1"
+            )
+            match.add_judge_result(
+                "judge2", vote2, {"conversation": "test2"}, "Explanation 2"
+            )
 
             assert match.check_early_consensus() == expected_consensus
 
@@ -175,9 +207,15 @@ class TestBackwardCompatibility:
         match = TournamentMatch("existing_match", "model_a", "model_b", "test_eval")
 
         # Simulate existing match with 3 judges (even though first 2 agreed)
-        match.add_judge_result("judge1", "A", {"conversation": "test1"}, "Explanation 1")
-        match.add_judge_result("judge2", "A", {"conversation": "test2"}, "Explanation 2")
-        match.add_judge_result("judge3", "B", {"conversation": "test3"}, "Explanation 3")
+        match.add_judge_result(
+            "judge1", "A", {"conversation": "test1"}, "Explanation 1"
+        )
+        match.add_judge_result(
+            "judge2", "A", {"conversation": "test2"}, "Explanation 2"
+        )
+        match.add_judge_result(
+            "judge3", "B", {"conversation": "test3"}, "Explanation 3"
+        )
 
         # Calculate result (majority should win - A)
         match.calculate_result()
@@ -202,7 +240,11 @@ class TestBackwardCompatibility:
                     "match_id": "match2",
                     "model_a": "model_a",
                     "model_b": "model_c",
-                    "judge_votes": {"judge1": "A", "judge2": "B", "judge3": "A"},  # Full judging
+                    "judge_votes": {
+                        "judge1": "A",
+                        "judge2": "B",
+                        "judge3": "A",
+                    },  # Full judging
                     "result": "A",
                 },
             ]
@@ -214,7 +256,10 @@ class TestBackwardCompatibility:
 
         assert match1_judges == 2  # Early consensus
         assert match2_judges == 3  # Full judging
-        assert tournament_data["matches"][0]["result"] == tournament_data["matches"][1]["result"]
+        assert (
+            tournament_data["matches"][0]["result"]
+            == tournament_data["matches"][1]["result"]
+        )
 
 
 class TestAPICallReduction:
@@ -228,12 +273,16 @@ class TestAPICallReduction:
 
         total_matches = 3
         normal_judges_per_match = 3
-        expected_calls_without_optimization = total_matches * normal_judges_per_match  # 9
+        expected_calls_without_optimization = (
+            total_matches * normal_judges_per_match
+        )  # 9
 
         # With optimization: 2 early consensus (2 judges each) + 1 full judging (3 judges)
         early_consensus_matches = 2
         full_judging_matches = 1
-        actual_calls_with_optimization = (early_consensus_matches * 2) + (full_judging_matches * 3)  # 7
+        actual_calls_with_optimization = (early_consensus_matches * 2) + (
+            full_judging_matches * 3
+        )  # 7
 
         reduction_percentage = (
             expected_calls_without_optimization - actual_calls_with_optimization
@@ -255,8 +304,12 @@ class TestAPICallReduction:
             early_consensus_matches = int(total_matches * consensus_rate)
             full_judging_matches = total_matches - early_consensus_matches
 
-            expected_calls_without_optimization = total_matches * normal_judges_per_match
-            actual_calls_with_optimization = (early_consensus_matches * 2) + (full_judging_matches * 3)
+            expected_calls_without_optimization = (
+                total_matches * normal_judges_per_match
+            )
+            actual_calls_with_optimization = (early_consensus_matches * 2) + (
+                full_judging_matches * 3
+            )
 
             reduction_percentage = (
                 expected_calls_without_optimization - actual_calls_with_optimization
@@ -276,7 +329,9 @@ class TestEdgeCases:
         match = TournamentMatch("test_match", "model_a", "model_b", "test_eval")
 
         # First judge succeeds
-        match.add_judge_result("judge1", "A", {"conversation": "test1"}, "Explanation 1")
+        match.add_judge_result(
+            "judge1", "A", {"conversation": "test1"}, "Explanation 1"
+        )
 
         # Second judge has error (should not trigger early consensus)
         with pytest.raises(Exception):
@@ -284,7 +339,7 @@ class TestEdgeCases:
             raise Exception("Judge API error")
 
         # Should not have early consensus due to error
-        assert match.check_early_consensus() == False
+        assert match.check_early_consensus() is False
         assert len(match.judge_votes) == 1
 
     def test_early_consensus_with_judge_cache_hits(self):
@@ -294,11 +349,15 @@ class TestEdgeCases:
         match = TournamentMatch("cached_match", "model_a", "model_b", "test_eval")
 
         # Simulate cached judge results (same as fresh API calls)
-        match.add_judge_result("judge1", "A", {"conversation": "cached1"}, "Cached explanation 1")
-        match.add_judge_result("judge2", "A", {"conversation": "cached2"}, "Cached explanation 2")
+        match.add_judge_result(
+            "judge1", "A", {"conversation": "cached1"}, "Cached explanation 1"
+        )
+        match.add_judge_result(
+            "judge2", "A", {"conversation": "cached2"}, "Cached explanation 2"
+        )
 
         # Early consensus should work with cached results
-        assert match.check_early_consensus() == True
+        assert match.check_early_consensus() is True
         match.calculate_result()
         assert match.result == "A"
 
@@ -308,7 +367,11 @@ if __name__ == "__main__":
 
     import subprocess
 
-    result = subprocess.run(["python", "-m", "pytest", __file__, "-v", "--tb=short"], capture_output=True, text=True)
+    result = subprocess.run(
+        ["python", "-m", "pytest", __file__, "-v", "--tb=short"],
+        capture_output=True,
+        text=True,
+    )
 
     print(result.stdout)
     if result.stderr:

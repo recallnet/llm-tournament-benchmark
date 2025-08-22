@@ -1,7 +1,8 @@
 """
-AFBench Snakemake workflow
+AFBench Snakemake workflow - Proper file-based dependencies
 
-A modular data processing pipeline with rigorous QA standards.
+Uses the existing conversation execution system with native Snakemake caching.
+Snakemake automatically handles incremental updates based on file timestamps.
 """
 
 import sys
@@ -13,15 +14,19 @@ configfile: "config/config.yaml"
 
 # Define output directories  
 OUTPUT_DIR = Path("output")
-DATA_DIR = Path(config.get("data_dir", "tests/data"))  # Default to tests/data for safety
+DATA_DIR = Path(config.get("data_dir", "tests/data"))
 RESULTS_DIR = OUTPUT_DIR / "results"
 PLOTS_DIR = OUTPUT_DIR / "plots"
 
 # Ensure directories exist
-Path.mkdir(OUTPUT_DIR, exist_ok=True)
-Path.mkdir(DATA_DIR, exist_ok=True)
-Path.mkdir(RESULTS_DIR, exist_ok=True)
-Path.mkdir(PLOTS_DIR, exist_ok=True)
+try:
+    Path.mkdir(OUTPUT_DIR, exist_ok=True)
+    Path.mkdir(DATA_DIR, exist_ok=True)
+    Path.mkdir(RESULTS_DIR, exist_ok=True)
+    Path.mkdir(PLOTS_DIR, exist_ok=True)
+except FileNotFoundError:
+    # During dry runs or parsing, parent dirs might not exist - that's OK
+    pass
 
 # Define final outputs
 rule all:
@@ -35,8 +40,10 @@ rule afbench:
     shell:
         "python scripts/print_results_table.py {DATA_DIR}"
 
-# Load model pool (first stage)
+# Load model pool
 rule load_models:
+    input:
+        lambda wildcards: f"{config.get('model_pool', {}).get('pools_dir', 'model_pools')}/{config.get('model_pool', {}).get('default_pool', 'test')}.csv"
     output:
         DATA_DIR / "loaded_models.json"
     params:
@@ -47,6 +54,8 @@ rule load_models:
 
 # Load judge pool
 rule load_judges:
+    input:
+        lambda wildcards: f"{config.get('judge_pool', {}).get('pools_dir', 'judge_pools')}/{config.get('judge_pool', {}).get('default_pool', 'test')}.csv"
     output:
         DATA_DIR / "loaded_judges.json"
     params:
@@ -59,11 +68,11 @@ rule load_judges:
 def get_all_skill_files():
     """Dynamically find all skill JSON files."""
     import glob
-    return glob.glob("skills/*/*.json")
+    skills_dir = config.get("skills", {}).get("skills_dir", "skills")
+    return glob.glob(f"{skills_dir}/*/*.json")
 
 rule load_skills:
     input:
-        # Dynamically find all skill JSON files to trigger reload when they change
         get_all_skill_files()
     output:
         DATA_DIR / "loaded_skills.json"
@@ -73,97 +82,55 @@ rule load_skills:
     script:
         "scripts/load_skills.py"
 
-# Helper function to get model IDs for parallel execution
+# Helper function to get model IDs for parallel execution  
 def get_model_ids():
-    """Dynamically extract model IDs from loaded models file."""
-    models_file = DATA_DIR / "loaded_models.json"
-    if not models_file.exists():
+    """Get sanitized model IDs from model pool CSV file."""
+    # Read directly from CSV to avoid chicken-and-egg problem
+    pool_file = f"{config.get('model_pool', {}).get('pools_dir', 'model_pools')}/{config.get('model_pool', {}).get('default_pool', 'test')}.csv"
+    
+    try:
+        import pandas as pd
+        df = pd.read_csv(pool_file)
+        model_ids = df['id'].tolist()
+        # Sanitize for filenames
+        return [model_id.replace("/", "_").replace(":", "_") for model_id in model_ids]
+    except (FileNotFoundError, KeyError, ImportError):
+        # Fallback to empty list if CSV doesn't exist or has issues
         return []
-    
-    import sys
-    sys.path.insert(0, "scripts")
-    from snakemake_utils import get_model_ids, sanitize_model_id_for_filename
-    
-    model_ids = get_model_ids(str(models_file))
-    # Return sanitized IDs for use in filenames
-    return [sanitize_model_id_for_filename(model_id) for model_id in model_ids]
 
-# PARALLEL VERSION: Execute conversations for each model separately (cache only)
+# Execute conversations for each model in parallel with per-model serialization
 rule execute_conversations_for_model:
     input:
         models=DATA_DIR / "loaded_models.json",
         skills=DATA_DIR / "loaded_skills.json", 
         judges=DATA_DIR / "loaded_judges.json"
     output:
-        # Use a marker file instead of the per-model JSON
-        DATA_DIR / "conversations_cache_{model_id}.done"
+        DATA_DIR / "model_conversations_{model_id}.completed"
     params:
-        # Convert sanitized model ID back to original for processing
-        original_model_id=lambda wildcards: wildcards.model_id.replace('_', '/', 1)
-    run:
-        import sys
-        sys.path.insert(0, "scripts")
-        from execute_conversations_single_model import execute_conversations_for_model_cache_only
-        
-        # Execute conversations and cache them (no per-model JSON output)
-        # Pass the profile-specific cache directories  
-        cache_dir = DATA_DIR / "conversations"
-        intermediary_cache_dir = DATA_DIR / "intermediaries"
-        
-        try:
-            # This function now includes retry logic and raises exceptions on failure
-            success = execute_conversations_for_model_cache_only(
-                str(input.models),
-                str(input.skills),
-                str(input.judges),
-                params.original_model_id,
-                str(cache_dir),
-                str(intermediary_cache_dir)
-            )
-            
-            # Only create marker file if successful (function returns True or raises exception)
-            if success:
-                with open(output[0], 'w') as f:
-                    f.write(f"Model {params.original_model_id} conversations cached successfully\n")
-            else:
-                # This should not happen anymore since function raises exceptions instead of returning False
-                raise RuntimeError(f"Model {params.original_model_id} execution failed without specific error")
-                
-        except Exception as e:
-            # Provide clear error message and fail the pipeline
-            error_msg = (f"\n💥 PIPELINE FAILED: Model execution failed for {params.original_model_id}\n"
-                        f"🔍 Error Details: {str(e)}\n"
-                        f"📋 This could indicate:\n"
-                        f"   - API authentication issues\n"
-                        f"   - Rate limiting from the model provider\n" 
-                        f"   - Model endpoint unavailability\n"
-                        f"   - Network connectivity problems\n\n"
-                        f"🛠️  Troubleshooting steps:\n"
-                        f"   1. Check API keys and authentication\n"
-                        f"   2. Verify model availability at OpenRouter\n"
-                        f"   3. Try running with fewer parallel jobs (-j 2)\n"
-                        f"   4. Check network connectivity\n")
-            
-            print(error_msg, file=sys.stderr)
-            raise RuntimeError(f"Model execution failed: {params.original_model_id}") from e
+        original_model_id=lambda wildcards: wildcards.model_id.replace('_', '/', 1).replace('_', ':', 1)
+    resources:
+        # CRITICAL: Enforce per-model serialization - only one conversation generation per model at a time
+        # This creates a dynamic resource constraint based on the model_id
+        model_lock=lambda wildcards: f"model_{wildcards.model_id}"
+    threads: 1  # Single-threaded per model to prevent internal concurrency
+    shell:
+        "python scripts/execute_conversations_standalone.py {input.models} {input.skills} {input.judges} {params.original_model_id} {DATA_DIR}/conversations {DATA_DIR}/intermediaries && touch {output}"
 
-# LEGACY VERSION: Original sequential execution (kept as backup)
-rule execute_conversations_legacy:
+# Aggregate all model completions into single flag
+rule execute_conversations:
     input:
-        models=DATA_DIR / "loaded_models.json",
-        skills=DATA_DIR / "loaded_skills.json",
-        judges=DATA_DIR / "loaded_judges.json"
+        # Depend on all per-model completion markers
+        lambda wildcards: [DATA_DIR / f"model_conversations_{model_id}.completed" 
+                          for model_id in get_model_ids()]
     output:
-        DATA_DIR / "conversations_legacy.json"
-    script:
-        "scripts/execute_conversations.py"
+        DATA_DIR / "conversations_completed.flag"
+    shell:
+        "touch {output}"
 
-# Run Swiss tournaments for model evaluation (direct cache mode)
+# Run Swiss tournaments - depends on conversations being completed
 rule run_tournaments:
     input:
-        # Dynamically depend on conversation cache marker files for all models
-        cache_markers=lambda wildcards: [DATA_DIR / f"conversations_cache_{model_id}.done" 
-                                         for model_id in get_model_ids()],
+        flag=DATA_DIR / "conversations_completed.flag",
         models=DATA_DIR / "loaded_models.json",
         judges=DATA_DIR / "loaded_judges.json", 
         skills=DATA_DIR / "loaded_skills.json"
@@ -174,7 +141,7 @@ rule run_tournaments:
     shell:
         "python scripts/snakemake_tournament_wrapper.py {params.conversations_dir} {input.models} {input.judges} {input.skills} {output}"
 
-# Summarize tournaments with match history and rankings
+# Summarize tournaments
 rule summarize_tournaments:
     input:
         tournaments=DATA_DIR / "tournaments.json",
@@ -186,18 +153,7 @@ rule summarize_tournaments:
     shell:
         "python scripts/snakemake_summarize_wrapper.py {input.tournaments} {output}"
 
-# Fetch OpenRouter models data (depends on models/judges but doesn't invalidate cache)
-rule fetch_openrouter_models:
-    input:
-        models=DATA_DIR / "loaded_models.json",
-        judges=DATA_DIR / "loaded_judges.json"
-    output:
-        DATA_DIR / "openrouter_models_full.json",
-        DATA_DIR / "openrouter_models_filtered.json"
-    script:
-        "scripts/fetch_openrouter_models.py"
-
-# Calculate skill ratings using OpenSkill Bradley-Terry system
+# Calculate skill ratings
 rule calculate_skill_ratings:
     input:
         summaries=DATA_DIR / "tournament_summaries.json",
@@ -208,24 +164,6 @@ rule calculate_skill_ratings:
         DATA_DIR / "skill_ratings.json"
     shell:
         "{sys.executable} scripts/snakemake_ratings_wrapper.py {input.summaries} {input.models} {input.judges} {input.skills} {output}"
-
-# Generate final results JSON with all skills (triggered by score updates)
-rule generate_final_results:
-    input:
-        ratings=DATA_DIR / "skill_ratings.json",
-        skills=DATA_DIR / "loaded_skills.json"
-    output:
-        DATA_DIR / "final_results.json"
-    script:
-        "scripts/generate_final_results.py"
-
-# Print final results table
-rule print_results:
-    input:
-        DATA_DIR / "skill_ratings.json"
-    shell:
-        "python scripts/print_results_table.py"
-
 
 # Clean intermediate files
 rule clean:

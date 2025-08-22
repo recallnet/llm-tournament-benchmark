@@ -63,7 +63,9 @@ class TestGitHubIntegrationCore:
             print(f"URL length: {len(github_url)}")
 
             # Verify URL structure
-            assert github_url.startswith("https://github.com/recallnet/beam/issues/new?")
+            assert github_url.startswith(
+                "https://github.com/recallnet/beam/issues/new?"
+            )
             assert "title=" in github_url
             assert "body=" in github_url
             assert "Models" in content["title"]
@@ -81,7 +83,9 @@ class TestGitHubIntegrationCore:
         reporter = AFBenchIssueReporter()
 
         # Test with normal data
-        df = pd.DataFrame({"Model": ["model_1", "model_2"], "Score": [1600.5, 1450.2], "Rank": [1, 2]})
+        df = pd.DataFrame(
+            {"Model": ["model_1", "model_2"], "Score": [1600.5, 1450.2], "Rank": [1, 2]}
+        )
 
         markdown = reporter._dataframe_to_markdown(df)
         print(f"Generated markdown:\n{markdown}")
@@ -113,10 +117,20 @@ class TestGitHubIntegrationCore:
         test_cases = [
             ({}, ""),
             ({"page": "Models"}, "Models"),
-            ({"page": "Models", "selected_model": "test_model"}, "Models > Model: test_model"),
-            ({"page": "Judges", "selected_judge": "test_judge"}, "Judges > Judge: test_judge"),
             (
-                {"page": "Tournaments", "selected_skill": "skill_1", "selected_match": "match_1"},
+                {"page": "Models", "selected_model": "test_model"},
+                "Models > Model: test_model",
+            ),
+            (
+                {"page": "Judges", "selected_judge": "test_judge"},
+                "Judges > Judge: test_judge",
+            ),
+            (
+                {
+                    "page": "Tournaments",
+                    "selected_skill": "skill_1",
+                    "selected_match": "match_1",
+                },
                 "Tournaments > Skill: skill_1 > Match: match_1",
             ),
         ]
@@ -124,11 +138,15 @@ class TestGitHubIntegrationCore:
         with patch("github_issue_helper.st") as mock_st:
             for i, (context, expected_path) in enumerate(test_cases):
                 mock_st.session_state = Mock()
-                mock_st.session_state.get = lambda key, default: context if key == "issue_context" else default
+                mock_st.session_state.get = lambda key, default: (
+                    context if key == "issue_context" else default
+                )
 
                 path = reporter.get_context_path()
                 print(f"Test {i+1}: {context} -> '{path}'")
-                assert path == expected_path, f"Expected '{expected_path}', got '{path}'"
+                assert (
+                    path == expected_path
+                ), f"Expected '{expected_path}', got '{path}'"
 
         print("✅ Context path generation works correctly")
 
@@ -144,13 +162,20 @@ class TestGitHubIntegrationCore:
         special_df = pd.DataFrame(
             {
                 "Model": ["test/model", "model with spaces", 'model"quotes"'],
-                "Description": ["Contains & and <tags>", "Normal text", "Special: @#$%"],
+                "Description": [
+                    "Contains & and <tags>",
+                    "Normal text",
+                    "Special: @#$%",
+                ],
             }
         )
 
         class MockSessionState:
             def __init__(self):
-                self.issue_context = {"page": "Models", "selected_model": "dangerous/model&name"}
+                self.issue_context = {
+                    "page": "Models",
+                    "selected_model": "dangerous/model&name",
+                }
                 self.captured_tables = {
                     "Special Chars": {
                         "columns": list(special_df.columns),
@@ -178,14 +203,20 @@ class TestGitHubIntegrationCore:
 
             # Verify dangerous characters are encoded
             assert "<tags>" not in github_url, "Angle brackets should be encoded"
-            assert " " not in github_url.split("?", 1)[1], "Spaces should be encoded in parameters"
+            assert (
+                " " not in github_url.split("?", 1)[1]
+            ), "Spaces should be encoded in parameters"
 
             # Verify content is preserved when decoded
             decoded_title = urllib.parse.unquote(title_encoded)
             decoded_body = urllib.parse.unquote(body_encoded)
 
-            assert "dangerous/model&name" in decoded_title, "Model name should be preserved"
-            assert "Contains & and <tags>" in decoded_body, "Special chars should be preserved in body"
+            assert (
+                "dangerous/model&name" in decoded_title
+            ), "Model name should be preserved"
+            assert (
+                "Contains & and <tags>" in decoded_body
+            ), "Special chars should be preserved in body"
 
             print("✅ Special characters encoded safely")
 
@@ -205,7 +236,10 @@ class TestGitHubIntegrationCore:
                 "ID": range(100),
                 "Model": [f"model_{i}" for i in range(100)],
                 "Score": [1500 + i * 2.5 for i in range(100)],
-                "Description": [f"Description for model {i} with some additional text" for i in range(100)],
+                "Description": [
+                    f"Description for model {i} with some additional text"
+                    for i in range(100)
+                ],
             }
         )
 
@@ -244,8 +278,12 @@ class TestGitHubIntegrationCore:
             print(f"Issue body length: {len(content['body'])} characters")
 
             # Performance should be reasonable
-            assert markdown_time < 0.5, f"Markdown generation too slow: {markdown_time:.4f}s"
-            assert generation_time < 0.1, f"Issue generation too slow: {generation_time:.4f}s"
+            assert (
+                markdown_time < 0.5
+            ), f"Markdown generation too slow: {markdown_time:.4f}s"
+            assert (
+                generation_time < 0.1
+            ), f"Issue generation too slow: {generation_time:.4f}s"
 
         print("✅ Performance is acceptable for large datasets")
 
@@ -278,7 +316,10 @@ class TestGitHubIntegrationCore:
                 col_mock.__exit__ = Mock(return_value=None)
                 return col_mock
 
-            mock_st.columns = lambda n: [create_column_mock() for _ in range(len(n) if isinstance(n, list) else n)]
+            mock_st.columns = lambda n: [
+                create_column_mock()
+                for _ in range(len(n) if isinstance(n, list) else n)
+            ]
             mock_st.markdown = lambda content, **kwargs: markdown_calls.append(content)
 
             # Generate issue button
@@ -293,7 +334,9 @@ class TestGitHubIntegrationCore:
             # Verify HTML structure
             assert "<a href=" in str(button_html), "Should contain anchor tag"
             assert 'target="_blank"' in str(button_html), "Should open in new tab"
-            assert "github.com/recallnet/beam/issues/new" in str(button_html), "Should link to GitHub"
+            assert "github.com/recallnet/beam/issues/new" in str(
+                button_html
+            ), "Should link to GitHub"
             assert "Open Issue" in str(button_html), "Should contain button text"
 
             print("✅ Issue button generates correct HTML")

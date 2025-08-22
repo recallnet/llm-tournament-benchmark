@@ -5,7 +5,12 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts.summarize_tournaments import calculate_match_result, create_tournament_summary, load_judge_cache_files, main
+from scripts.summarize_tournaments import (
+    calculate_match_result,
+    create_tournament_summary,
+    load_judge_cache_files,
+    main,
+)
 
 
 class TestLoadJudgeCacheFilesComprehensive:
@@ -26,7 +31,10 @@ class TestLoadJudgeCacheFilesComprehensive:
             skill_dir.mkdir()
 
             cache_file = skill_dir / "match123_judge1_abc.json"
-            cache_data = {"metadata": {"match_id": "match123", "skill_id": "skill1"}, "judgment": {"vote": "A"}}
+            cache_data = {
+                "metadata": {"match_id": "match123", "skill_id": "skill1"},
+                "judgment": {"vote": "A"},
+            }
             with open(cache_file, "w") as f:
                 json.dump(cache_data, f)
 
@@ -50,7 +58,10 @@ class TestLoadJudgeCacheFilesComprehensive:
 
             # Create valid JSON file
             valid_file = skill_dir / "valid_match_judge1_abc.json"
-            valid_data = {"metadata": {"match_id": "valid_match", "skill_id": "skill1"}, "judgment": {"vote": "B"}}
+            valid_data = {
+                "metadata": {"match_id": "valid_match", "skill_id": "skill1"},
+                "judgment": {"vote": "B"},
+            }
             with open(valid_file, "w") as f:
                 json.dump(valid_data, f)
 
@@ -59,7 +70,9 @@ class TestLoadJudgeCacheFilesComprehensive:
 
             # Should print warning about corrupted file (exact message may vary)
             print_calls = [str(call) for call in mock_print.call_args_list]
-            assert any("⚠️  Skipping corrupted cache file" in call for call in print_calls)
+            assert any(
+                "⚠️  Skipping corrupted cache file" in call for call in print_calls
+            )
             assert any(str(corrupted_file) in call for call in print_calls)
 
             # Should still load valid file
@@ -92,7 +105,9 @@ class TestLoadJudgeCacheFilesComprehensive:
                     matches = load_judge_cache_files(tournaments_dir)
 
             # Should print warning about file error
-            mock_print.assert_called_with(f"⚠️  Skipping corrupted cache file {error_file}: Permission denied")
+            mock_print.assert_called_with(
+                f"⚠️  Skipping corrupted cache file {error_file}: Permission denied"
+            )
 
             # Should return empty since we couldn't read any files
             assert matches == {}
@@ -217,8 +232,12 @@ class TestMainFunctionComprehensive:
                             main()
 
             # Verify success path printing
-            mock_print.assert_any_call(f"🔍 Found {len(mock_matches)} tournament matches")
-            mock_print.assert_any_call("✅ Processed 2 matches across 2 evals in 2 skills")
+            mock_print.assert_any_call(
+                f"🔍 Found {len(mock_matches)} tournament matches"
+            )
+            mock_print.assert_any_call(
+                "✅ Processed 2 matches across 2 evals in 2 skills"
+            )
 
             # Verify skill summaries were printed
             mock_print.assert_any_call("\n🏆 skill_alpha:")
@@ -293,8 +312,12 @@ class TestMainFunctionComprehensive:
                             main()
 
             # Check that model rankings were printed (should show top models with scores)
-            ranking_calls = [call for call in mock_print.call_args_list if "pts" in str(call)]
-            assert len(ranking_calls) >= 1  # Should have at least one model ranking print
+            ranking_calls = [
+                call for call in mock_print.call_args_list if "pts" in str(call)
+            ]
+            assert (
+                len(ranking_calls) >= 1
+            )  # Should have at least one model ranking print
 
     def test_main_module_execution(self):
         """Test module-level execution (line 308)."""
@@ -332,7 +355,9 @@ class TestMainFunctionComprehensive:
                             main()
 
             # Should detect that we have matches but no valid summaries
-            mock_print.assert_any_call(f"🔍 Found {len(mock_matches)} tournament matches")
+            mock_print.assert_any_call(
+                f"🔍 Found {len(mock_matches)} tournament matches"
+            )
 
             # Should save with zero stats
             mock_json_dump.assert_called_once()

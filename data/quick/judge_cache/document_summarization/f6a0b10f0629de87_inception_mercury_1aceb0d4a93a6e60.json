@@ -22,7 +22,7 @@
     "model_b_id": "inception/mercury",
     "eval_id": "arxiv-2508-08314v1",
     "skill_id": "document_summarization",
-    "timestamp": "2025-08-21T00:54:22.962330",
+    "timestamp": "2025-08-21T23:04:55.103924",
     "cache_key": "1aceb0d4a93a6e60"
   }
 }

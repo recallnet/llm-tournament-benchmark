@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "procedural_fps_map",
+    "eval_name": "Procedural FPS Map Generator",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-21T22:28:23.570906",
+    "cache_key": "b719380ca85554e1",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that generates procedural top-down FPS maps.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Generates procedural FPS maps with rooms, corridors, spawn points, weapon pickups\n- Color scheme: black walls, gray floors, green spawn points, red weapon pickups\n- Maps must be tactically interesting and playable (not random noise)\n- Include minimap legend and \"Generate New Map\" button\n- Flood-fill algorithm ensures all areas are reachable\n- Smooth performance targeting 60 FPS during generation\n- No external libraries, works in all major browsers\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "// Initialize canvas and variables\nconst canvas = document.getElementById('map');\nconst ctx = canvas.getContext('2d');\ncanvas.width = 500;\ncanvas.height = 500;\nconst map = Array.from({length: 500}, () => new Array(500).fill(0));\nconst colors = {\n  wall: '#000',\n  floor: '#808080',\n  start: '#008000',\n  weapon: '#ff0000',\n};\nlet startX, startY;\n\n// Flood fill to check reachability\nfunction floodFill(x, y) {\n  if (x < 0 || x >= 500 || y < 0 || y >= 500) return;\n  if (map[y][x] !== 0) return;\n  map[y][x] = 1;\n  floodFill(x + 1, y);\n  floodFill(x - 1, y);\n  floodFill(x, y + 1);\n  floodFill(x, y - 1);\n}\n\n// Generate random room\nfunction generateRoom(x, y, w, h) {\n  for (let i = 0; i < w; i++) {\n    for (let j = 0; j < h; j++) {\n      map[y + i][x + j] = 0;\n      floodFill(x + j, y + i);\n    }\n  }\n}\n\n// Generate corridor between rooms\nfunction generateCorridor(x1, y1, x2, y2) {\n  const dx = Math.abs(x2 - x1);\n  const dy = Math.abs(y2 - y1);\n  const sx = x1 < x2 ? 1 : -1;\n  const sy = y1 < y2 ? 1 : -1;\n  let x = x1;\n  let y = y1;\n  while (x !== x2 || y !== y2) {\n    map[y][x] = 0;\n    floodFill(x, y);\n    x += sx;\n    y += sy;\n  }\n}\n\n// Generate procedural FPS map\nfunction generateMap() {\n  // Clear previous map\n  for (let i = 0; i < 500; i++) {\n    for (let j = 0; j < 500; j++) {\n      map[i][j] = -1;\n    }\n  }\n  // Place starting position\n  while (true) {\n    startX = Math.floor(Math.random() * 500);\n    startY = Math.floor(Math.random() * 500);\n    if (map[startY][startX] === 0) break;\n  }\n  map[startY][startX] = 2;\n  // Generate rooms and corridors\n  const num Rooms = Math.floor(Math.random() * 10) + 5;\n  for (let i = 0; i < num Rooms; i++) {\n    const x = Math.floor(Math.random() * 500);\n    const y = Math.floor(Math.random() * 500);\n    const w = Math.floor(Math.random() * 50) + 5;\n    const h = Math.floor(Math.random() * 50) + 5;\n    generateRoom(x, y, w, h);\n    if (i === 0) {\n      startX = x + Math.floor(w / 2);\n      startY = y + Math.floor(h / 2);\n    }\n  }\n  for (let i = 1; i < num Rooms; i++) {\n    let x1 = 0;\n    let y1 = 0;\n    while (true) {\n      x1 = Math.floor(Math.random() * 500);\n      y1 = Math.floor(Math.random() * 500);\n      if (map[y1][x1] === -1) {\n        break;\n      }\n    }\n    const x2 = startX;\n    const y2 = startY;\n    generateCorridor(x1, y1, x2, y2);\n  }\n  // Paint map\n  for (let i = 0; i < 500; i++) {\n    for (let j = 0; j < 500; j++) {\n      ctx.fillStyle = colors[map[i][j]];\n      ctx.fillRect(j * 10, i * 10, 10, 10);\n    }\n  }\n  // Place weapon pickups\n  for (let i = 0; i < Math.floor(Math.random() * 10) + 5; i++) {\n    let x = 0;\n    let y = 0;\n    while (true) {\n      x = Math.floor(Math.random() * 500);\n      y = Math.floor(Math.random() * 500);\n      if (map[y][x] === 1) {\n        break;\n      }\n    }\n    map[y][x] = 3;\n    ctx.fillStyle = colors.weapon;\n    ctx.fillRect(x * 10, y * 10, 10, 10);\n  }\n  // Clear screen\n  ctx.fillStyle = '#fff';\n  ctx.fillRect(0, 0, 500, 500);\n  // Draw min"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

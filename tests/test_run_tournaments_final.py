@@ -5,7 +5,12 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from scripts.run_tournaments import JudgeExecutor, SwissTournament, TournamentMatch, main
+from scripts.run_tournaments import (
+    JudgeExecutor,
+    SwissTournament,
+    TournamentMatch,
+    main,
+)
 
 
 class TestFinalCoverage:
@@ -18,7 +23,13 @@ class TestFinalCoverage:
         # Mock successful API response
         mock_response = Mock()
         mock_response.json.return_value = {
-            "choices": [{"message": {"content": "**Vote: A**\n\nModel A provides better analysis and reasoning."}}]
+            "choices": [
+                {
+                    "message": {
+                        "content": "**Vote: A**\n\nModel A provides better analysis and reasoning."
+                    }
+                }
+            ]
         }
         mock_response.raise_for_status.return_value = None
         mock_post.return_value = mock_response
@@ -43,7 +54,11 @@ class TestFinalCoverage:
             conversations_a = {
                 "conversations": [
                     {
-                        "metadata": {"model_id": "model_a", "skill_id": "skill_1", "eval_id": "eval_1"},
+                        "metadata": {
+                            "model_id": "model_a",
+                            "skill_id": "skill_1",
+                            "eval_id": "eval_1",
+                        },
                         "final": "Response from model A",
                         "steps": [],
                         "messages": [],
@@ -54,7 +69,11 @@ class TestFinalCoverage:
             conversations_b = {
                 "conversations": [
                     {
-                        "metadata": {"model_id": "model_b", "skill_id": "skill_1", "eval_id": "eval_1"},
+                        "metadata": {
+                            "model_id": "model_b",
+                            "skill_id": "skill_1",
+                            "eval_id": "eval_1",
+                        },
                         "final": "Response from model B",
                         "steps": [],
                         "messages": [],
@@ -64,7 +83,13 @@ class TestFinalCoverage:
 
             # Execute judge
             result = executor.execute_judge(
-                judge_config, conversations_a, conversations_b, "model_a", "model_b", "skill_1", "eval_1"
+                judge_config,
+                conversations_a,
+                conversations_b,
+                "model_a",
+                "model_b",
+                "skill_1",
+                "eval_1",
             )
 
             # Validate result
@@ -79,7 +104,11 @@ class TestFinalCoverage:
         conversations_data = {
             "conversations": [
                 {
-                    "metadata": {"model_id": "model_a", "skill_id": "skill_1", "eval_id": "eval_1"},
+                    "metadata": {
+                        "model_id": "model_a",
+                        "skill_id": "skill_1",
+                        "eval_id": "eval_1",
+                    },
                     "steps": [{"step_num": 1, "content": "Step 1 content"}],
                     "messages": [{"role": "user", "content": "User message"}],
                     "final": "Final response",
@@ -95,7 +124,12 @@ class TestFinalCoverage:
         ]
 
         content = executor._build_view_content(
-            view_specs, conversations_data, conversations_data, "model_a", "skill_1", "eval_1"
+            view_specs,
+            conversations_data,
+            conversations_data,
+            "model_a",
+            "skill_1",
+            "eval_1",
         )
 
         assert "Step 1 content" in content
@@ -106,19 +140,29 @@ class TestFinalCoverage:
     @patch("json.load")
     @patch("json.dump")
     @patch("builtins.print")
-    def test_main_function_complete_execution_path(self, mock_print, mock_json_dump, mock_json_load, mock_open):
+    def test_main_function_complete_execution_path(
+        self, mock_print, mock_json_dump, mock_json_load, mock_open
+    ):
         """Test main function complete execution with tournaments."""
         # Mock data that should trigger full tournament execution
         conversations = {
             "conversations": [
                 {
-                    "metadata": {"model_id": "model_a", "skill_id": "skill_1", "eval_id": "eval_1"},
+                    "metadata": {
+                        "model_id": "model_a",
+                        "skill_id": "skill_1",
+                        "eval_id": "eval_1",
+                    },
                     "final": "Response A",
                     "steps": [],
                     "messages": [],
                 },
                 {
-                    "metadata": {"model_id": "model_b", "skill_id": "skill_1", "eval_id": "eval_1"},
+                    "metadata": {
+                        "model_id": "model_b",
+                        "skill_id": "skill_1",
+                        "eval_id": "eval_1",
+                    },
                     "final": "Response B",
                     "steps": [],
                     "messages": [],
@@ -135,7 +179,11 @@ class TestFinalCoverage:
                 {
                     "id": "eval_1",
                     "_metadata": {"skill": "skill_1"},
-                    "judge": {"view": {"A": [], "B": []}, "prompt": "Judge this", "system": "You are a judge"},
+                    "judge": {
+                        "view": {"A": [], "B": []},
+                        "prompt": "Judge this",
+                        "system": "You are a judge",
+                    },
                 }
             ]
         }
@@ -205,7 +253,9 @@ class TestFinalCoverage:
             valid_evals = [{"id": "eval_1", "_metadata": {"skill": "skill_1"}}]
 
             with patch("builtins.print"):
-                executor.cleanup_invalid_match_cache(valid_models, valid_judges, valid_evals)
+                executor.cleanup_invalid_match_cache(
+                    valid_models, valid_judges, valid_evals
+                )
 
             # Both invalid cache files should be removed
             assert not invalid_cache.exists()
@@ -258,7 +308,9 @@ class TestFinalCoverage:
             valid_evals = [{"id": "eval_1", "_metadata": {"skill": "skill_1"}}]
 
             with patch("builtins.print"):
-                executor.cleanup_invalid_match_cache(valid_models, valid_judges, valid_evals)
+                executor.cleanup_invalid_match_cache(
+                    valid_models, valid_judges, valid_evals
+                )
 
             # Both files should be removed
             assert not invalid_judge_cache.exists()
@@ -279,7 +331,12 @@ class TestFinalCoverage:
         match2 = TournamentMatch("model_c", "model_d", "eval_1", "skill_1")
 
         tournament.rounds = [[match1, match2]]
-        tournament.scores = {"model_a": 1.0, "model_b": 0.0, "model_c": 1.0, "model_d": 0.0}
+        tournament.scores = {
+            "model_a": 1.0,
+            "model_b": 0.0,
+            "model_c": 1.0,
+            "model_d": 0.0,
+        }
 
         # Second round should avoid rematches
         second_round_pairings = tournament._get_pairings_for_round(2)

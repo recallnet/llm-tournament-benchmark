@@ -1,2 +1,3 @@
 id,author,slug,context_window,pricing,endpoint,max_tokens
-openai/gpt-oss-20b,OpenAI,gpt-oss-20b,8192,input:0.0001,openrouter,1000
+test/model-A,TestCorp,model-A,4096,input:0.0001|output:0.0001,mock,1000
+test/model-B,TestCorp,model-B,4096,input:0.0001|output:0.0001,mock,1000

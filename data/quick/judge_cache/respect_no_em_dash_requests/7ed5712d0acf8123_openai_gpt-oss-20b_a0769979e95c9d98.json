@@ -18,7 +18,7 @@
     "model_b_id": "openai/gpt-oss-120b",
     "eval_id": "black-swan-event",
     "skill_id": "respect_no_em_dash_requests",
-    "timestamp": "2025-08-21T01:22:48.437367",
+    "timestamp": "2025-08-21T23:43:58.781581",
     "cache_key": "a0769979e95c9d98"
   }
 }

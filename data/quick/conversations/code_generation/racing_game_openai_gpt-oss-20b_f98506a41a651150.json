@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "racing_game",
+    "eval_name": "Voice-Controlled Racing Game",
+    "model_id": "openai/gpt-oss-20b",
+    "model_slug": "gpt-oss-20b",
+    "model_author": "OpenAI",
+    "timestamp": "2025-08-21T22:30:10.334406",
+    "cache_key": "f98506a41a651150",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that creates a voice-controlled racing game.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Top-down racing track with curves and obstacles\n- Car speed controlled by microphone volume (louder = faster)\n- Web Audio API for microphone access with graceful permission handling\n- Visual volume meter showing microphone input level\n- Lap timing system with personal best tracking\n- Crash detection with realistic physics (speed affects severity)\n- \"Start Race\" button and race completion celebration\n- Mute/unmute toggle for testing\n- Smooth 60 FPS performance\n- No external libraries beyond Web Audio API\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": ""
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

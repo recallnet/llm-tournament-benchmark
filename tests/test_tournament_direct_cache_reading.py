@@ -33,14 +33,21 @@ class TestTournamentDirectCacheReading:
 
         shutil.rmtree(self.temp_dir)
 
-    def create_mock_conversation_file(self, skill: str, eval_id: str, model_id: str, messages: list):
+    def create_mock_conversation_file(
+        self, skill: str, eval_id: str, model_id: str, messages: list
+    ):
         """Create a mock conversation cache file."""
         safe_model_id = model_id.replace("/", "_").replace(":", "_")
         filename = f"{eval_id}_{safe_model_id}_abc123.json"
         file_path = self.conversations_dir / skill / filename
 
         conversation_data = {
-            "metadata": {"skill_id": skill, "eval_id": eval_id, "model_id": model_id, "cache_key": "abc123"},
+            "metadata": {
+                "skill_id": skill,
+                "eval_id": eval_id,
+                "model_id": model_id,
+                "cache_key": "abc123",
+            },
             "messages": messages,
             "execution_info": {"status": "completed"},
         }
@@ -55,15 +62,23 @@ class TestTournamentDirectCacheReading:
         print("\\n🔍 TESTING: Find conversation in cache")
 
         # Create test conversation
-        messages = [{"role": "user", "content": "Test prompt"}, {"role": "assistant", "content": "Test response"}]
+        messages = [
+            {"role": "user", "content": "Test prompt"},
+            {"role": "assistant", "content": "Test response"},
+        ]
 
-        self.create_mock_conversation_file("harm_avoidance", "test_eval", "thedrummer/unslopnemo-12b", messages)
+        self.create_mock_conversation_file(
+            "harm_avoidance", "test_eval", "thedrummer/unslopnemo-12b", messages
+        )
 
         # Test the function we need to implement
         from scripts.run_tournaments import find_conversation_in_cache
 
         conversation = find_conversation_in_cache(
-            str(self.conversations_dir), "harm_avoidance", "test_eval", "thedrummer/unslopnemo-12b"
+            str(self.conversations_dir),
+            "harm_avoidance",
+            "test_eval",
+            "thedrummer/unslopnemo-12b",
         )
 
         assert conversation is not None, "Should find conversation in cache"
@@ -81,7 +96,10 @@ class TestTournamentDirectCacheReading:
         from scripts.run_tournaments import find_conversation_in_cache
 
         conversation = find_conversation_in_cache(
-            str(self.conversations_dir), "harm_avoidance", "nonexistent_eval", "thedrummer/unslopnemo-12b"
+            str(self.conversations_dir),
+            "harm_avoidance",
+            "nonexistent_eval",
+            "thedrummer/unslopnemo-12b",
         )
 
         assert conversation is None, "Should return None for missing conversation"
@@ -92,24 +110,35 @@ class TestTournamentDirectCacheReading:
         print("\\n👥 TESTING: Multiple models same eval")
 
         # Create conversations for different models
-        models = ["thedrummer/unslopnemo-12b", "openai/gpt-oss-20b", "inception/mercury"]
+        models = [
+            "thedrummer/unslopnemo-12b",
+            "openai/gpt-oss-20b",
+            "inception/mercury",
+        ]
 
         for i, model_id in enumerate(models):
             messages = [
                 {"role": "user", "content": f"Test prompt for {model_id}"},
                 {"role": "assistant", "content": f"Response from {model_id} #{i}"},
             ]
-            self.create_mock_conversation_file("code_generation", "python_task", model_id, messages)
+            self.create_mock_conversation_file(
+                "code_generation", "python_task", model_id, messages
+            )
 
         from scripts.run_tournaments import find_conversation_in_cache
 
         # Test finding each conversation
         for i, model_id in enumerate(models):
-            conversation = find_conversation_in_cache(str(self.conversations_dir), "code_generation", "python_task", model_id)
+            conversation = find_conversation_in_cache(
+                str(self.conversations_dir), "code_generation", "python_task", model_id
+            )
 
             assert conversation is not None, f"Should find conversation for {model_id}"
             assert conversation["metadata"]["model_id"] == model_id
-            assert f"Response from {model_id} #{i}" in conversation["messages"][-1]["content"]
+            assert (
+                f"Response from {model_id} #{i}"
+                in conversation["messages"][-1]["content"]
+            )
 
         print(f"✅ Found conversations for all {len(models)} models")
 
@@ -126,7 +155,10 @@ class TestTournamentDirectCacheReading:
         ]
 
         for skill, eval_id, model_id, response in test_conversations:
-            messages = [{"role": "user", "content": f"Prompt for {eval_id}"}, {"role": "assistant", "content": response}]
+            messages = [
+                {"role": "user", "content": f"Prompt for {eval_id}"},
+                {"role": "assistant", "content": response},
+            ]
             self.create_mock_conversation_file(skill, eval_id, model_id, messages)
 
         # Mock the tournament system to use cache directly
@@ -134,9 +166,17 @@ class TestTournamentDirectCacheReading:
             # Mock successful cache lookups
             def mock_find_impl(cache_dir, skill, eval_id, model_id):
                 for test_skill, test_eval, test_model, response in test_conversations:
-                    if test_skill == skill and test_eval == eval_id and test_model == model_id:
+                    if (
+                        test_skill == skill
+                        and test_eval == eval_id
+                        and test_model == model_id
+                    ):
                         return {
-                            "metadata": {"skill_id": skill, "eval_id": eval_id, "model_id": model_id},
+                            "metadata": {
+                                "skill_id": skill,
+                                "eval_id": eval_id,
+                                "model_id": model_id,
+                            },
                             "messages": [
                                 {"role": "user", "content": f"Prompt for {eval_id}"},
                                 {"role": "assistant", "content": response},
@@ -150,7 +190,11 @@ class TestTournamentDirectCacheReading:
             from scripts.run_tournaments import build_judge_prompt_from_cache
 
             prompt = build_judge_prompt_from_cache(
-                str(self.conversations_dir), "harm_avoidance", "eval1", "thedrummer/unslopnemo-12b", "openai/gpt-oss-20b"
+                str(self.conversations_dir),
+                "harm_avoidance",
+                "eval1",
+                "thedrummer/unslopnemo-12b",
+                "openai/gpt-oss-20b",
             )
 
             assert "Response A1" in prompt, "Should include model A response"

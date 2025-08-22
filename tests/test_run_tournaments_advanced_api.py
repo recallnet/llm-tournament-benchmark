@@ -105,7 +105,12 @@ class TestAdvancedAPIIntegration:
         intermediaries_data = {"conversations": []}
 
         content = executor._build_view_content(
-            view_spec, "data/testonly/conversations", intermediaries_data, "model_a", "skill_1", "eval_1"
+            view_spec,
+            "data/testonly/conversations",
+            intermediaries_data,
+            "model_a",
+            "skill_1",
+            "eval_1",
         )
         assert isinstance(content, str)
 
@@ -120,7 +125,12 @@ class TestAdvancedAPIIntegration:
         intermediaries_data = {"conversations": []}
 
         content = executor._build_view_content(
-            view_spec, "data/testonly/conversations", intermediaries_data, "model_b", "skill_2", "eval_2"
+            view_spec,
+            "data/testonly/conversations",
+            intermediaries_data,
+            "model_b",
+            "skill_2",
+            "eval_2",
         )
         assert isinstance(content, str)
 
@@ -132,14 +142,26 @@ class TestAdvancedAPIIntegration:
 
         conversations_data = {
             "conversations": [
-                {"metadata": {"model_id": "different_model", "skill_id": "skill_1", "eval_id": "eval_1"}, "messages": []}
+                {
+                    "metadata": {
+                        "model_id": "different_model",
+                        "skill_id": "skill_1",
+                        "eval_id": "eval_1",
+                    },
+                    "messages": [],
+                }
             ]
         }
 
         view_spec = [{"kind": "step", "id": "step_missing", "part": "final"}]
 
         content = executor._build_view_content(
-            view_spec, conversations_data, {}, "model_a", "skill_1", "eval_1"  # Different model - won't match
+            view_spec,
+            conversations_data,
+            {},
+            "model_a",
+            "skill_1",
+            "eval_1",  # Different model - won't match
         )
 
         assert "[STEP_NOT_FOUND: step_missing]" in content
@@ -155,7 +177,12 @@ class TestAdvancedAPIIntegration:
         intermediaries_data = {"conversations": []}
 
         content = executor._build_view_content(
-            view_spec, "data/testonly/conversations", intermediaries_data, "model_a", "skill_1", "eval_1"
+            view_spec,
+            "data/testonly/conversations",
+            intermediaries_data,
+            "model_a",
+            "skill_1",
+            "eval_1",
         )
         assert isinstance(content, str)
 
@@ -184,7 +211,9 @@ class TestAdvancedAPIIntegration:
 
         view_spec = [{"kind": "intermediary", "id": "inter_1", "part": "final"}]
 
-        content = executor._build_view_content(view_spec, {}, intermediaries_data, "model_a", "skill_1", "eval_1")
+        content = executor._build_view_content(
+            view_spec, {}, intermediaries_data, "model_a", "skill_1", "eval_1"
+        )
 
         assert "My analysis is complete" in content
 
@@ -215,7 +244,9 @@ class TestAdvancedAPIIntegration:
 
         view_spec = [{"kind": "intermediary", "id": "inter_2", "part": "history"}]
 
-        content = executor._build_view_content(view_spec, {}, intermediaries_data, "model_a", "skill_1", "eval_1")
+        content = executor._build_view_content(
+            view_spec, {}, intermediaries_data, "model_a", "skill_1", "eval_1"
+        )
 
         assert "user: Evaluate this" in content
         assert "assistant: Step 1: Analysis" in content
@@ -243,7 +274,9 @@ class TestAdvancedAPIIntegration:
 
         view_spec = [{"kind": "intermediary", "id": "missing_inter", "part": "final"}]
 
-        content = executor._build_view_content(view_spec, {}, intermediaries_data, "model_a", "skill_1", "eval_1")
+        content = executor._build_view_content(
+            view_spec, {}, intermediaries_data, "model_a", "skill_1", "eval_1"
+        )
 
         assert "[INTERMEDIARY_NOT_FOUND: missing_inter]" in content
 
@@ -269,7 +302,9 @@ class TestAdvancedAPIIntegration:
 
         view_spec = [{"kind": "intermediary", "id": "inter_1", "part": "final"}]
 
-        content = executor._build_view_content(view_spec, {}, intermediaries_data, "model_a", "skill_1", "eval_1")
+        content = executor._build_view_content(
+            view_spec, {}, intermediaries_data, "model_a", "skill_1", "eval_1"
+        )
 
         assert "[NO_INTERMEDIARY_RESPONSE]" in content
 
@@ -283,7 +318,11 @@ class TestAdvancedAPIIntegration:
         intermediaries_data = {
             "conversations": [
                 {
-                    "metadata": {"model_id": "model_a", "eval_id": "eval_1", "skill_id": "skill_1"},
+                    "metadata": {
+                        "model_id": "model_a",
+                        "eval_id": "eval_1",
+                        "skill_id": "skill_1",
+                    },
                     "final": "Analysis result",
                     "steps": [],
                     "messages": [],
@@ -297,7 +336,12 @@ class TestAdvancedAPIIntegration:
         ]
 
         content = executor._build_view_content(
-            view_spec, "data/testonly/conversations", intermediaries_data, "model_a", "skill_1", "eval_1"
+            view_spec,
+            "data/testonly/conversations",
+            intermediaries_data,
+            "model_a",
+            "skill_1",
+            "eval_1",
         )
 
         assert isinstance(content, str)
@@ -316,7 +360,13 @@ class TestAdvancedJudgeExecution:
             # Mock API response
             mock_response = Mock()
             mock_response.json.return_value = {
-                "choices": [{"message": {"content": "Model A provides better reasoning. MY VOTE IS FOR: A"}}]
+                "choices": [
+                    {
+                        "message": {
+                            "content": "Model A provides better reasoning. MY VOTE IS FOR: A"
+                        }
+                    }
+                ]
             }
             mock_response.raise_for_status.return_value = None
             mock_post.return_value = mock_response
@@ -340,14 +390,22 @@ class TestAdvancedJudgeExecution:
             conversations_data = {
                 "conversations": [
                     {
-                        "metadata": {"model_id": "model_a", "skill_id": "skill_1", "eval_id": "eval_1"},
+                        "metadata": {
+                            "model_id": "model_a",
+                            "skill_id": "skill_1",
+                            "eval_id": "eval_1",
+                        },
                         "messages": [
                             {"role": "user", "content": "Solve this"},
                             {"role": "assistant", "content": "Solution A"},
                         ],
                     },
                     {
-                        "metadata": {"model_id": "model_b", "skill_id": "skill_1", "eval_id": "eval_1"},
+                        "metadata": {
+                            "model_id": "model_b",
+                            "skill_id": "skill_1",
+                            "eval_id": "eval_1",
+                        },
                         "messages": [
                             {"role": "user", "content": "Solve this"},
                             {"role": "assistant", "content": "Solution B"},
@@ -391,11 +449,17 @@ class TestAdvancedJudgeExecution:
             match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
             judge = {"id": "gpt-4", "name": "GPT-4 Judge"}
             eval_config = {
-                "judge": {"view": {"A": [], "B": []}, "prompt": "Compare {{A}} vs {{B}}", "system": "You are a judge"}
+                "judge": {
+                    "view": {"A": [], "B": []},
+                    "prompt": "Compare {{A}} vs {{B}}",
+                    "system": "You are a judge",
+                }
             }
 
             with patch("builtins.print"):  # Suppress error prints
-                vote, messages, explanation = executor.execute_judge_decision(match, judge, eval_config, {}, {})
+                vote, messages, explanation = executor.execute_judge_decision(
+                    match, judge, eval_config, {}, {}
+                )
 
             # Should default to TIE on error
             assert vote == "TIE"
@@ -417,10 +481,17 @@ class TestAdvancedJudgeExecution:
 
             match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
             judge = {"id": "gpt-4", "name": "GPT-4 Judge"}
-            eval_config = {"judge": {"view": {"A": [], "B": []}, "prompt": "Compare {{A}} vs {{B}}"}}
+            eval_config = {
+                "judge": {
+                    "view": {"A": [], "B": []},
+                    "prompt": "Compare {{A}} vs {{B}}",
+                }
+            }
 
             with patch("builtins.print"):  # Suppress error prints
-                vote, messages, explanation = executor.execute_judge_decision(match, judge, eval_config, {}, {})
+                vote, messages, explanation = executor.execute_judge_decision(
+                    match, judge, eval_config, {}, {}
+                )
 
             # Should handle invalid response gracefully
             assert vote == "TIE"

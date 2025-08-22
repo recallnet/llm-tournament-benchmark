@@ -21,14 +21,20 @@ def test_conversation_data():
 
     ethical_skill = skills.get("ethical_loopholes")
     if ethical_skill:
-        print(f"✅ ethical_loopholes skill found with {ethical_skill['eval_count']} evals")
+        print(
+            f"✅ ethical_loopholes skill found with {ethical_skill['eval_count']} evals"
+        )
         print(f"   Eval IDs: {ethical_skill['eval_ids']}")
     else:
         print("❌ ethical_loopholes skill not found in loaded skills")
-        assert ethical_skill is not None, "ethical_loopholes skill not found in loaded skills"
+        assert (
+            ethical_skill is not None
+        ), "ethical_loopholes skill not found in loaded skills"
 
     # Check if ethical_loopholes evals exist in the evals list
-    ethical_evals = [e for e in evals if e.get("_metadata", {}).get("skill") == "ethical_loopholes"]
+    ethical_evals = [
+        e for e in evals if e.get("_metadata", {}).get("skill") == "ethical_loopholes"
+    ]
     print(f"📊 Found {len(ethical_evals)} ethical_loopholes evals in evals list")
 
     for eval_data in ethical_evals:

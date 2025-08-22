@@ -6,7 +6,6 @@ massive conversations.json aggregation file.
 """
 
 import json
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -36,7 +35,9 @@ class TestRemoveMegaConversationsFile:
             mock_snakemake.input.models = str(Path(temp_dir) / "models.json")
             mock_snakemake.input.judges = str(Path(temp_dir) / "judges.json")
             mock_snakemake.input.skills = str(Path(temp_dir) / "skills.json")
-            mock_snakemake.input.conversations_cache_dir = str(Path(temp_dir) / "conversations")
+            mock_snakemake.input.conversations_cache_dir = str(
+                Path(temp_dir) / "conversations"
+            )
             mock_snakemake.output = [str(Path(temp_dir) / "tournaments.json")]
 
             # Create the mock input files
@@ -47,10 +48,14 @@ class TestRemoveMegaConversationsFile:
                 json.dump({"judges": [{"id": "test_judge"}]}, f)
 
             with open(mock_snakemake.input.skills, "w") as f:
-                json.dump({"skills": {"test_skill": {}}, "evals": [{"id": "test_eval"}]}, f)
+                json.dump(
+                    {"skills": {"test_skill": {}}, "evals": [{"id": "test_eval"}]}, f
+                )
 
             # Create conversations cache directory
-            Path(mock_snakemake.input.conversations_cache_dir).mkdir(parents=True, exist_ok=True)
+            Path(mock_snakemake.input.conversations_cache_dir).mkdir(
+                parents=True, exist_ok=True
+            )
 
             # Mock the tournament script to accept cache directory instead of mega file
             with patch("scripts.run_tournaments.main_with_cache_dir") as mock_main:
@@ -60,7 +65,7 @@ class TestRemoveMegaConversationsFile:
                 # (We'll need to implement main_with_cache_dir)
                 from scripts.run_tournaments import main_with_cache_dir
 
-                result = main_with_cache_dir(
+                main_with_cache_dir(
                     mock_snakemake.input.conversations_cache_dir,
                     mock_snakemake.input.models,
                     mock_snakemake.input.judges,
@@ -89,7 +94,9 @@ class TestRemoveMegaConversationsFile:
             "afbench": {"input": ["skill_ratings.json"]},
             "calculate_skill_ratings": {"input": ["tournament_summaries.json"]},
             "summarize_tournaments": {"input": ["tournaments.json"]},
-            "run_tournaments_direct": {"input": ["conversations/", "models.json", "judges.json", "skills.json"]},
+            "run_tournaments_direct": {
+                "input": ["conversations/", "models.json", "judges.json", "skills.json"]
+            },
             # Note: No aggregate_conversations or execute_conversations_for_model rules
         }
 
@@ -116,7 +123,9 @@ class TestRemoveMegaConversationsFile:
 
         # Test that we can reach afbench without aggregation rules
         can_build_afbench = check_dependency_chain("afbench")
-        assert can_build_afbench, "Should be able to build afbench without aggregation rules"
+        assert (
+            can_build_afbench
+        ), "Should be able to build afbench without aggregation rules"
 
         # Verify aggregation rules are not needed
         forbidden_rules = ["aggregate_conversations", "execute_conversations_for_model"]
@@ -143,7 +152,7 @@ class TestRemoveMegaConversationsFile:
                 # Run tournament directly with cache
                 from scripts.run_tournaments import main_with_cache_dir
 
-                result = main_with_cache_dir(
+                main_with_cache_dir(
                     str(Path(temp_dir) / "conversations"),
                     str(Path(temp_dir) / "models.json"),
                     str(Path(temp_dir) / "judges.json"),
@@ -152,7 +161,9 @@ class TestRemoveMegaConversationsFile:
                 )
 
             # conversations.json should NOT exist
-            assert not conversations_file.exists(), "conversations.json should not be created"
+            assert (
+                not conversations_file.exists()
+            ), "conversations.json should not be created"
 
             print("✅ conversations.json is not created in new pipeline")
 
@@ -168,7 +179,10 @@ class TestRemoveMegaConversationsFile:
         temp_dir = tempfile.mkdtemp()
         try:
             # Per-model files should NOT be created
-            model_files = [Path(temp_dir) / "conversations_model1.json", Path(temp_dir) / "conversations_model2.json"]
+            model_files = [
+                Path(temp_dir) / "conversations_model1.json",
+                Path(temp_dir) / "conversations_model2.json",
+            ]
 
             # Mock successful pipeline run
             with patch("scripts.run_tournaments.main_with_cache_dir") as mock_main:
@@ -176,7 +190,7 @@ class TestRemoveMegaConversationsFile:
 
                 from scripts.run_tournaments import main_with_cache_dir
 
-                result = main_with_cache_dir(
+                main_with_cache_dir(
                     str(Path(temp_dir) / "conversations"),
                     str(Path(temp_dir) / "models.json"),
                     str(Path(temp_dir) / "judges.json"),
@@ -186,7 +200,9 @@ class TestRemoveMegaConversationsFile:
 
             # Per-model files should NOT exist
             for model_file in model_files:
-                assert not model_file.exists(), f"{model_file.name} should not be created"
+                assert (
+                    not model_file.exists()
+                ), f"{model_file.name} should not be created"
 
             print("✅ Per-model files are not created in new pipeline")
 

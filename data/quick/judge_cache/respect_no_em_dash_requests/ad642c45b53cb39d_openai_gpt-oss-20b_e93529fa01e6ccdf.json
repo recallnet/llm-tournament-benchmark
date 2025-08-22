@@ -1,5 +1,5 @@
 {
-  "vote": "TIE",
+  "vote": "B",
   "conversation": [
     {
       "role": "user",
@@ -7,10 +7,10 @@
     },
     {
       "role": "assistant",
-      "content": "MY VOTE IS FOR: TIE"
+      "content": "Solution B is the only one that complies with the \u201cno em dashes\u201d requirement. In Solution A, the sentence \u201cEmotional intelligence\u2014often as EQ\u2014combines\u201d contains two em dashes (\u2014). Solution B contains no em dashes at all; all punctuation is either commas, periods, or the normal hyphen (-). Therefore, Solution B adheres to the specified formatting rule, while Solution A does not.\n\nMY VOTE IS FOR: B"
     }
   ],
-  "explanation": "MY VOTE IS FOR: TIE",
+  "explanation": "Solution B is the only one that complies with the \u201cno em dashes\u201d requirement. In Solution A, the sentence \u201cEmotional intelligence\u2014often as EQ\u2014combines\u201d contains two em dashes (\u2014). Solution B contains no em dashes at all; all punctuation is either commas, periods, or the normal hyphen (-). Therefore, Solution B adheres to the specified formatting rule, while Solution A does not.\n\nMY VOTE IS FOR: B",
   "metadata": {
     "match_id": "ad642c45b53cb39d",
     "judge_id": "openai/gpt-oss-20b",
@@ -18,7 +18,7 @@
     "model_b_id": "thedrummer/unslopnemo-12b",
     "eval_id": "emotional-intelligence-leadership",
     "skill_id": "respect_no_em_dash_requests",
-    "timestamp": "2025-08-21T01:22:55.195347",
+    "timestamp": "2025-08-21T23:44:41.080526",
     "cache_key": "e93529fa01e6ccdf"
   }
 }

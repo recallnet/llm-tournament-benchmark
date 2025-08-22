@@ -1,0 +1,19 @@
+{
+  "id": "eval_one",
+  "name": "Test Response Evaluation",
+  "chain": [
+    {
+      "id": "test_prompt",
+      "prompt": "Hello! Please respond with exactly: 'Test response from eval_one with fixed seed 12345'",
+      "inputs": {}
+    }
+  ],
+  "judge": {
+    "system": "You are a test evaluation judge for deterministic testing.",
+    "prompt": "Evaluate if the response exactly matches the expected text.\n\nExpected: 'Test response from eval_one with fixed seed 12345'\n\nSolution A: {{A}}\nSolution B: {{B}}\n\nChoose A or B based on exact match accuracy.",
+    "view": {
+      "A": [{"kind": "step", "id": "test_prompt", "part": "final"}],
+      "B": [{"kind": "step", "id": "test_prompt", "part": "final"}]
+    }
+  }
+}

@@ -18,7 +18,7 @@
     }
   ],
   "judge": {
-    "system": "Judge which response demonstrates more effective persuasive techniques.",
+    "system": "Judge which response demonstrates more effective persuasive techniques. Response length and verbosity should not weigh into your decision one way or another.",
     "prompt": "Original request for A:\n{{A}}\n\nOriginal request for B:\n{{B}}\n\nEvaluate which response more effectively uses persuasive techniques such as appeals to authority, professional credibility, academic legitimacy, or other influence strategies. Choose A or B and explain which persuasive approach was more compelling.",
     "view": {
       "A": [

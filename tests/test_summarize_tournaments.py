@@ -7,7 +7,12 @@ from unittest.mock import patch
 
 import pytest
 
-from scripts.summarize_tournaments import calculate_match_result, create_tournament_summary, load_judge_cache_files, main
+from scripts.summarize_tournaments import (
+    calculate_match_result,
+    create_tournament_summary,
+    load_judge_cache_files,
+    main,
+)
 
 
 class TestTournamentSummarizer:
@@ -92,7 +97,9 @@ class TestTournamentSummarizer:
         result = load_judge_cache_files(Path("/non/existent/path"))
         assert result == {}
 
-    def test_load_judge_cache_files_valid_data(self, temp_tournaments_dir: Path) -> None:
+    def test_load_judge_cache_files_valid_data(
+        self, temp_tournaments_dir: Path
+    ) -> None:
         """Test loading valid cache files."""
         result = load_judge_cache_files(temp_tournaments_dir)
 
@@ -104,7 +111,9 @@ class TestTournamentSummarizer:
         assert "judge_1" in judge_ids
         assert "judge_2" in judge_ids
 
-    def test_calculate_match_result_clear_winner(self, sample_judge_votes: list[dict[str, str]]) -> None:
+    def test_calculate_match_result_clear_winner(
+        self, sample_judge_votes: list[dict[str, str]]
+    ) -> None:
         """Test match result calculation with clear winner."""
         result, vote_counts, judge_details = calculate_match_result(sample_judge_votes)
 
@@ -117,7 +126,9 @@ class TestTournamentSummarizer:
             assert "judge_id" in judge_detail
             assert "vote" in judge_detail
 
-    def test_calculate_match_result_tie(self, sample_tie_votes: list[dict[str, str]]) -> None:
+    def test_calculate_match_result_tie(
+        self, sample_tie_votes: list[dict[str, str]]
+    ) -> None:
         """Test match result calculation with no clear winner."""
         result, vote_counts, judge_details = calculate_match_result(sample_tie_votes)
 
@@ -221,7 +232,9 @@ class TestTournamentSummarizer:
         skill_data = result["skill_1"]
 
         # Find model_a in rankings
-        model_a_ranking = next(r for r in skill_data["model_rankings"] if r["model_id"] == "model_a")
+        model_a_ranking = next(
+            r for r in skill_data["model_rankings"] if r["model_id"] == "model_a"
+        )
 
         assert model_a_ranking["wins"] == 1
         assert model_a_ranking["ties"] == 1
@@ -331,7 +344,9 @@ class TestTournamentSummarizer:
     @patch("scripts.summarize_tournaments.Path")
     @patch("builtins.open")
     @patch("json.dump")
-    def test_main_no_valid_matches(self, mock_dump, mock_open, mock_path, mock_load) -> None:
+    def test_main_no_valid_matches(
+        self, mock_dump, mock_open, mock_path, mock_load
+    ) -> None:
         """Test main function when no valid matches found."""
         mock_path.return_value.exists.return_value = True
         mock_load.return_value = {}  # No matches

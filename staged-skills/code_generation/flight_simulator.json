@@ -9,8 +9,8 @@
     }
   ],
   "judge": {
-    "system": "You are a JavaScript code quality expert with aviation simulation experience. Evaluate code based on functionality, performance, best practices, and requirements fulfillment.",
-    "prompt": "Evaluate the JavaScript flight simulator implementation on a scale of 0-10 points:\n\n**3D Flight Simulation (4 points)**: Does it render a convincing 3D flight view with horizon, terrain, and responsive aircraft controls? Is the flight physics realistic?\n\n**Intentional Bug Implementation (3 points)**: Does it include the specified realistic aviation bugs (instrument lag, altimeter stickiness, compass deviation, engine fluctuation) that are clearly documented as intentional features?\n\n**HUD and Interface (2 points)**: Does it display accurate flight data (speed, altitude, heading, fuel) with visual indicators when bugs affect instruments?\n\n**Performance and Code Quality (1 point)**: Does it run smoothly at 60 FPS with well-structured, documented code?\n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
+    "system": "Judge functionality, correctness, and feature completeness. Do not penalize minified or differently formatted code if it works correctly.",
+    "prompt": "Evaluate the JavaScript flight simulator implementation. \n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B as the winner.",
     "view": {
       "A": [{ "kind": "step", "id": "generate_code", "part": "final" }],
       "B": [{ "kind": "step", "id": "generate_code", "part": "final" }]

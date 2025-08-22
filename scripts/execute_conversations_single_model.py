@@ -12,7 +12,11 @@ import time
 from typing import Any
 
 # Import the original ConversationExecutor and utility functions
-from scripts.execute_conversations import ConversationExecutor, cleanup_stale_cache
+try:
+    from scripts.execute_conversations import ConversationExecutor, cleanup_stale_cache
+except ModuleNotFoundError:
+    # When running standalone, scripts prefix may not work
+    from execute_conversations import ConversationExecutor, cleanup_stale_cache
 
 
 def execute_conversations_for_model_cache_only(
@@ -50,11 +54,18 @@ def execute_conversations_for_model_cache_only(
             if attempt > 0:
                 # Exponential backoff: 2^attempt seconds (2s, 4s, 8s)
                 backoff_time = 2**attempt
-                print(f"🔄 Retry attempt {attempt + 1}/{max_retries} for {target_model_id} (waiting {backoff_time}s)")
+                print(
+                    f"🔄 Retry attempt {attempt + 1}/{max_retries} for {target_model_id} (waiting {backoff_time}s)"
+                )
                 time.sleep(backoff_time)
 
             result = execute_conversations_for_model(
-                models_file, skills_file, judges_file, target_model_id, cache_dir, intermediary_cache_dir
+                models_file,
+                skills_file,
+                judges_file,
+                target_model_id,
+                cache_dir,
+                intermediary_cache_dir,
             )
 
             # Check if execution was successful based on whether we had any successful conversations
@@ -64,12 +75,17 @@ def execute_conversations_for_model_cache_only(
             successful = exec_info["successful_conversations"]
             failed = exec_info["failed_conversations"]
 
-            # Consider successful if we processed all conversations (even if some failed)
-            is_successful = total > 0 and (successful > 0 or total == failed)
+            # Consider successful ONLY if we had at least some successful conversations
+            # If ALL conversations failed, that's a critical error that should halt the pipeline
+            is_successful = total > 0 and successful > 0
+
+            # print(f"🔍 Success check: total={total}, successful={successful}, failed={failed}, is_successful={is_successful}")  # Debug output
 
             if is_successful:
                 if attempt > 0:
-                    print(f"✅ Successfully completed {target_model_id} after {attempt + 1} attempts")
+                    print(
+                        f"✅ Successfully completed {target_model_id} after {attempt + 1} attempts"
+                    )
                 return True
             else:
                 error_msg = f"Model {target_model_id} failed: {successful}/{total} conversations successful, {failed} failed"
@@ -80,7 +96,9 @@ def execute_conversations_for_model_cache_only(
         except Exception as e:
             last_exception = e
             if attempt < max_retries - 1:
-                print(f"❌ Attempt {attempt + 1} failed for {target_model_id}: {e} - will retry")
+                print(
+                    f"❌ Attempt {attempt + 1} failed for {target_model_id}: {e} - will retry"
+                )
             else:
                 print(f"❌ Final attempt failed for {target_model_id}: {e}")
 
@@ -146,11 +164,17 @@ def execute_conversations_for_model(
     from pathlib import Path
 
     cache_dir_path = Path(cache_dir) if cache_dir else None
-    intermediary_cache_dir_path = Path(intermediary_cache_dir) if intermediary_cache_dir else None
-    executor = ConversationExecutor(cache_dir=cache_dir_path, intermediary_cache_dir=intermediary_cache_dir_path)
+    intermediary_cache_dir_path = (
+        Path(intermediary_cache_dir) if intermediary_cache_dir else None
+    )
+    executor = ConversationExecutor(
+        cache_dir=cache_dir_path, intermediary_cache_dir=intermediary_cache_dir_path
+    )
 
     # Clean stale cache entries
-    cleanup_stale_cache(models, judges, executor.cache_dir, executor.intermediary_cache_dir)
+    cleanup_stale_cache(
+        models, judges, executor.cache_dir, executor.intermediary_cache_dir
+    )
 
     # Execute conversations for this model only
     results = []
@@ -166,16 +190,33 @@ def execute_conversations_for_model(
     for eval_data in evals:
         skill_id = eval_data["_metadata"]["skill"]
         eval_id = eval_data["id"]
-        has_intermediaries = "intermediaries" in eval_data and eval_data["intermediaries"]
+        has_intermediaries = (
+            "intermediaries" in eval_data and eval_data["intermediaries"]
+        )
 
         completed += 1
-        print(f"\n[{completed}/{total_conversations}] Processing {skill_id}/{eval_id} x {target_model['id']}")
+        print(
+            f"\n[{completed}/{total_conversations}] Processing {skill_id}/{eval_id} x {target_model['id']}"
+        )
 
         try:
             # Execute main conversation
-            conversation_result = executor.execute_conversation(target_model, skill_id, eval_data)
+            conversation_result = executor.execute_conversation(
+                target_model, skill_id, eval_data
+            )
             results.append(conversation_result)
-            successful_conversations += 1
+
+            # Check if conversation actually succeeded
+            if (
+                conversation_result.get("execution_info", {}).get("status")
+                == "completed"
+            ):
+                successful_conversations += 1
+            else:
+                failed_conversations += 1
+                print(
+                    f"   ❌ Conversation marked as failed: {conversation_result.get('metadata', {}).get('error', 'Unknown error')}"
+                )
 
             # Execute intermediaries if they exist
             if has_intermediaries and judges:
@@ -185,7 +226,11 @@ def execute_conversations_for_model(
                 for intermediary_data in intermediary_data_list:
                     try:
                         intermediary_result = executor.execute_intermediary(
-                            intermediary_data, conversation_result, judges[0], skill_id, eval_id
+                            intermediary_data,
+                            conversation_result,
+                            judges[0],
+                            skill_id,
+                            eval_id,
                         )
                         intermediary_results.append(intermediary_result)
                         successful_intermediaries += 1
@@ -207,7 +252,11 @@ def execute_conversations_for_model(
             "total_intermediaries": total_intermediaries,
             "successful_intermediaries": successful_intermediaries,
             "failed_intermediaries": failed_intermediaries,
-            "timestamp": conversation_result.get("metadata", {}).get("timestamp", "") if results else "",
+            "timestamp": (
+                conversation_result.get("metadata", {}).get("timestamp", "")
+                if results
+                else ""
+            ),
             "models_count": 1,  # Only one model processed
             "evals_count": len(evals),
             "judges_count": len(judges),
@@ -219,7 +268,9 @@ def execute_conversations_for_model(
     return result
 
 
-def create_empty_result(model_id: str, evals_count: int, judges_count: int) -> dict[str, Any]:
+def create_empty_result(
+    model_id: str, evals_count: int, judges_count: int
+) -> dict[str, Any]:
     """Create empty but valid result structure for missing models."""
     from datetime import datetime
 
@@ -258,7 +309,9 @@ def main():
     print(f"🎯 Target model: {target_model_id}")
 
     try:
-        result = execute_conversations_for_model(models_file, skills_file, judges_file, target_model_id)
+        result = execute_conversations_for_model(
+            models_file, skills_file, judges_file, target_model_id
+        )
 
         # Output result as JSON to stdout for Snakemake capture
         # or write to a file based on usage pattern

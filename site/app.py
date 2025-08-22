@@ -7,7 +7,12 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-st.set_page_config(page_title="AFBench Admin UI", page_icon="🏆", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="AFBench Admin UI",
+    page_icon="🏆",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 
 @st.cache_data(ttl=300)
@@ -41,7 +46,11 @@ def load_validated_tournament_data():
         st.error("tournament_summaries.json not found")
         return None
 
-    validated_tournaments = {skill: data for skill, data in tournaments_data["tournaments"].items() if skill in valid_skills}
+    validated_tournaments = {
+        skill: data
+        for skill, data in tournaments_data["tournaments"].items()
+        if skill in valid_skills
+    }
 
     # Step 3: Load metadata files
     files_to_load = {
@@ -101,7 +110,9 @@ def load_judge_decision(skill: str, match_id: str, judge_id: str):
     # Use environment variable for data directory
     data_dir_env = os.getenv("AFBENCH_ADMIN_DATA_DIR")
     if not data_dir_env:
-        raise ValueError("🚨 SAFETY: Admin UI requires AFBENCH_ADMIN_DATA_DIR environment variable.")
+        raise ValueError(
+            "🚨 SAFETY: Admin UI requires AFBENCH_ADMIN_DATA_DIR environment variable."
+        )
     pattern = f"{data_dir_env}/judge_cache/{skill}/{match_id}_{judge_id}_*.json"
     matches = glob.glob(pattern)
     if not matches:
@@ -150,13 +161,19 @@ def show_models_page(data):
         total_wins = 0
         best_skill = None
         worst_skill = None
-        best_rating = float("-inf")  # Start with negative infinity so first rating becomes best
+        best_rating = float(
+            "-inf"
+        )  # Start with negative infinity so first rating becomes best
         worst_rating = float("inf")
 
         for skill, tournament_data in tournaments.items():
-            if model_id in [r["model_id"] for r in tournament_data.get("model_rankings", [])]:
+            if model_id in [
+                r["model_id"] for r in tournament_data.get("model_rankings", [])
+            ]:
                 skills_participated += 1
-                total_matches += tournament_data.get("total_matches", 0) // len(tournament_data.get("model_rankings", [1]))
+                total_matches += tournament_data.get("total_matches", 0) // len(
+                    tournament_data.get("model_rankings", [1])
+                )
 
                 # Find this model's ranking
                 for ranking in tournament_data.get("model_rankings", []):
@@ -166,7 +183,11 @@ def show_models_page(data):
 
                         # Get rating for this skill
                         skill_ratings = ratings.get(skill, {})
-                        model_rating = skill_ratings.get("model_ratings", {}).get(model_id, {}).get("mu", 1500)
+                        model_rating = (
+                            skill_ratings.get("model_ratings", {})
+                            .get(model_id, {})
+                            .get("mu", 1500)
+                        )
 
                         if model_rating > best_rating:
                             best_rating = model_rating
@@ -196,7 +217,9 @@ def show_models_page(data):
     st.dataframe(df, use_container_width=True)
 
     # Model selection for detail view
-    selected_model = st.selectbox("Select model for details:", [m["Model ID"] for m in model_stats])
+    selected_model = st.selectbox(
+        "Select model for details:", [m["Model ID"] for m in model_stats]
+    )
 
     if selected_model:
         st.subheader(f"📊 {selected_model} Details")
@@ -220,10 +243,20 @@ def show_models_page(data):
                     {
                         "Skill": skill,
                         "Rating": f"{rating:.1f}",
-                        "Rank": tournament_stats.get("rank", "N/A") if tournament_stats else "N/A",
-                        "Wins": tournament_stats.get("wins", 0) if tournament_stats else 0,
-                        "Losses": tournament_stats.get("losses", 0) if tournament_stats else 0,
-                        "Ties": tournament_stats.get("ties", 0) if tournament_stats else 0,
+                        "Rank": (
+                            tournament_stats.get("rank", "N/A")
+                            if tournament_stats
+                            else "N/A"
+                        ),
+                        "Wins": (
+                            tournament_stats.get("wins", 0) if tournament_stats else 0
+                        ),
+                        "Losses": (
+                            tournament_stats.get("losses", 0) if tournament_stats else 0
+                        ),
+                        "Ties": (
+                            tournament_stats.get("ties", 0) if tournament_stats else 0
+                        ),
                     }
                 )
 
@@ -245,7 +278,7 @@ def show_judges_page(data):
         judge_id = judge["id"]
 
         total_decisions = 0
-        for skill, tournament_data in tournaments.items():
+        for _skill, tournament_data in tournaments.items():
             for match in tournament_data.get("match_history", []):
                 if judge_id in match.get("judges", []):
                     total_decisions += 1
@@ -288,7 +321,11 @@ def show_skills_page(data):
     if selected_skill:
         st.subheader(f"📋 {selected_skill} Evaluations")
 
-        skill_evals = [e for e in data["skills"]["evals"] if e.get("_metadata", {}).get("skill") == selected_skill]
+        skill_evals = [
+            e
+            for e in data["skills"]["evals"]
+            if e.get("_metadata", {}).get("skill") == selected_skill
+        ]
 
         eval_table = []
         for eval_data in skill_evals:
@@ -296,7 +333,11 @@ def show_skills_page(data):
                 {
                     "ID": eval_data["id"],
                     "Name": eval_data["name"],
-                    "Type": "Multi-step" if len(eval_data.get("chain", [])) > 1 else "Single-step",
+                    "Type": (
+                        "Multi-step"
+                        if len(eval_data.get("chain", [])) > 1
+                        else "Single-step"
+                    ),
                 }
             )
 
@@ -305,10 +346,14 @@ def show_skills_page(data):
             st.dataframe(eval_df, use_container_width=True)
 
             # Evaluation detail
-            selected_eval = st.selectbox("Select evaluation for JSON:", [e["ID"] for e in eval_table])
+            selected_eval = st.selectbox(
+                "Select evaluation for JSON:", [e["ID"] for e in eval_table]
+            )
 
             if selected_eval:
-                eval_json = next((e for e in skill_evals if e["id"] == selected_eval), None)
+                eval_json = next(
+                    (e for e in skill_evals if e["id"] == selected_eval), None
+                )
                 if eval_json:
                     st.subheader(f"📄 {selected_eval} Configuration")
                     st.json(eval_json)
@@ -332,7 +377,9 @@ def show_tournaments_page(data):
         row = {"Model": model}
         for skill in skills:
             skill_ratings = ratings.get(skill, {})
-            rating = skill_ratings.get("model_ratings", {}).get(model, {}).get("mu", 1500)
+            rating = (
+                skill_ratings.get("model_ratings", {}).get(model, {}).get("mu", 1500)
+            )
             row[skill] = rating
         matrix_data.append(row)
 
@@ -372,7 +419,8 @@ def show_tournaments_page(data):
 
         if matches:
             selected_match = st.selectbox(
-                "Select match for details:", [f"{m['match_id']}: {m['model_a']} vs {m['model_b']}" for m in matches]
+                "Select match for details:",
+                [f"{m['match_id']}: {m['model_a']} vs {m['model_b']}" for m in matches],
             )
 
             if selected_match:
@@ -386,7 +434,9 @@ def show_tournaments_page(data):
 
                     with col1:
                         st.markdown(f"**Model A:** {match['model_a']}")
-                        conv_a = load_conversation_log(selected_skill, match.get("eval_id", ""), match["model_a"])
+                        conv_a = load_conversation_log(
+                            selected_skill, match.get("eval_id", ""), match["model_a"]
+                        )
                         if conv_a:
                             with st.expander("Model A Conversation JSON"):
                                 st.json(conv_a)
@@ -395,7 +445,9 @@ def show_tournaments_page(data):
 
                     with col2:
                         st.markdown(f"**Model B:** {match['model_b']}")
-                        conv_b = load_conversation_log(selected_skill, match.get("eval_id", ""), match["model_b"])
+                        conv_b = load_conversation_log(
+                            selected_skill, match.get("eval_id", ""), match["model_b"]
+                        )
                         if conv_b:
                             with st.expander("Model B Conversation JSON"):
                                 st.json(conv_b)
@@ -408,19 +460,27 @@ def show_tournaments_page(data):
                     # Check for early consensus (2 judges with same vote)
                     judge_votes = []
                     for judge_id in match.get("judges", []):
-                        judge_decision = load_judge_decision(selected_skill, match_id, judge_id)
+                        judge_decision = load_judge_decision(
+                            selected_skill, match_id, judge_id
+                        )
                         if judge_decision and "vote" in judge_decision:
                             judge_votes.append(judge_decision["vote"])
 
                     is_early_consensus = (
-                        len(judge_votes) == 2 and len(set(judge_votes)) == 1 and judge_votes[0] in ["A", "B", "TIE"]
+                        len(judge_votes) == 2
+                        and len(set(judge_votes)) == 1
+                        and judge_votes[0] in ["A", "B", "TIE"]
                     )
 
                     if is_early_consensus:
-                        st.info(f"🎯 **Early Consensus**: First 2 judges agreed on **{judge_votes[0]}** - 3rd judge skipped")
+                        st.info(
+                            f"🎯 **Early Consensus**: First 2 judges agreed on **{judge_votes[0]}** - 3rd judge skipped"
+                        )
 
                     for judge_id in match.get("judges", []):
-                        judge_decision = load_judge_decision(selected_skill, match_id, judge_id)
+                        judge_decision = load_judge_decision(
+                            selected_skill, match_id, judge_id
+                        )
                         if judge_decision:
                             with st.expander(f"Judge: {judge_id}"):
                                 st.json(judge_decision)
@@ -440,7 +500,9 @@ def main():
     data = load_validated_tournament_data()
 
     if not data:
-        st.error("Failed to load tournament data. Check that the pipeline has run successfully.")
+        st.error(
+            "Failed to load tournament data. Check that the pipeline has run successfully."
+        )
         return
 
     # Show data freshness in sidebar

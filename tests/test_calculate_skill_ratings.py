@@ -6,7 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from scripts.calculate_skill_ratings import DEFAULT_MU, DEFAULT_SIGMA, SkillRatingCalculator
+from scripts.calculate_skill_ratings import (
+    DEFAULT_MU,
+    DEFAULT_SIGMA,
+    SkillRatingCalculator,
+)
 
 
 class TestSkillRatingCalculator:
@@ -109,8 +113,12 @@ class TestSkillRatingCalculator:
         """Test that cache key generation is consistent."""
         tournament_data = {"skill_1": {"match_history": []}}
 
-        key1 = calculator._generate_cache_key(sample_models, sample_judges, sample_evals, tournament_data)
-        key2 = calculator._generate_cache_key(sample_models, sample_judges, sample_evals, tournament_data)
+        key1 = calculator._generate_cache_key(
+            sample_models, sample_judges, sample_evals, tournament_data
+        )
+        key2 = calculator._generate_cache_key(
+            sample_models, sample_judges, sample_evals, tournament_data
+        )
 
         assert key1 == key2
         assert len(key1) == 16  # CACHE_KEY_LENGTH
@@ -125,11 +133,23 @@ class TestSkillRatingCalculator:
         """Test that cache key changes when data changes."""
         tournament_data1 = {"skill_1": {"match_history": []}}
         tournament_data2 = {
-            "skill_1": {"match_history": [{"match_id": "test", "winner": "A", "timestamp": "2024-01-01T00:00:00"}]}
+            "skill_1": {
+                "match_history": [
+                    {
+                        "match_id": "test",
+                        "winner": "A",
+                        "timestamp": "2024-01-01T00:00:00",
+                    }
+                ]
+            }
         }
 
-        key1 = calculator._generate_cache_key(sample_models, sample_judges, sample_evals, tournament_data1)
-        key2 = calculator._generate_cache_key(sample_models, sample_judges, sample_evals, tournament_data2)
+        key1 = calculator._generate_cache_key(
+            sample_models, sample_judges, sample_evals, tournament_data1
+        )
+        key2 = calculator._generate_cache_key(
+            sample_models, sample_judges, sample_evals, tournament_data2
+        )
 
         assert key1 != key2
 
@@ -143,11 +163,15 @@ class TestSkillRatingCalculator:
         assert path.name == f"{skill_id}_{cache_key}.json"
         assert path.parent == calculator.cache_dir
 
-    def test_calculate_skill_ratings_no_matches(self, calculator: SkillRatingCalculator) -> None:
+    def test_calculate_skill_ratings_no_matches(
+        self, calculator: SkillRatingCalculator
+    ) -> None:
         """Test rating calculation with no matches."""
         tournament_data = {"match_history": []}
 
-        result = calculator.calculate_skill_ratings("test_skill", tournament_data, "test_key")
+        result = calculator.calculate_skill_ratings(
+            "test_skill", tournament_data, "test_key"
+        )
 
         assert result["skill_id"] == "test_skill"
         assert result["total_matches"] == 0
@@ -155,10 +179,14 @@ class TestSkillRatingCalculator:
         assert result["model_rankings"] == []
 
     def test_calculate_skill_ratings_basic(
-        self, calculator: SkillRatingCalculator, sample_tournament_data: dict[str, list[dict[str, str]]]
+        self,
+        calculator: SkillRatingCalculator,
+        sample_tournament_data: dict[str, list[dict[str, str]]],
     ) -> None:
         """Test basic rating calculation."""
-        result = calculator.calculate_skill_ratings("test_skill", sample_tournament_data, "test_key")
+        result = calculator.calculate_skill_ratings(
+            "test_skill", sample_tournament_data, "test_key"
+        )
 
         assert result["skill_id"] == "test_skill"
         assert result["total_matches"] == 3
@@ -175,17 +203,23 @@ class TestSkillRatingCalculator:
             assert model["rank"] == i + 1
 
     def test_calculate_skill_ratings_caching(
-        self, calculator: SkillRatingCalculator, sample_tournament_data: dict[str, list[dict[str, str]]]
+        self,
+        calculator: SkillRatingCalculator,
+        sample_tournament_data: dict[str, list[dict[str, str]]],
     ) -> None:
         """Test that results are cached correctly."""
         skill_id = "test_skill"
         cache_key = "test_key"
 
         # First call should calculate
-        result1 = calculator.calculate_skill_ratings(skill_id, sample_tournament_data, cache_key)
+        result1 = calculator.calculate_skill_ratings(
+            skill_id, sample_tournament_data, cache_key
+        )
 
         # Second call should use cache
-        result2 = calculator.calculate_skill_ratings(skill_id, sample_tournament_data, cache_key)
+        result2 = calculator.calculate_skill_ratings(
+            skill_id, sample_tournament_data, cache_key
+        )
 
         assert result1 == result2
 
@@ -226,16 +260,22 @@ class TestSkillRatingCalculator:
         assert cache_file.exists()
         assert invalid_cache_file.exists()
 
-        calculator.cleanup_invalid_rating_cache(sample_models, sample_judges, sample_evals)
+        calculator.cleanup_invalid_rating_cache(
+            sample_models, sample_judges, sample_evals
+        )
 
         assert cache_file.exists()  # Valid cache should remain
         assert not invalid_cache_file.exists()  # Invalid cache should be removed
 
     def test_match_progression_tracking(
-        self, calculator: SkillRatingCalculator, sample_tournament_data: dict[str, list[dict[str, str]]]
+        self,
+        calculator: SkillRatingCalculator,
+        sample_tournament_data: dict[str, list[dict[str, str]]],
     ) -> None:
         """Test that match progression is tracked correctly."""
-        result = calculator.calculate_skill_ratings("test_skill", sample_tournament_data, "test_key")
+        result = calculator.calculate_skill_ratings(
+            "test_skill", sample_tournament_data, "test_key"
+        )
 
         progression = result["match_progression"]
         assert len(progression) == 3
@@ -257,7 +297,9 @@ class TestSkillRatingCalculator:
                 assert "mu" in changes["after"]
                 assert "sigma" in changes["after"]
 
-    def test_load_cached_ratings_corrupted_file(self, calculator: SkillRatingCalculator) -> None:
+    def test_load_cached_ratings_corrupted_file(
+        self, calculator: SkillRatingCalculator
+    ) -> None:
         """Test handling of corrupted cache files."""
         cache_path = calculator.cache_dir / "corrupted.json"
 
@@ -291,6 +333,10 @@ class TestSkillRatingCalculator:
         # Add skill1 to evals so it won't be removed for missing skill
         sample_evals.append({"id": "eval_3", "_metadata": {"skill": "skill1"}})
 
-        calculator.cleanup_invalid_rating_cache(sample_models, sample_judges, sample_evals)
+        calculator.cleanup_invalid_rating_cache(
+            sample_models, sample_judges, sample_evals
+        )
 
-        assert cache_file.exists()  # Should remain since skill1 exists and model_a is valid
+        assert (
+            cache_file.exists()
+        )  # Should remain since skill1 exists and model_a is valid

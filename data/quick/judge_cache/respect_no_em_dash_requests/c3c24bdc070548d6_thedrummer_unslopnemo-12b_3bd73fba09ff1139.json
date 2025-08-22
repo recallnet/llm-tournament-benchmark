@@ -1,5 +1,5 @@
 {
-  "vote": "A",
+  "vote": "B",
   "conversation": [
     {
       "role": "user",
@@ -7,10 +7,10 @@
     },
     {
       "role": "assistant",
-      "content": "MY VOTE IS FOR: A\n\nThe formatting of Solution B uses multiple em dashes, which were explicitly requested not to be used in the prompt. While Solution A correctly avoid the use of em dashes, Solution B liberally uses them throughout (e.g., in the sentences \"The origin of the term is as fascinating as its implications\u2014in the 17th century, European explorers assumed that all swans were white.\", \"This shift\u2014towards embracing uncertainty and complexity\u2014has profound implications for various fields, including...\", etc.). Therefore, Solution A adheres more closely to the formatting request and should be preferred."
+      "content": "MY VOTE IS FOR: B\n\nResponse B better adheres to the formatting request of no em dashes. It uses dashes to set off Hegelian dialectic lists and for parenthetical thoughts, but these are not em dashes. Response A, on the other hand, uses em dashes to introduce examples and parenthetical thoughts, which violates the formatting request. Therefore, Response B is the better choice for adherence to the formatting request."
     }
   ],
-  "explanation": "MY VOTE IS FOR: A\n\nThe formatting of Solution B uses multiple em dashes, which were explicitly requested not to be used in the prompt. While Solution A correctly avoid the use of em dashes, Solution B liberally uses them throughout (e.g., in the sentences \"The origin of the term is as fascinating as its implications\u2014in the 17th century, European explorers assumed that all swans were white.\", \"This shift\u2014towards embracing uncertainty and complexity\u2014has profound implications for various fields, including...\", etc.). Therefore, Solution A adheres more closely to the formatting request and should be preferred.",
+  "explanation": "MY VOTE IS FOR: B\n\nResponse B better adheres to the formatting request of no em dashes. It uses dashes to set off Hegelian dialectic lists and for parenthetical thoughts, but these are not em dashes. Response A, on the other hand, uses em dashes to introduce examples and parenthetical thoughts, which violates the formatting request. Therefore, Response B is the better choice for adherence to the formatting request.",
   "metadata": {
     "match_id": "c3c24bdc070548d6",
     "judge_id": "thedrummer/unslopnemo-12b",
@@ -18,7 +18,7 @@
     "model_b_id": "inception/mercury",
     "eval_id": "black-swan-event",
     "skill_id": "respect_no_em_dash_requests",
-    "timestamp": "2025-08-21T01:21:53.470767",
+    "timestamp": "2025-08-21T23:44:11.349856",
     "cache_key": "3bd73fba09ff1139"
   }
 }

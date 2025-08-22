@@ -80,7 +80,11 @@ class TestFileReferenceValidation:
             test_file = Path(temp_dir) / "test.txt"
             test_file.write_text("test content")
 
-            eval_data = {"id": "test_eval", "name": "Test Eval", "prompt": f"Use ${{file:{test_file}}}"}
+            eval_data = {
+                "id": "test_eval",
+                "name": "Test Eval",
+                "prompt": f"Use ${{file:{test_file}}}",
+            }
 
             # Should not raise exception
             validate_eval_file_references(eval_data, "test_path")
@@ -93,7 +97,10 @@ class TestFileReferenceValidation:
 
             eval_data = {
                 "id": "test_eval",
-                "judge": {"system": f"System prompt with ${{file:{test_file}}}", "prompt": "Regular prompt"},
+                "judge": {
+                    "system": f"System prompt with ${{file:{test_file}}}",
+                    "prompt": "Regular prompt",
+                },
             }
 
             # Should not raise exception
@@ -107,7 +114,10 @@ class TestFileReferenceValidation:
 
             eval_data = {
                 "id": "test_eval",
-                "chain": [{"prompt": f"Step 1: ${{file:{test_file}}}"}, {"prompt": "Step 2: normal prompt"}],
+                "chain": [
+                    {"prompt": f"Step 1: ${{file:{test_file}}}"},
+                    {"prompt": "Step 2: normal prompt"},
+                ],
             }
 
             # Should not raise exception
@@ -117,7 +127,10 @@ class TestFileReferenceValidation:
         """Test validation raises error for missing files in nested structures."""
         eval_data = {
             "id": "test_eval",
-            "judge": {"system": "System prompt with ${file:/missing.txt}", "prompt": "Regular prompt"},
+            "judge": {
+                "system": "System prompt with ${file:/missing.txt}",
+                "prompt": "Regular prompt",
+            },
         }
 
         with pytest.raises(ValueError) as exc_info:
@@ -196,7 +209,9 @@ class TestJSONSchemaValidation:
         eval_data = {
             "id": "test_eval",
             "name": "Test Evaluation",
-            "chain": [{"id": "step1", "prompt": "Test prompt", "carry": "invalid"}],  # Invalid carry value
+            "chain": [
+                {"id": "step1", "prompt": "Test prompt", "carry": "invalid"}
+            ],  # Invalid carry value
             "judge": {
                 "prompt": "Compare {{A}} vs {{B}}",
                 "view": {
@@ -255,7 +270,10 @@ class TestJSONSchemaValidation:
     def test_validate_eval_json_general_exception(self):
         """Test validation handles general exceptions."""
         # Create invalid data that will cause a general exception
-        with patch("scripts.load_skills.jsonschema.validate", side_effect=Exception("General error")):
+        with patch(
+            "scripts.load_skills.jsonschema.validate",
+            side_effect=Exception("General error"),
+        ):
             eval_data = {"id": "test"}
 
             with pytest.raises(ValueError) as exc_info:
@@ -396,7 +414,10 @@ class TestLoadSkillEvals:
             eval_file.write_text('{"id": "test"}')
 
             # Mock validate_eval_json to raise a general exception
-            with patch("scripts.load_skills.validate_eval_json", side_effect=Exception("Validation error")):
+            with patch(
+                "scripts.load_skills.validate_eval_json",
+                side_effect=Exception("Validation error"),
+            ):
                 with patch("builtins.print"):
                     with pytest.raises(ValueError) as exc_info:
                         load_skill_evals(skill_dir)
@@ -443,7 +464,12 @@ class TestAnalyzeEvalChain:
 
     def test_analyze_eval_chain_simple(self):
         """Test analysis of simple eval chain."""
-        eval_data = {"chain": [{"id": "step1", "prompt": "First step"}, {"id": "step2", "prompt": "Second step"}]}
+        eval_data = {
+            "chain": [
+                {"id": "step1", "prompt": "First step"},
+                {"id": "step2", "prompt": "Second step"},
+            ]
+        }
 
         analysis = analyze_eval_chain(eval_data)
 
@@ -459,7 +485,11 @@ class TestAnalyzeEvalChain:
             "chain": [
                 {"id": "step1", "prompt": "First step"},
                 {"id": "step2", "prompt": "Second step", "depends_on": ["step1"]},
-                {"id": "step3", "prompt": "Third step", "depends_on": ["step1", "step2"]},
+                {
+                    "id": "step3",
+                    "prompt": "Third step",
+                    "depends_on": ["step1", "step2"],
+                },
             ]
         }
 
@@ -501,7 +531,9 @@ class TestAnalyzeEvalChain:
 class TestMainFunction:
     """Test the main function execution."""
 
-    def create_mock_snakemake(self, skills_dir="skills", output_path="output.json", selected_skills=None):
+    def create_mock_snakemake(
+        self, skills_dir="skills", output_path="output.json", selected_skills=None
+    ):
         """Helper to create mock snakemake object."""
         mock_snakemake = Mock()
         mock_snakemake.output = [output_path]
@@ -553,7 +585,9 @@ class TestMainFunction:
             output_file = Path(temp_dir) / "output.json"
             nonexistent_dir = Path(temp_dir) / "nonexistent_skills"
 
-            mock_snakemake = self.create_mock_snakemake(skills_dir=str(nonexistent_dir), output_path=str(output_file))
+            mock_snakemake = self.create_mock_snakemake(
+                skills_dir=str(nonexistent_dir), output_path=str(output_file)
+            )
 
             # Add snakemake to the module's globals
             import scripts.load_skills as load_module
@@ -581,7 +615,9 @@ class TestMainFunction:
             skills_dir.mkdir()
             output_file = Path(temp_dir) / "output.json"
 
-            mock_snakemake = self.create_mock_snakemake(skills_dir=str(skills_dir), output_path=str(output_file))
+            mock_snakemake = self.create_mock_snakemake(
+                skills_dir=str(skills_dir), output_path=str(output_file)
+            )
 
             # Add snakemake to the module's globals
             import scripts.load_skills as load_module
@@ -608,7 +644,9 @@ class TestMainFunction:
             output_file = Path(temp_dir) / "output.json"
 
             mock_snakemake = self.create_mock_snakemake(
-                skills_dir=str(skills_dir), output_path=str(output_file), selected_skills=["existing_skill", "missing_skill"]
+                skills_dir=str(skills_dir),
+                output_path=str(output_file),
+                selected_skills=["existing_skill", "missing_skill"],
             )
 
             # Add snakemake to the module's globals
@@ -656,7 +694,9 @@ class TestMainFunction:
 
             output_file = Path(temp_dir) / "output.json"
 
-            mock_snakemake = self.create_mock_snakemake(skills_dir=str(skills_dir), output_path=str(output_file))
+            mock_snakemake = self.create_mock_snakemake(
+                skills_dir=str(skills_dir), output_path=str(output_file)
+            )
 
             # Add snakemake to the module's globals
             import scripts.load_skills as load_module
@@ -697,7 +737,9 @@ class TestMainFunction:
                 eval_data = {
                     "id": f"eval_{skill_name}",
                     "name": f"Evaluation for {skill_name}",
-                    "chain": [{"id": "step1", "prompt": f"Test prompt for {skill_name}"}],
+                    "chain": [
+                        {"id": "step1", "prompt": f"Test prompt for {skill_name}"}
+                    ],
                     "judge": {
                         "prompt": "Compare {{A}} vs {{B}}",
                         "view": {
@@ -715,7 +757,9 @@ class TestMainFunction:
 
             # Test with selected skills
             mock_snakemake = self.create_mock_snakemake(
-                skills_dir=str(skills_dir), output_path=str(output_file), selected_skills=["skill1", "skill3"]
+                skills_dir=str(skills_dir),
+                output_path=str(output_file),
+                selected_skills=["skill1", "skill3"],
             )
 
             # Add snakemake to the module's globals
@@ -754,7 +798,9 @@ class TestMainFunction:
                 eval_data = {
                     "id": "duplicate_id",  # Same ID in both skills
                     "name": f"Evaluation for {skill_name}",
-                    "chain": [{"id": "step1", "prompt": f"Test prompt for {skill_name}"}],
+                    "chain": [
+                        {"id": "step1", "prompt": f"Test prompt for {skill_name}"}
+                    ],
                     "judge": {
                         "prompt": "Compare {{A}} vs {{B}}",
                         "view": {
@@ -769,7 +815,9 @@ class TestMainFunction:
                     json.dump(eval_data, f)
 
             output_file = Path(temp_dir) / "output.json"
-            mock_snakemake = self.create_mock_snakemake(skills_dir=str(skills_dir), output_path=str(output_file))
+            mock_snakemake = self.create_mock_snakemake(
+                skills_dir=str(skills_dir), output_path=str(output_file)
+            )
 
             # Add snakemake to the module's globals
             import scripts.load_skills as load_module
@@ -801,7 +849,9 @@ class TestMainFunction:
                 f.write("{broken json")
 
             output_file = Path(temp_dir) / "output.json"
-            mock_snakemake = self.create_mock_snakemake(skills_dir=str(skills_dir), output_path=str(output_file))
+            mock_snakemake = self.create_mock_snakemake(
+                skills_dir=str(skills_dir), output_path=str(output_file)
+            )
 
             # Add snakemake to the module's globals
             import scripts.load_skills as load_module
@@ -845,10 +895,15 @@ class TestMainFunction:
                 json.dump(eval_data, f)
 
             output_file = Path(temp_dir) / "output.json"
-            mock_snakemake = self.create_mock_snakemake(skills_dir=str(skills_dir), output_path=str(output_file))
+            mock_snakemake = self.create_mock_snakemake(
+                skills_dir=str(skills_dir), output_path=str(output_file)
+            )
 
             # Mock analyze_eval_chain to raise exception
-            with patch("scripts.load_skills.analyze_eval_chain", side_effect=Exception("Analysis error")):
+            with patch(
+                "scripts.load_skills.analyze_eval_chain",
+                side_effect=Exception("Analysis error"),
+            ):
                 # Add snakemake to the module's globals
                 import scripts.load_skills as load_module
 
@@ -892,7 +947,9 @@ class TestMainFunction:
 
             # Use invalid output path to trigger save failure
             output_file = "/invalid/path/output.json"
-            mock_snakemake = self.create_mock_snakemake(skills_dir=str(skills_dir), output_path=output_file)
+            mock_snakemake = self.create_mock_snakemake(
+                skills_dir=str(skills_dir), output_path=output_file
+            )
 
             # Add snakemake to the module's globals
             import scripts.load_skills as load_module

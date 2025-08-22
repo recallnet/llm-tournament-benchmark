@@ -6,16 +6,28 @@ import pandas as pd
 
 def validate_model_pool(df, pool_name):
     """Validate that model pool has required columns and data"""
-    required_columns = ["id", "author", "slug", "context_window", "pricing", "endpoint", "max_tokens"]
+    required_columns = [
+        "id",
+        "author",
+        "slug",
+        "context_window",
+        "pricing",
+        "endpoint",
+        "max_tokens",
+    ]
 
     missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
-        raise ValueError(f"Model pool '{pool_name}' missing required columns: {missing_columns}")
+        raise ValueError(
+            f"Model pool '{pool_name}' missing required columns: {missing_columns}"
+        )
 
     # Check for empty required fields
     for col in required_columns:
         if df[col].isna().any():
-            raise ValueError(f"Model pool '{pool_name}' has empty values in column '{col}'")
+            raise ValueError(
+                f"Model pool '{pool_name}' has empty values in column '{col}'"
+            )
 
     # Validate numeric columns
     numeric_columns = ["context_window", "pricing", "max_tokens"]
@@ -24,7 +36,9 @@ def validate_model_pool(df, pool_name):
             try:
                 df[col] = pd.to_numeric(df[col])
             except ValueError:
-                raise ValueError(f"Column '{col}' in pool '{pool_name}' contains non-numeric values")
+                raise ValueError(
+                    f"Column '{col}' in pool '{pool_name}' contains non-numeric values"
+                )
 
     return df
 
@@ -38,7 +52,12 @@ def load_model_pool(pool_path):
         df = validate_model_pool(df, pool_name)
 
         print(f"Loaded model pool '{pool_name}' with {len(df)} models")
-        return {"name": pool_name, "path": str(pool_path), "model_count": len(df), "models": df.to_dict("records")}
+        return {
+            "name": pool_name,
+            "path": str(pool_path),
+            "model_count": len(df),
+            "models": df.to_dict("records"),
+        }
     except Exception as e:
         print(f"Error loading model pool '{pool_name}': {e}")
         raise
@@ -75,7 +94,10 @@ def main():
             "avg_context_window": float(models_df["context_window"].mean()),
             "avg_pricing": float(models_df["pricing"].mean()),
             "avg_max_tokens": float(models_df["max_tokens"].mean()),
-            "price_range": {"min": float(models_df["pricing"].min()), "max": float(models_df["pricing"].max())},
+            "price_range": {
+                "min": float(models_df["pricing"].min()),
+                "max": float(models_df["pricing"].max()),
+            },
             "context_window_range": {
                 "min": int(models_df["context_window"].min()),
                 "max": int(models_df["context_window"].max()),

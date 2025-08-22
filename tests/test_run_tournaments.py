@@ -41,7 +41,9 @@ class TestTournamentMatch:
         """Test adding a valid judge result."""
         match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
 
-        match.add_judge_result("judge_1", "A", [{"role": "user", "content": "test"}], "Model A is better")
+        match.add_judge_result(
+            "judge_1", "A", [{"role": "user", "content": "test"}], "Model A is better"
+        )
 
         assert match.judge_votes["judge_1"] == "A"
         assert match.judge_explanations["judge_1"] == "Model A is better"
@@ -88,7 +90,9 @@ class TestTournamentMatch:
         """Test conversion to dictionary."""
         match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
         match.timestamp = "2024-01-01T00:00:00"
-        match.add_judge_result("judge_1", "A", [{"role": "user", "content": "test"}], "Model A wins")
+        match.add_judge_result(
+            "judge_1", "A", [{"role": "user", "content": "test"}], "Model A wins"
+        )
         match.calculate_result()
 
         result_dict = match.to_dict()
@@ -120,20 +124,28 @@ class TestSwissTournament:
         """Create a SwissTournament instance."""
         return SwissTournament("skill_1", "eval_1", sample_models)
 
-    def test_tournament_id_generation(self, sample_models: list[dict[str, str]]) -> None:
+    def test_tournament_id_generation(
+        self, sample_models: list[dict[str, str]]
+    ) -> None:
         """Test tournament ID generation."""
         tournament1 = SwissTournament("skill_1", "eval_1", sample_models)
         tournament2 = SwissTournament("skill_1", "eval_1", sample_models)
 
         assert tournament1.tournament_id == tournament2.tournament_id
 
-    def test_tournament_id_uniqueness(self, sample_models: list[dict[str, str]]) -> None:
+    def test_tournament_id_uniqueness(
+        self, sample_models: list[dict[str, str]]
+    ) -> None:
         """Test that different tournaments have unique IDs."""
         tournament1 = SwissTournament("skill_1", "eval_1", sample_models)
         tournament2 = SwissTournament("skill_2", "eval_1", sample_models)
         tournament3 = SwissTournament("skill_1", "eval_2", sample_models)
 
-        ids = {tournament1.tournament_id, tournament2.tournament_id, tournament3.tournament_id}
+        ids = {
+            tournament1.tournament_id,
+            tournament2.tournament_id,
+            tournament3.tournament_id,
+        }
         assert len(ids) == 3
 
     def test_calculate_rounds_needed(self, sample_models: list[dict[str, str]]) -> None:
@@ -166,10 +178,17 @@ class TestSwissTournament:
 
         assert len(paired_models) == 4
 
-    def test_get_pairings_subsequent_rounds_by_score(self, tournament: SwissTournament) -> None:
+    def test_get_pairings_subsequent_rounds_by_score(
+        self, tournament: SwissTournament
+    ) -> None:
         """Test that subsequent rounds pair by score."""
         # Set up scores (model_1 and model_2 should be paired as top scorers)
-        tournament.scores = {"model_1": 2.0, "model_2": 2.0, "model_3": 1.0, "model_4": 0.0}
+        tournament.scores = {
+            "model_1": 2.0,
+            "model_2": 2.0,
+            "model_3": 1.0,
+            "model_4": 0.0,
+        }
 
         pairings = tournament._get_pairings_for_round(1)
 
@@ -223,28 +242,44 @@ class TestSwissTournament:
         assert tournament.scores["model_1"] == initial_score_1 + 0.5
         assert tournament.scores["model_2"] == initial_score_2 + 0.5
 
-    def test_is_tournament_complete_insufficient_rounds(self, tournament: SwissTournament) -> None:
+    def test_is_tournament_complete_insufficient_rounds(
+        self, tournament: SwissTournament
+    ) -> None:
         """Test tournament completion check with insufficient rounds."""
         # No rounds played yet
         assert not tournament.is_tournament_complete()
 
-    def test_is_tournament_complete_clear_winner(self, tournament: SwissTournament) -> None:
+    def test_is_tournament_complete_clear_winner(
+        self, tournament: SwissTournament
+    ) -> None:
         """Test tournament completion with clear winner."""
         # Simulate enough rounds
         tournament.rounds = [[], [], []]  # 3 rounds (enough for 4 models)
 
         # Set clear winner
-        tournament.scores = {"model_1": 3.0, "model_2": 1.5, "model_3": 1.0, "model_4": 0.5}  # Clear leader
+        tournament.scores = {
+            "model_1": 3.0,
+            "model_2": 1.5,
+            "model_3": 1.0,
+            "model_4": 0.5,
+        }  # Clear leader
 
         assert tournament.is_tournament_complete()
         assert tournament.winner == "model_1"
 
-    def test_is_tournament_complete_tied_leaders(self, tournament: SwissTournament) -> None:
+    def test_is_tournament_complete_tied_leaders(
+        self, tournament: SwissTournament
+    ) -> None:
         """Test tournament completion with tied leaders."""
         tournament.rounds = [[], [], []]  # Enough rounds
 
         # Set tied leaders
-        tournament.scores = {"model_1": 2.0, "model_2": 2.0, "model_3": 1.0, "model_4": 0.5}  # Tied for lead  # Tied for lead
+        tournament.scores = {
+            "model_1": 2.0,
+            "model_2": 2.0,
+            "model_3": 1.0,
+            "model_4": 0.5,
+        }  # Tied for lead  # Tied for lead
 
         # Should not be complete due to tie
         assert not tournament.is_tournament_complete()
@@ -265,7 +300,7 @@ class TestSwissTournament:
         assert result_dict["skill_id"] == "skill_1"
         assert result_dict["eval_id"] == "eval_1"
         assert result_dict["model_ids"] == tournament.model_ids
-        assert result_dict["completed"] == True
+        assert result_dict["completed"] is True
         assert result_dict["winner"] == "model_1"
         assert len(result_dict["rounds"]) == 1
         assert len(result_dict["rounds"][0]) == 1
@@ -327,19 +362,28 @@ class TestJudgeExecutor:
         assert new_cache_dir.exists()
 
     def test_generate_judge_cache_key_consistent(
-        self, judge_executor: JudgeExecutor, sample_match: TournamentMatch, sample_eval_config: dict[str, str]
+        self,
+        judge_executor: JudgeExecutor,
+        sample_match: TournamentMatch,
+        sample_eval_config: dict[str, str],
     ) -> None:
         """Test that cache key generation is consistent."""
         final_prompt = "Test prompt"
         judge_id = "test_judge"
 
-        key1 = judge_executor._generate_judge_cache_key_with_prompt(sample_match, judge_id, final_prompt, sample_eval_config)
-        key2 = judge_executor._generate_judge_cache_key_with_prompt(sample_match, judge_id, final_prompt, sample_eval_config)
+        key1 = judge_executor._generate_judge_cache_key_with_prompt(
+            sample_match, judge_id, final_prompt, sample_eval_config
+        )
+        key2 = judge_executor._generate_judge_cache_key_with_prompt(
+            sample_match, judge_id, final_prompt, sample_eval_config
+        )
 
         assert key1 == key2
         assert len(key1) == 16
 
-    def test_get_judge_cache_path(self, judge_executor: JudgeExecutor, sample_match: TournamentMatch) -> None:
+    def test_get_judge_cache_path(
+        self, judge_executor: JudgeExecutor, sample_match: TournamentMatch
+    ) -> None:
         """Test judge cache path generation."""
         judge_id = "test/judge:1"  # With special characters
         cache_key = "abc123"
@@ -351,18 +395,24 @@ class TestJudgeExecutor:
         assert path.name == expected_filename
         assert path.parent == judge_executor.cache_dir / sample_match.skill_id
 
-    def test_parse_judge_vote_explicit_format(self, judge_executor: JudgeExecutor) -> None:
+    def test_parse_judge_vote_explicit_format(
+        self, judge_executor: JudgeExecutor
+    ) -> None:
         """Test parsing explicit vote format."""
         assert judge_executor._parse_judge_vote("MY VOTE IS FOR: A") == "A"
         assert judge_executor._parse_judge_vote("MY VOTE IS FOR: B") == "B"
         assert judge_executor._parse_judge_vote("MY VOTE IS FOR: TIE") == "TIE"
 
-    def test_parse_judge_vote_case_insensitive(self, judge_executor: JudgeExecutor) -> None:
+    def test_parse_judge_vote_case_insensitive(
+        self, judge_executor: JudgeExecutor
+    ) -> None:
         """Test that vote parsing is case insensitive."""
         assert judge_executor._parse_judge_vote("my vote is for: a") == "A"
         assert judge_executor._parse_judge_vote("My Vote Is For: b") == "B"
 
-    def test_parse_judge_vote_fallback_patterns(self, judge_executor: JudgeExecutor) -> None:
+    def test_parse_judge_vote_fallback_patterns(
+        self, judge_executor: JudgeExecutor
+    ) -> None:
         """Test fallback vote parsing patterns."""
         assert judge_executor._parse_judge_vote("I choose A") == "A"
         assert judge_executor._parse_judge_vote("Option B is better") == "B"
@@ -373,7 +423,9 @@ class TestJudgeExecutor:
         assert judge_executor._parse_judge_vote("This is unclear") == "TIE"
         assert judge_executor._parse_judge_vote("") == "TIE"
 
-    def test_cleanup_invalid_match_cache(self, judge_executor: JudgeExecutor, temp_cache_dir: Path) -> None:
+    def test_cleanup_invalid_match_cache(
+        self, judge_executor: JudgeExecutor, temp_cache_dir: Path
+    ) -> None:
         """Test cleanup of invalid match cache files."""
         # Create skill directory
         skill_dir = temp_cache_dir / "skill_1"

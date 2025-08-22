@@ -30,7 +30,9 @@ def test_ethical_tournaments_missing():
     # 2. Check expected count (3 evals × 4 models = 12 conversations)
     expected_conversations = 3 * 4  # 3 ethical_loopholes evals, 4 models
     if len(ethical_conv_files) < expected_conversations:
-        print(f"⚠️  WARNING: Expected {expected_conversations} conversations, found {len(ethical_conv_files)}")
+        print(
+            f"⚠️  WARNING: Expected {expected_conversations} conversations, found {len(ethical_conv_files)}"
+        )
 
     # 3. Verify ethical_loopholes skill is in loaded skills
     with open("data/testonly/loaded_skills.json") as f:
@@ -63,7 +65,9 @@ def test_ethical_tournaments_missing():
 
     if "ethical_loopholes" not in ratings_data["skill_ratings"]:
         print("❌ FAIL: ethical_loopholes not in skill_ratings.json")
-        print(f"📊 Available skills in ratings: {list(ratings_data['skill_ratings'].keys())}")
+        print(
+            f"📊 Available skills in ratings: {list(ratings_data['skill_ratings'].keys())}"
+        )
         return False
 
     print("✅ All ethical_loopholes tournament components exist")
@@ -81,7 +85,9 @@ def test_tournament_script_parameter_handling():
 
         # Check if script has skill filtering capability
         if "--skill" not in script_content and "skill" not in script_content.lower():
-            print("❌ FAIL: Tournament script doesn't appear to support skill filtering")
+            print(
+                "❌ FAIL: Tournament script doesn't appear to support skill filtering"
+            )
             return False
 
         # Check for proper argument parsing
@@ -132,7 +138,9 @@ def test_snakemake_rule_coverage():
 
         missing_skills = set(all_skills) - set(existing_skills)
         if missing_skills:
-            print(f"❌ FAIL: Missing tournament directories for skills: {missing_skills}")
+            print(
+                f"❌ FAIL: Missing tournament directories for skills: {missing_skills}"
+            )
             return False
 
         print("✅ All skills have tournament directories")

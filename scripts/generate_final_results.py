@@ -8,7 +8,9 @@ from typing import Any
 class FinalResultsGenerator:
     """Handles generation of final results from loaded skills data."""
 
-    def load_individual_skill_files(self, loaded_skills_data: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    def load_individual_skill_files(
+        self, loaded_skills_data: dict[str, Any]
+    ) -> dict[str, dict[str, Any]]:
         """Load individual skill configuration files.
 
         Args:
@@ -23,7 +25,7 @@ class FinalResultsGenerator:
         """
         skills = {}
 
-        for skill_category, skill_info in loaded_skills_data.get("skills", {}).items():
+        for _skill_category, skill_info in loaded_skills_data.get("skills", {}).items():
             skill_path = Path(skill_info["path"])
 
             for eval_id in skill_info.get("eval_ids", []):
@@ -95,7 +97,9 @@ class FinalResultsGenerator:
         except (TypeError, KeyError):
             return False
 
-    def generate_final_results(self, loaded_skills_data: dict[str, Any]) -> list[dict[str, Any]]:
+    def generate_final_results(
+        self, loaded_skills_data: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Generate final results by aggregating all skill configurations.
 
         Args:
@@ -114,7 +118,9 @@ class FinalResultsGenerator:
         validated_skills = []
         for skill_id, skill_config in skills.items():
             if not self.validate_evalconfig_schema(skill_config):
-                raise ValueError(f"Skill '{skill_id}' does not match EvalConfigTiny schema")
+                raise ValueError(
+                    f"Skill '{skill_id}' does not match EvalConfigTiny schema"
+                )
             validated_skills.append(skill_config)
 
         return validated_skills

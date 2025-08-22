@@ -5,7 +5,12 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from scripts.run_tournaments import JudgeExecutor, SwissTournament, TournamentMatch, main
+from scripts.run_tournaments import (
+    JudgeExecutor,
+    SwissTournament,
+    TournamentMatch,
+    main,
+)
 
 
 class TestSwissTournamentAdvanced:
@@ -65,7 +70,9 @@ class TestSwissTournamentAdvanced:
         second_round_pairings = tournament._get_pairings_for_round(2)
 
         # Verify no rematches
-        first_round_pairs = {tuple(sorted([m.model_a_id, m.model_b_id])) for m in first_round_matches}
+        first_round_pairs = {
+            tuple(sorted([m.model_a_id, m.model_b_id])) for m in first_round_matches
+        }
         second_round_pairs = {tuple(sorted(pair)) for pair in second_round_pairings}
 
         assert len(first_round_pairs.intersection(second_round_pairs)) == 0
@@ -84,12 +91,22 @@ class TestSwissTournamentAdvanced:
         assert not tournament.is_tournament_complete()
 
         # Scenario 2: Clear winner after sufficient rounds
-        tournament.scores = {"model_a": 3.0, "model_b": 2.0, "model_c": 1.0, "model_d": 0.0}
+        tournament.scores = {
+            "model_a": 3.0,
+            "model_b": 2.0,
+            "model_c": 1.0,
+            "model_d": 0.0,
+        }
         tournament.rounds = [[], [], []]  # 3 rounds completed
         assert tournament.is_tournament_complete()
 
         # Scenario 3: Tied leaders - tournament should continue
-        tournament.scores = {"model_a": 3.0, "model_b": 3.0, "model_c": 1.0, "model_d": 0.0}
+        tournament.scores = {
+            "model_a": 3.0,
+            "model_b": 3.0,
+            "model_c": 1.0,
+            "model_d": 0.0,
+        }
         assert not tournament.is_tournament_complete()
 
 
@@ -127,22 +144,21 @@ class TestJudgeExecutorAdvanced:
         # Mock successful API response
         mock_response = Mock()
         mock_response.json.return_value = {
-            "choices": [{"message": {"content": "MY VOTE IS FOR: A\nModel A is better because..."}}]
+            "choices": [
+                {
+                    "message": {
+                        "content": "MY VOTE IS FOR: A\nModel A is better because..."
+                    }
+                }
+            ]
         }
         mock_response.raise_for_status.return_value = None
         mock_post.return_value = mock_response
 
         # Test judge decision execution using actual method
-        judge_config = {
-            "id": "test-judge",
-            "name": "test-judge",
-            "model": "gpt-4",
-            "view": {"A": [{"kind": "step", "step": "final"}], "B": [{"kind": "step", "step": "final"}]},
-            "prompt": "Compare these models",
-        }
 
         # Create a proper tournament match
-        match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
+        TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
 
         # Basic test - verify method exists and accepts correct parameters
         assert hasattr(executor, "execute_judge_decision")
@@ -201,11 +217,14 @@ class TestJudgeExecutorAdvanced:
             current_models_list = [{"id": m} for m in current_models]
             current_judges_list = [{"id": j} for j in current_judges]
             current_evals_list = [
-                {"id": e, "_metadata": {"skill": s}} for e, s in zip(current_evals, current_skills, strict=False)
+                {"id": e, "_metadata": {"skill": s}}
+                for e, s in zip(current_evals, current_skills, strict=False)
             ]
 
             with patch("builtins.print"):  # Suppress print output
-                executor.cleanup_invalid_match_cache(current_models_list, current_judges_list, current_evals_list)
+                executor.cleanup_invalid_match_cache(
+                    current_models_list, current_judges_list, current_evals_list
+                )
 
             # Should clean up invalid files and directories
             assert not old_skill_dir.exists()
@@ -243,13 +262,17 @@ class TestMainFunction:
                 main()
 
         # Should print warning about insufficient models
-        mock_print.assert_any_call("⚠️  Need at least 2 models for tournaments - skipping")
+        mock_print.assert_any_call(
+            "⚠️  Need at least 2 models for tournaments - skipping"
+        )
 
     @patch("scripts.run_tournaments.Path")
     @patch("builtins.open")
     @patch("json.load")
     @patch("json.dump")
-    def test_main_snakemake_mode(self, mock_json_dump, mock_json_load, mock_open, mock_path):
+    def test_main_snakemake_mode(
+        self, mock_json_dump, mock_json_load, mock_open, mock_path
+    ):
         """Test main function in Snakemake mode."""
         # Mock snakemake global
         mock_snakemake = Mock()
@@ -313,7 +336,9 @@ class TestTournamentMatchAdvanced:
         match.conversation_a_key = "conv_a_key"
         match.conversation_b_key = "conv_b_key"
 
-        match.add_judge_result("judge_1", "A", [{"role": "user", "content": "test"}], "A wins")
+        match.add_judge_result(
+            "judge_1", "A", [{"role": "user", "content": "test"}], "A wins"
+        )
         match.calculate_result()
 
         data = match.to_dict()

@@ -59,7 +59,11 @@ class TestDataDirectoryBug:
                 first_skill = project_skills[0]
                 first_model = project_models[0]
                 skill_data = project_root_data["ratings"][first_skill]
-                rating = skill_data.get("model_ratings", {}).get(first_model, {}).get("mu", "MISSING")
+                rating = (
+                    skill_data.get("model_ratings", {})
+                    .get(first_model, {})
+                    .get("mu", "MISSING")
+                )
                 print(f"   Sample rating ({first_model}, {first_skill}): {rating}")
         else:
             print("   ❌ Failed to load data from project root")
@@ -82,7 +86,11 @@ class TestDataDirectoryBug:
                 first_skill = site_skills[0]
                 first_model = site_models[0]
                 skill_data = site_data["ratings"][first_skill]
-                rating = skill_data.get("model_ratings", {}).get(first_model, {}).get("mu", "MISSING")
+                rating = (
+                    skill_data.get("model_ratings", {})
+                    .get(first_model, {})
+                    .get("mu", "MISSING")
+                )
                 print(f"   Sample rating ({first_model}, {first_skill}): {rating}")
         else:
             print("   ❌ Failed to load data from site directory")
@@ -97,7 +105,9 @@ class TestDataDirectoryBug:
 
             print(f"   Project root skills: {len(project_skills)}")
             print(f"   Site directory skills: {len(site_skills)}")
-            print(f"   Different datasets: {'✅' if set(project_skills) != set(site_skills) else '❌'}")
+            print(
+                f"   Different datasets: {'✅' if set(project_skills) != set(site_skills) else '❌'}"
+            )
 
             if set(project_skills) != set(site_skills):
                 only_in_project = set(project_skills) - set(site_skills)
@@ -109,18 +119,26 @@ class TestDataDirectoryBug:
                     print(f"   Skills only in site: {only_in_site}")
 
                 print("\n🎯 ROOT CAUSE IDENTIFIED:")
-                print("   The Streamlit app loads different data depending on working directory!")
-                print("   When run from site/, it finds site/data/ instead of project root data/")
+                print(
+                    "   The Streamlit app loads different data depending on working directory!"
+                )
+                print(
+                    "   When run from site/, it finds site/data/ instead of project root data/"
+                )
                 print("   This causes all the reported bugs:")
                 print("   - User sees fewer skills than expected")
                 print("   - Different ratings/tournament data")
-                print("   - Potentially different model participation leading to same best/worst skills")
+                print(
+                    "   - Potentially different model participation leading to same best/worst skills"
+                )
 
     @patch("app.st.dataframe")
     @patch("app.st.header")
     @patch("app.st.selectbox")
     @patch("app.st.subheader")
-    def test_app_behavior_differs_by_working_directory(self, mock_subheader, mock_selectbox, mock_header, mock_dataframe):
+    def test_app_behavior_differs_by_working_directory(
+        self, mock_subheader, mock_selectbox, mock_header, mock_dataframe
+    ):
         """
         Test that the app shows different results when run from different directories.
         This confirms the user's reported issue.
@@ -166,7 +184,8 @@ class TestDataDirectoryBug:
                             "skills_count": len(data["ratings"]),
                             "best_skill": first_row["Best Skill"],
                             "worst_skill": first_row["Worst Skill"],
-                            "same_best_worst": first_row["Best Skill"] == first_row["Worst Skill"],
+                            "same_best_worst": first_row["Best Skill"]
+                            == first_row["Worst Skill"],
                         }
 
                         results[directory_name] = result
@@ -175,13 +194,17 @@ class TestDataDirectoryBug:
                         print(f"   Skills available: {result['skills_count']}")
                         print(f"   Best skill: {result['best_skill']}")
                         print(f"   Worst skill: {result['worst_skill']}")
-                        print(f"   Same best/worst: {'🐛 YES' if result['same_best_worst'] else '✅ NO'}")
+                        print(
+                            f"   Same best/worst: {'🐛 YES' if result['same_best_worst'] else '✅ NO'}"
+                        )
 
                         # Check detailed performance if available
                         if len(mock_dataframe.call_args_list) > 1:
                             detailed_table = mock_dataframe.call_args_list[1][0][0]
                             default_rating_count = sum(
-                                1 for _, row in detailed_table.iterrows() if float(row["Rating"]) == 1500.0
+                                1
+                                for _, row in detailed_table.iterrows()
+                                if float(row["Rating"]) == 1500.0
                             )
                             print(f"   1500.0 default ratings: {default_rating_count}")
             else:
@@ -199,7 +222,9 @@ class TestDataDirectoryBug:
             print(
                 f"   Different skill counts: {'✅' if project_result['skills_count'] != site_result['skills_count'] else '❌'}"
             )
-            print(f"   Different best skills: {'✅' if project_result['best_skill'] != site_result['best_skill'] else '❌'}")
+            print(
+                f"   Different best skills: {'✅' if project_result['best_skill'] != site_result['best_skill'] else '❌'}"
+            )
             print(
                 f"   Different worst skills: {'✅' if project_result['worst_skill'] != site_result['worst_skill'] else '❌'}"
             )
@@ -231,7 +256,9 @@ class TestDataDirectoryBug:
         print("regardless of the working directory when Streamlit is run.")
         print("")
         print("Alternative fix:")
-        print("    data_dir = Path('data').resolve() if Path('data').exists() else Path('../data').resolve()")
+        print(
+            "    data_dir = Path('data').resolve() if Path('data').exists() else Path('../data').resolve()"
+        )
 
 
 if __name__ == "__main__":

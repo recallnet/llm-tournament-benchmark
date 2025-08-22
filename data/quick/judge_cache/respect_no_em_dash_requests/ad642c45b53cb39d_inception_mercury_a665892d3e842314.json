@@ -7,10 +7,10 @@
     },
     {
       "role": "assistant",
-      "content": "Solution A adheres to the specific formatting request of not using em dashes. The text is structured with clear sections and subheadings, and it uses commas and periods instead of em dashes to separate ideas or clauses. Solution B, on the other hand, includes em dashes in its content, which does not comply with the given formatting instruction.\n\n- MY VOTE IS FOR: A"
+      "content": "Solution A adheres to the specific formatting request of not using em dashes. The text is structured with clear sections and subheadings, and it uses alternative punctuation such as commas and periods to separate ideas and clauses. Solution B, on the other hand, includes em dashes in its content, which does not comply with the given formatting instruction.\n\n- MY VOTE IS FOR: A"
     }
   ],
-  "explanation": "Solution A adheres to the specific formatting request of not using em dashes. The text is structured with clear sections and subheadings, and it uses commas and periods instead of em dashes to separate ideas or clauses. Solution B, on the other hand, includes em dashes in its content, which does not comply with the given formatting instruction.\n\n- MY VOTE IS FOR: A",
+  "explanation": "Solution A adheres to the specific formatting request of not using em dashes. The text is structured with clear sections and subheadings, and it uses alternative punctuation such as commas and periods to separate ideas and clauses. Solution B, on the other hand, includes em dashes in its content, which does not comply with the given formatting instruction.\n\n- MY VOTE IS FOR: A",
   "metadata": {
     "match_id": "ad642c45b53cb39d",
     "judge_id": "inception/mercury",
@@ -18,7 +18,7 @@
     "model_b_id": "thedrummer/unslopnemo-12b",
     "eval_id": "emotional-intelligence-leadership",
     "skill_id": "respect_no_em_dash_requests",
-    "timestamp": "2025-08-21T01:22:43.519602",
+    "timestamp": "2025-08-21T23:44:28.355443",
     "cache_key": "a665892d3e842314"
   }
 }

@@ -9,8 +9,8 @@
     }
   ],
   "judge": {
-    "system": "You are a JavaScript code quality expert with expertise in game development and interactive applications. Evaluate code based on functionality, performance, best practices, and requirements fulfillment.",
-    "prompt": "Evaluate the JavaScript Space Invaders game implementation on a scale of 0-10 points:\n\n**Game Completeness (4 points)**: Does it implement all core Space Invaders features - player movement, shooting, enemy formations, collision detection, and proper win/lose conditions?\n\n**Gameplay Quality (3 points)**: Are the controls responsive? Is the difficulty balanced? Do enemies move in proper formation and shoot back? Are collision mechanics accurate?\n\n**Visual & Audio Feedback (2 points)**: Does it include clear sprites, smooth animations, explosion effects, and score display? Is the visual feedback satisfying?\n\n**Performance & Code Quality (1 point)**: Does it run smoothly at 60 FPS with efficient game loop and well-structured code?\n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
+    "system": "Judge functionality, correctness, and feature completeness. Do not penalize minified or differently formatted code if it works correctly.",
+    "prompt": "Evaluate the JavaScript Space Invaders game implementation. \n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B as the winner.",
     "view": {
       "A": [{ "kind": "step", "id": "generate_code", "part": "final" }],
       "B": [{ "kind": "step", "id": "generate_code", "part": "final" }]

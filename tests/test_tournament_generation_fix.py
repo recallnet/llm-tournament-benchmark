@@ -73,7 +73,9 @@ def test_skill_ratings_completeness():
     expected_skills = len(all_skills)
 
     if total_skills_in_ratings != expected_skills:
-        print(f"❌ FAIL: Expected {expected_skills} skills in ratings, got {total_skills_in_ratings}")
+        print(
+            f"❌ FAIL: Expected {expected_skills} skills in ratings, got {total_skills_in_ratings}"
+        )
         return False
 
     print("✅ All skills have ratings calculated")
@@ -86,7 +88,12 @@ def test_results_table_includes_all_skills():
 
     # Run the results table script and capture output
     try:
-        result = subprocess.run(["python", "scripts/print_results_table.py"], capture_output=True, text=True, timeout=30)
+        result = subprocess.run(
+            ["python", "scripts/print_results_table.py"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
 
         if result.returncode != 0:
             print(f"❌ FAIL: Results table script failed: {result.stderr}")
@@ -106,7 +113,12 @@ def test_results_table_includes_all_skills():
         missing_in_output = []
         for skill in all_skills:
             # Check various forms the skill might appear as in the output
-            skill_variants = [skill.replace("_", " ").title(), skill.replace("_", " "), skill, skill.replace("_", "").title()]
+            skill_variants = [
+                skill.replace("_", " ").title(),
+                skill.replace("_", " "),
+                skill,
+                skill.replace("_", "").title(),
+            ]
 
             skill_found = any(variant in output for variant in skill_variants)
             if not skill_found:

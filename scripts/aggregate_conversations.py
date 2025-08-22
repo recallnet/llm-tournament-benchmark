@@ -12,7 +12,9 @@ from pathlib import Path
 from typing import Any
 
 
-def aggregate_conversation_results(per_model_results: list[dict[str, Any]]) -> dict[str, Any]:
+def aggregate_conversation_results(
+    per_model_results: list[dict[str, Any]],
+) -> dict[str, Any]:
     """
     Aggregate multiple per-model conversation results into unified format.
 
@@ -42,17 +44,36 @@ def aggregate_conversation_results(per_model_results: list[dict[str, Any]]) -> d
         }
 
     # Aggregate execution_info statistics with safe defaults
-    total_conversations = sum(result["execution_info"].get("total_conversations", 0) for result in per_model_results)
-    successful_conversations = sum(result["execution_info"].get("successful_conversations", 0) for result in per_model_results)
-    failed_conversations = sum(result["execution_info"].get("failed_conversations", 0) for result in per_model_results)
-    total_intermediaries = sum(result["execution_info"].get("total_intermediaries", 0) for result in per_model_results)
-    successful_intermediaries = sum(
-        result["execution_info"].get("successful_intermediaries", 0) for result in per_model_results
+    total_conversations = sum(
+        result["execution_info"].get("total_conversations", 0)
+        for result in per_model_results
     )
-    failed_intermediaries = sum(result["execution_info"].get("failed_intermediaries", 0) for result in per_model_results)
+    successful_conversations = sum(
+        result["execution_info"].get("successful_conversations", 0)
+        for result in per_model_results
+    )
+    failed_conversations = sum(
+        result["execution_info"].get("failed_conversations", 0)
+        for result in per_model_results
+    )
+    total_intermediaries = sum(
+        result["execution_info"].get("total_intermediaries", 0)
+        for result in per_model_results
+    )
+    successful_intermediaries = sum(
+        result["execution_info"].get("successful_intermediaries", 0)
+        for result in per_model_results
+    )
+    failed_intermediaries = sum(
+        result["execution_info"].get("failed_intermediaries", 0)
+        for result in per_model_results
+    )
 
     # Use latest timestamp with safe default
-    timestamps = [result["execution_info"].get("timestamp", datetime.now().isoformat()) for result in per_model_results]
+    timestamps = [
+        result["execution_info"].get("timestamp", datetime.now().isoformat())
+        for result in per_model_results
+    ]
     latest_timestamp = max(timestamps) if timestamps else datetime.now().isoformat()
 
     # Count unique models (should equal number of input results for per-model execution)
@@ -65,8 +86,16 @@ def aggregate_conversation_results(per_model_results: list[dict[str, Any]]) -> d
     models_count = len(all_model_ids)
 
     # Get eval and judge counts from first result (should be same across all)
-    evals_count = per_model_results[0]["execution_info"].get("evals_count", 0) if per_model_results else 0
-    judges_count = per_model_results[0]["execution_info"].get("judges_count", 0) if per_model_results else 0
+    evals_count = (
+        per_model_results[0]["execution_info"].get("evals_count", 0)
+        if per_model_results
+        else 0
+    )
+    judges_count = (
+        per_model_results[0]["execution_info"].get("judges_count", 0)
+        if per_model_results
+        else 0
+    )
 
     # Combine conversations and intermediaries
     all_conversations = []
@@ -158,13 +187,19 @@ def main(input_files: list[str], output_file: str) -> None:
     print(f"Aggregated output written to: {output_file}")
     print(f"Total conversations: {aggregated['execution_info']['total_conversations']}")
     print(f"Total models: {aggregated['execution_info']['models_count']}")
-    print(f"Total intermediaries: {aggregated['execution_info']['total_intermediaries']}")
+    print(
+        f"Total intermediaries: {aggregated['execution_info']['total_intermediaries']}"
+    )
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python aggregate_conversations.py <output_file> <input_file1> [input_file2] ...")
-        print("Example: python aggregate_conversations.py data/conversations.json data/conversations_*.json")
+        print(
+            "Usage: python aggregate_conversations.py <output_file> <input_file1> [input_file2] ..."
+        )
+        print(
+            "Example: python aggregate_conversations.py data/conversations.json data/conversations_*.json"
+        )
         sys.exit(1)
 
     output_file = sys.argv[1]

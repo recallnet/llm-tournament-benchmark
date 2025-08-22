@@ -26,7 +26,9 @@ def simulate_conversation_cache_generation():
 
     from execute_conversations import ConversationExecutor
 
-    executor = ConversationExecutor(Path("data/testonly/conversations"), Path("data/testonly/intermediaries"))
+    executor = ConversationExecutor(
+        Path("data/testonly/conversations"), Path("data/testonly/intermediaries")
+    )
 
     # Generate cache keys for current state
     cache_keys = {}
@@ -95,18 +97,26 @@ def test_eval_modification_invalidation():
                 if eval_id == modified_eval_id:
                     # This eval was modified - key should change
                     if original_key == modified_key:
-                        print(f"   ❌ Cache key should change for modified eval {eval_id}: {original_key}")
+                        print(
+                            f"   ❌ Cache key should change for modified eval {eval_id}: {original_key}"
+                        )
                         return False
                     else:
                         changed_keys += 1
                 elif original_key != modified_key:
-                    print(f"   ❌ Cache key should NOT change for unmodified eval {eval_id}: {original_key} -> {modified_key}")
+                    print(
+                        f"   ❌ Cache key should NOT change for unmodified eval {eval_id}: {original_key} -> {modified_key}"
+                    )
                     return False
                 else:
                     unchanged_keys += 1
 
-            print(f"   ✅ {changed_keys} cache keys properly invalidated for modified eval")
-            print(f"   ✅ {unchanged_keys} cache keys properly preserved for unmodified evals")
+            print(
+                f"   ✅ {changed_keys} cache keys properly invalidated for modified eval"
+            )
+            print(
+                f"   ✅ {unchanged_keys} cache keys properly preserved for unmodified evals"
+            )
 
         finally:
             # Restore original file
@@ -172,13 +182,17 @@ def test_model_removal_invalidation():
                     print(f"   ❌ Cache key missing for preserved model {model_id}")
                     return False
                 elif original_key != modified_key:
-                    print(f"   ❌ Cache key changed for preserved model {model_id}: {original_key} -> {modified_key}")
+                    print(
+                        f"   ❌ Cache key changed for preserved model {model_id}: {original_key} -> {modified_key}"
+                    )
                     return False
                 else:
                     preserved_keys += 1
 
         print(f"   ✅ {removed_keys} cache keys properly removed for deleted model")
-        print(f"   ✅ {preserved_keys} cache keys properly preserved for remaining models")
+        print(
+            f"   ✅ {preserved_keys} cache keys properly preserved for remaining models"
+        )
 
     finally:
         # Restore original file
@@ -223,7 +237,9 @@ def test_collision_resistance():
 
     from execute_conversations import ConversationExecutor
 
-    executor = ConversationExecutor(Path("data/testonly/conversations"), Path("data/testonly/intermediaries"))
+    executor = ConversationExecutor(
+        Path("data/testonly/conversations"), Path("data/testonly/intermediaries")
+    )
 
     # Create slightly different eval configurations
     base_eval = skills_data["evals"][0]
@@ -231,14 +247,41 @@ def test_collision_resistance():
     # Test variations
     variations = [
         ("original", base_eval),
-        ("extra_space", {**base_eval, "chain": [{**base_eval["chain"][0], "prompt": base_eval["chain"][0]["prompt"] + " "}]}),
+        (
+            "extra_space",
+            {
+                **base_eval,
+                "chain": [
+                    {
+                        **base_eval["chain"][0],
+                        "prompt": base_eval["chain"][0]["prompt"] + " ",
+                    }
+                ],
+            },
+        ),
         (
             "extra_word",
-            {**base_eval, "chain": [{**base_eval["chain"][0], "prompt": base_eval["chain"][0]["prompt"] + " test"}]},
+            {
+                **base_eval,
+                "chain": [
+                    {
+                        **base_eval["chain"][0],
+                        "prompt": base_eval["chain"][0]["prompt"] + " test",
+                    }
+                ],
+            },
         ),
         (
             "case_change",
-            {**base_eval, "chain": [{**base_eval["chain"][0], "prompt": base_eval["chain"][0]["prompt"].upper()}]},
+            {
+                **base_eval,
+                "chain": [
+                    {
+                        **base_eval["chain"][0],
+                        "prompt": base_eval["chain"][0]["prompt"].upper(),
+                    }
+                ],
+            },
         ),
     ]
 
@@ -252,12 +295,16 @@ def test_collision_resistance():
     # Check all keys are different
     unique_keys = set(cache_keys.values())
     if len(unique_keys) != len(variations):
-        print(f"   ❌ Cache collision detected: {len(unique_keys)} unique keys from {len(variations)} variations")
+        print(
+            f"   ❌ Cache collision detected: {len(unique_keys)} unique keys from {len(variations)} variations"
+        )
         for name, key in cache_keys.items():
             print(f"      {name}: {key}")
         return False
 
-    print(f"   ✅ {len(variations)} variations produced {len(unique_keys)} unique cache keys")
+    print(
+        f"   ✅ {len(variations)} variations produced {len(unique_keys)} unique cache keys"
+    )
     return True
 
 

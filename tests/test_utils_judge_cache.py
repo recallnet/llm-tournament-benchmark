@@ -29,6 +29,8 @@ def verify_no_cache_conflicts():
     tournaments_json = get_tournaments_json_path()
 
     if str(judge_cache) == str(tournaments_json.parent):
-        raise ValueError(f"Judge cache {judge_cache} conflicts with tournaments.json parent {tournaments_json.parent}")
+        raise ValueError(
+            f"Judge cache {judge_cache} conflicts with tournaments.json parent {tournaments_json.parent}"
+        )
 
     return True

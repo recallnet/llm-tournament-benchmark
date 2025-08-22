@@ -22,7 +22,7 @@
     "model_b_id": "openai/gpt-oss-120b",
     "eval_id": "arxiv-2409-09684v2",
     "skill_id": "document_summarization",
-    "timestamp": "2025-08-21T01:10:57.283792",
+    "timestamp": "2025-08-21T23:51:20.438798",
     "cache_key": "253f03814e162a3b"
   }
 }

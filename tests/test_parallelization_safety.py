@@ -26,9 +26,14 @@ class TestAPIRateLimitingBehavior:
             # Create test data
             test_models = {
                 "pool_info": {"name": "test", "model_count": 2},
-                "models": [{"id": "rate_limited_model", "slug": "rate_limited"}, {"id": "normal_model", "slug": "normal"}],
+                "models": [
+                    {"id": "rate_limited_model", "slug": "rate_limited"},
+                    {"id": "normal_model", "slug": "normal"},
+                ],
             }
-            test_skills = {"evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]}
+            test_skills = {
+                "evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]
+            }
             test_judges = {"judges": [{"id": "test_judge"}]}
 
             temp_path = Path(temp_dir)
@@ -36,11 +41,17 @@ class TestAPIRateLimitingBehavior:
             skills_file = temp_path / "skills.json"
             judges_file = temp_path / "judges.json"
 
-            for file_path, data in [(models_file, test_models), (skills_file, test_skills), (judges_file, test_judges)]:
+            for file_path, data in [
+                (models_file, test_models),
+                (skills_file, test_skills),
+                (judges_file, test_judges),
+            ]:
                 with open(file_path, "w") as f:
                     json.dump(data, f)
 
-            from scripts.execute_conversations_single_model import execute_conversations_for_model
+            from scripts.execute_conversations_single_model import (
+                execute_conversations_for_model,
+            )
 
             # Simulate rate limiting with eventual success
             rate_limit_calls = 0
@@ -53,22 +64,36 @@ class TestAPIRateLimitingBehavior:
                         raise Exception("Rate limit exceeded - 429")
                     # Success on 3rd try
                 return {
-                    "metadata": {"model_id": model["id"], "timestamp": "2025-08-20T10:00:00"},
+                    "metadata": {
+                        "model_id": model["id"],
+                        "timestamp": "2025-08-20T10:00:00",
+                    },
                     "messages": [{"role": "assistant", "content": "success"}],
                 }
 
-            with patch("scripts.execute_conversations_single_model.ConversationExecutor") as mock_executor_class:
-                with patch("scripts.execute_conversations_single_model.cleanup_stale_cache"):
+            with patch(
+                "scripts.execute_conversations_single_model.ConversationExecutor"
+            ) as mock_executor_class:
+                with patch(
+                    "scripts.execute_conversations_single_model.cleanup_stale_cache"
+                ):
                     mock_executor = MagicMock()
-                    mock_executor.execute_conversation.side_effect = mock_rate_limited_execution
-                    mock_executor.execute_intermediary.return_value = {"id": "test_inter"}
+                    mock_executor.execute_conversation.side_effect = (
+                        mock_rate_limited_execution
+                    )
+                    mock_executor.execute_intermediary.return_value = {
+                        "id": "test_inter"
+                    }
                     mock_executor_class.return_value = mock_executor
 
                     # Execute with rate limited model - should eventually succeed
                     # Note: In real implementation, retries would be handled by ConversationExecutor
                     # Here we're testing that the structure handles failures gracefully
                     result = execute_conversations_for_model(
-                        str(models_file), str(skills_file), str(judges_file), "rate_limited_model"
+                        str(models_file),
+                        str(skills_file),
+                        str(judges_file),
+                        "rate_limited_model",
                     )
 
                     # Should handle the rate limiting gracefully
@@ -88,12 +113,21 @@ class TestAPIRateLimitingBehavior:
 
         def mock_api_call(model, skill_id, eval_data):
             with call_lock:
-                api_calls.append({"model": model["id"], "timestamp": time.time(), "thread": threading.current_thread().ident})
+                api_calls.append(
+                    {
+                        "model": model["id"],
+                        "timestamp": time.time(),
+                        "thread": threading.current_thread().ident,
+                    }
+                )
 
             # Simulate API call time
             time.sleep(0.1)
             return {
-                "metadata": {"model_id": model["id"], "timestamp": "2025-08-20T10:00:00"},
+                "metadata": {
+                    "model_id": model["id"],
+                    "timestamp": "2025-08-20T10:00:00",
+                },
                 "messages": [{"role": "assistant", "content": "success"}],
             }
 
@@ -103,31 +137,52 @@ class TestAPIRateLimitingBehavior:
             # Create test data for multiple models
             test_models = {
                 "pool_info": {"name": "test", "model_count": 4},
-                "models": [{"id": f"model_{i}", "slug": f"model_{i}"} for i in range(4)],
+                "models": [
+                    {"id": f"model_{i}", "slug": f"model_{i}"} for i in range(4)
+                ],
             }
-            test_skills = {"evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]}
+            test_skills = {
+                "evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]
+            }
             test_judges = {"judges": [{"id": "test_judge"}]}
 
             models_file = temp_path / "models.json"
             skills_file = temp_path / "skills.json"
             judges_file = temp_path / "judges.json"
 
-            for file_path, data in [(models_file, test_models), (skills_file, test_skills), (judges_file, test_judges)]:
+            for file_path, data in [
+                (models_file, test_models),
+                (skills_file, test_skills),
+                (judges_file, test_judges),
+            ]:
                 with open(file_path, "w") as f:
                     json.dump(data, f)
 
-            from scripts.execute_conversations_single_model import execute_conversations_for_model
+            from scripts.execute_conversations_single_model import (
+                execute_conversations_for_model,
+            )
 
             # Execute multiple models concurrently
             def run_model_execution(model_id):
-                with patch("scripts.execute_conversations_single_model.ConversationExecutor") as mock_executor_class:
-                    with patch("scripts.execute_conversations_single_model.cleanup_stale_cache"):
+                with patch(
+                    "scripts.execute_conversations_single_model.ConversationExecutor"
+                ) as mock_executor_class:
+                    with patch(
+                        "scripts.execute_conversations_single_model.cleanup_stale_cache"
+                    ):
                         mock_executor = MagicMock()
                         mock_executor.execute_conversation.side_effect = mock_api_call
-                        mock_executor.execute_intermediary.return_value = {"id": "test_inter"}
+                        mock_executor.execute_intermediary.return_value = {
+                            "id": "test_inter"
+                        }
                         mock_executor_class.return_value = mock_executor
 
-                        return execute_conversations_for_model(str(models_file), str(skills_file), str(judges_file), model_id)
+                        return execute_conversations_for_model(
+                            str(models_file),
+                            str(skills_file),
+                            str(judges_file),
+                            model_id,
+                        )
 
             # Run concurrent executions
             threads = []
@@ -135,7 +190,11 @@ class TestAPIRateLimitingBehavior:
 
             for model in test_models["models"][:3]:  # Test with 3 concurrent models
                 model_id = model["id"]
-                thread = threading.Thread(target=lambda mid=model_id: results.update({mid: run_model_execution(mid)}))
+                thread = threading.Thread(
+                    target=lambda mid=model_id: results.update(
+                        {mid: run_model_execution(mid)}
+                    )
+                )
                 threads.append(thread)
                 thread.start()
 
@@ -148,7 +207,9 @@ class TestAPIRateLimitingBehavior:
 
             # Verify different threads were used (indicating parallel execution)
             unique_threads = set(call["thread"] for call in api_calls)
-            assert len(unique_threads) >= 2, "Should use multiple threads for parallel execution"
+            assert (
+                len(unique_threads) >= 2
+            ), "Should use multiple threads for parallel execution"
 
 
 class TestDiskSpaceAndResourceHandling:
@@ -182,7 +243,9 @@ class TestDiskSpaceAndResourceHandling:
                             "models_count": 1,
                             "timestamp": f"2025-08-20T10:0{delay}:00",
                         },
-                        "conversations": [{"metadata": {"model_id": model_id}, "messages": []}],
+                        "conversations": [
+                            {"metadata": {"model_id": model_id}, "messages": []}
+                        ],
                         "intermediaries": [],
                     }
 
@@ -195,7 +258,9 @@ class TestDiskSpaceAndResourceHandling:
                         written_data = json.load(f)
 
                     with write_lock:
-                        write_results[model_id] = written_data["execution_info"]["timestamp"]
+                        write_results[model_id] = written_data["execution_info"][
+                            "timestamp"
+                        ]
 
                 except Exception as e:
                     with write_lock:
@@ -206,7 +271,9 @@ class TestDiskSpaceAndResourceHandling:
             model_ids = ["model_a", "model_b", "model_c", "model_d"]
 
             for i, model_id in enumerate(model_ids):
-                thread = threading.Thread(target=write_model_result, args=(model_id, i * 0.1))
+                thread = threading.Thread(
+                    target=write_model_result, args=(model_id, i * 0.1)
+                )
                 threads.append(thread)
                 thread.start()
 
@@ -216,7 +283,9 @@ class TestDiskSpaceAndResourceHandling:
 
             # Verify all writes succeeded
             assert len(write_errors) == 0, f"File write errors: {write_errors}"
-            assert len(write_results) == len(model_ids), "All models should write successfully"
+            assert len(write_results) == len(
+                model_ids
+            ), "All models should write successfully"
 
             # Verify each file contains correct data
             for model_id in model_ids:
@@ -248,7 +317,10 @@ class TestDiskSpaceAndResourceHandling:
                         },
                         "messages": [
                             {"role": "user", "content": f"Test prompt {eval_idx}"},
-                            {"role": "assistant", "content": f"Test response {eval_idx}"},
+                            {
+                                "role": "assistant",
+                                "content": f"Test response {eval_idx}",
+                            },
                         ],
                     }
                 )
@@ -294,7 +366,10 @@ class TestPartialFailureRecovery:
         import tempfile
         from pathlib import Path
 
-        from scripts.aggregate_conversations import aggregate_conversation_results, load_conversation_files
+        from scripts.aggregate_conversations import (
+            aggregate_conversation_results,
+            load_conversation_files,
+        )
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -302,7 +377,11 @@ class TestPartialFailureRecovery:
             # Simulate scenario where some models completed, others didn't
             completed_results = {
                 "model_a": {
-                    "execution_info": {"total_conversations": 2, "successful_conversations": 2, "models_count": 1},
+                    "execution_info": {
+                        "total_conversations": 2,
+                        "successful_conversations": 2,
+                        "models_count": 1,
+                    },
                     "conversations": [
                         {"metadata": {"model_id": "model_a", "eval_id": "eval1"}},
                         {"metadata": {"model_id": "model_a", "eval_id": "eval2"}},
@@ -310,7 +389,11 @@ class TestPartialFailureRecovery:
                     "intermediaries": [],
                 },
                 "model_c": {
-                    "execution_info": {"total_conversations": 2, "successful_conversations": 2, "models_count": 1},
+                    "execution_info": {
+                        "total_conversations": 2,
+                        "successful_conversations": 2,
+                        "models_count": 1,
+                    },
                     "conversations": [
                         {"metadata": {"model_id": "model_c", "eval_id": "eval1"}},
                         {"metadata": {"model_id": "model_c", "eval_id": "eval2"}},
@@ -341,7 +424,9 @@ class TestPartialFailureRecovery:
             assert len(aggregated["conversations"]) == 4
 
             # Verify model IDs are correct
-            model_ids = {conv["metadata"]["model_id"] for conv in aggregated["conversations"]}
+            model_ids = {
+                conv["metadata"]["model_id"] for conv in aggregated["conversations"]
+            }
             assert model_ids == {"model_a", "model_c"}
 
     def test_handling_corrupted_intermediate_files(self):
@@ -379,14 +464,22 @@ class TestPartialFailureRecovery:
             # Missing file (referenced but doesn't exist)
             missing_file = temp_path / "conversations_missing.json"
 
-            file_list = [str(good_file), str(corrupted_file), str(empty_file), str(missing_file)]
+            file_list = [
+                str(good_file),
+                str(corrupted_file),
+                str(empty_file),
+                str(missing_file),
+            ]
 
             # Should handle corrupted files gracefully
             loaded_results = load_conversation_files(file_list)
 
             # Should only load the valid file
             assert len(loaded_results) == 1
-            assert loaded_results[0]["conversations"][0]["metadata"]["model_id"] == "good_model"
+            assert (
+                loaded_results[0]["conversations"][0]["metadata"]["model_id"]
+                == "good_model"
+            )
 
 
 class TestSnakemakeIntegrationSafety:
@@ -434,7 +527,13 @@ class TestSnakemakeIntegrationSafety:
 
         # Test dependency graph structure
         result = subprocess.run(
-            ["snakemake", "--dag", "-s", str(Path.cwd() / "Snakefile"), "conversations.json"],
+            [
+                "snakemake",
+                "--dag",
+                "-s",
+                str(Path.cwd() / "Snakefile"),
+                "conversations.json",
+            ],
             capture_output=True,
             text=True,
             cwd=str(Path.cwd()),
@@ -445,7 +544,10 @@ class TestSnakemakeIntegrationSafety:
 
             # Should show proper dependencies
             # aggregate_conversations should depend on execute_conversations_for_model rules
-            assert "aggregate_conversations" in dag_output or "execute_conversations" in dag_output
+            assert (
+                "aggregate_conversations" in dag_output
+                or "execute_conversations" in dag_output
+            )
 
             # The DAG should be a directed acyclic graph (no cycles)
             assert "->" in dag_output, "Should show dependencies in DAG format"

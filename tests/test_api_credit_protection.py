@@ -69,13 +69,21 @@ def test_detect_repeated_api_calls():
         recent_files = [f for f in files if f["age_minutes"] < 60]  # Last hour
         if len(recent_files) > 1:
             recent_duplicates.append(
-                {"conversation": key, "duplicate_files": len(recent_files), "newest_age": recent_files[0]["age_minutes"]}
+                {
+                    "conversation": key,
+                    "duplicate_files": len(recent_files),
+                    "newest_age": recent_files[0]["age_minutes"],
+                }
             )
 
     if recent_duplicates:
-        print(f"🚨 CREDIT BURN DETECTED: {len(recent_duplicates)} conversations have recent duplicates")
+        print(
+            f"🚨 CREDIT BURN DETECTED: {len(recent_duplicates)} conversations have recent duplicates"
+        )
         for dup in recent_duplicates:
-            print(f"   ⚠️ {dup['conversation']}: {dup['duplicate_files']} files in last hour")
+            print(
+                f"   ⚠️ {dup['conversation']}: {dup['duplicate_files']} files in last hour"
+            )
 
         print("\n💰 This indicates repeated API calls for the same conversations!")
         print("🛑 STOPPING to prevent credit burn")
@@ -107,7 +115,9 @@ def test_check_for_infinite_loops():
             recent_markers.append(marker)
 
     if len(recent_markers) > 10:
-        print(f"🚨 Found {len(recent_markers)} recent cache markers - possible rapid regeneration loop")
+        print(
+            f"🚨 Found {len(recent_markers)} recent cache markers - possible rapid regeneration loop"
+        )
         return False
 
     # Check individual conversation files for malformed content
@@ -125,7 +135,11 @@ def test_check_for_infinite_loops():
                     conv_data = json.load(f)
 
                 # Handle different conversation formats
-                conversations = [conv_data] if isinstance(conv_data, dict) else conv_data.get("conversations", [])
+                conversations = (
+                    [conv_data]
+                    if isinstance(conv_data, dict)
+                    else conv_data.get("conversations", [])
+                )
 
                 for conv in conversations:
                     total_conversations += 1
@@ -142,16 +156,22 @@ def test_check_for_infinite_loops():
                 malformed_count += 1
 
         if malformed_count > total_conversations * 0.5:
-            print(f"🚨 INFINITE LOOP RISK: {malformed_count}/{total_conversations} conversations malformed")
+            print(
+                f"🚨 INFINITE LOOP RISK: {malformed_count}/{total_conversations} conversations malformed"
+            )
             print("💡 These may cause repeated regeneration attempts")
             return False
 
         if total_conversations > 0 and empty_step_count == total_conversations:
-            print(f"🚨 INFINITE LOOP DETECTED: ALL {empty_step_count} conversations have 0 steps")
+            print(
+                f"🚨 INFINITE LOOP DETECTED: ALL {empty_step_count} conversations have 0 steps"
+            )
             print("💡 This indicates the generation script is failing but not erroring")
             return False
 
-    print(f"✅ Cache activity looks normal ({len(cache_markers)} markers, {len(recent_markers)} recent)")
+    print(
+        f"✅ Cache activity looks normal ({len(cache_markers)} markers, {len(recent_markers)} recent)"
+    )
     return True
 
 
@@ -182,7 +202,9 @@ def test_estimate_credit_burn_rate():
         print(f"   Max acceptable cost: ${MAX_ACCEPTABLE_COST:.2f}")
 
         if estimated_cost > MAX_ACCEPTABLE_COST:
-            print(f"🚨 COST OVERRUN: Estimated ${estimated_cost:.2f} exceeds ${MAX_ACCEPTABLE_COST:.2f}")
+            print(
+                f"🚨 COST OVERRUN: Estimated ${estimated_cost:.2f} exceeds ${MAX_ACCEPTABLE_COST:.2f}"
+            )
             print("💡 Consider reducing model count or using cheaper models")
             return False
 

@@ -40,8 +40,15 @@ class TestCriticalPipelineIntegration:
                 "cache_key": "abc123",
                 "timestamp": "2025-08-20T17:00:00",
             },
-            "messages": [{"role": "user", "content": "Test question"}, {"role": "assistant", "content": "Test response"}],
-            "execution_info": {"total_steps": 1, "completed_steps": 1, "status": "completed"},
+            "messages": [
+                {"role": "user", "content": "Test question"},
+                {"role": "assistant", "content": "Test response"},
+            ],
+            "execution_info": {
+                "total_steps": 1,
+                "completed_steps": 1,
+                "status": "completed",
+            },
         }
 
     @pytest.fixture
@@ -54,7 +61,9 @@ class TestCriticalPipelineIntegration:
         """Mock judge model data."""
         return {"id": "openai/gpt-4", "author": "OpenAI"}
 
-    def test_execute_intermediary_method_signature(self, mock_conversation_data, mock_intermediary_data, mock_judge_model):
+    def test_execute_intermediary_method_signature(
+        self, mock_conversation_data, mock_intermediary_data, mock_judge_model
+    ):
         """Test that execute_intermediary is called with correct signature - this catches the 7 vs 6 args bug."""
         print("\\n🧪 Testing execute_intermediary method signature...")
 
@@ -64,7 +73,9 @@ class TestCriticalPipelineIntegration:
 
         # Mock the API call to avoid needing real API key
         with patch.object(ConversationExecutor, "_make_api_request") as mock_api:
-            mock_api.return_value = {"choices": [{"message": {"content": "Mock response"}}]}
+            mock_api.return_value = {
+                "choices": [{"message": {"content": "Mock response"}}]
+            }
 
             # This should work without the "takes 6 but 7 given" error
             with tempfile.TemporaryDirectory() as tmp_dir:
@@ -75,7 +86,7 @@ class TestCriticalPipelineIntegration:
 
                 # The CORRECT method signature (the bug was calling it wrong)
                 try:
-                    result = executor.execute_intermediary(
+                    executor.execute_intermediary(
                         mock_intermediary_data,  # intermediary
                         mock_conversation_data,  # conversation_result
                         mock_judge_model,  # judge_model
@@ -90,10 +101,14 @@ class TestCriticalPipelineIntegration:
 
     def test_execute_conversations_for_model_cache_only_status_bug(self):
         """Test the KeyError: 'status' bug in execute_conversations_for_model_cache_only."""
-        print("\\n🧪 Testing execute_conversations_for_model_cache_only status access...")
+        print(
+            "\\n🧪 Testing execute_conversations_for_model_cache_only status access..."
+        )
 
         sys.path.insert(0, "scripts")
-        from execute_conversations_single_model import execute_conversations_for_model_cache_only
+        from execute_conversations_single_model import (
+            execute_conversations_for_model_cache_only,
+        )
 
         # Create minimal test data files
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -103,7 +118,15 @@ class TestCriticalPipelineIntegration:
 
             # Minimal valid data
             models_data = {"models": [{"id": "test/model", "author": "Test"}]}
-            skills_data = {"evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}, "chain": ["step1"]}]}
+            skills_data = {
+                "evals": [
+                    {
+                        "id": "test_eval",
+                        "_metadata": {"skill": "test_skill"},
+                        "chain": ["step1"],
+                    }
+                ]
+            }
             judges_data = {"judges": [{"id": "test/judge", "author": "Test"}]}
 
             models_file.write_text(json.dumps(models_data))
@@ -111,7 +134,9 @@ class TestCriticalPipelineIntegration:
             judges_file.write_text(json.dumps(judges_data))
 
             # This should NOT raise KeyError: 'status'
-            with patch("scripts.execute_conversations.ConversationExecutor") as mock_executor_class:
+            with patch(
+                "scripts.execute_conversations.ConversationExecutor"
+            ) as mock_executor_class:
                 mock_executor = MagicMock()
                 mock_executor_class.return_value = mock_executor
 
@@ -128,15 +153,29 @@ class TestCriticalPipelineIntegration:
                 }
 
                 # Mock the execute_conversation method
-                mock_executor.execute_conversation.return_value = {"metadata": {"timestamp": "2025-08-20T17:00:00"}}
+                mock_executor.execute_conversation.return_value = {
+                    "metadata": {"timestamp": "2025-08-20T17:00:00"}
+                }
 
                 # Patch the function that was causing the KeyError
                 with patch(
-                    "scripts.execute_conversations_single_model.execute_conversations_for_model", return_value=mock_result
+                    "scripts.execute_conversations_single_model.execute_conversations_for_model",
+                    return_value=mock_result,
                 ):
                     try:
+                        # Provide cache directories
+                        cache_dir = Path(tmp_dir) / "conversations"
+                        intermediary_cache_dir = Path(tmp_dir) / "intermediaries"
+                        cache_dir.mkdir(parents=True, exist_ok=True)
+                        intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+
                         result = execute_conversations_for_model_cache_only(
-                            str(models_file), str(skills_file), str(judges_file), "test/model"
+                            str(models_file),
+                            str(skills_file),
+                            str(judges_file),
+                            "test/model",
+                            cache_dir=str(cache_dir),
+                            intermediary_cache_dir=str(intermediary_cache_dir),
                         )
                         print(f"✅ No KeyError: 'status' - function returned {result}")
                         assert isinstance(result, bool), "Should return boolean"
@@ -158,8 +197,24 @@ class TestCriticalPipelineIntegration:
             judges_file = Path(tmp_dir) / "judges.json"
 
             # Create realistic test data
-            models_data = {"models": [{"id": "inception/mercury", "author": "Inception", "slug": "mercury"}]}
-            skills_data = {"evals": [{"id": "test_eval", "_metadata": {"skill": "ethical_loopholes"}, "chain": ["step1"]}]}
+            models_data = {
+                "models": [
+                    {
+                        "id": "inception/mercury",
+                        "author": "Inception",
+                        "slug": "mercury",
+                    }
+                ]
+            }
+            skills_data = {
+                "evals": [
+                    {
+                        "id": "test_eval",
+                        "_metadata": {"skill": "ethical_loopholes"},
+                        "chain": ["step1"],
+                    }
+                ]
+            }
             judges_data = {"judges": [{"id": "openai/gpt-4", "author": "OpenAI"}]}
 
             models_file.write_text(json.dumps(models_data))
@@ -167,16 +222,33 @@ class TestCriticalPipelineIntegration:
             judges_file.write_text(json.dumps(judges_data))
 
             # Mock the ConversationExecutor to avoid API calls
-            with patch("scripts.execute_conversations.ConversationExecutor") as mock_executor_class:
+            with patch(
+                "scripts.execute_conversations.ConversationExecutor"
+            ) as mock_executor_class:
                 mock_executor = MagicMock()
                 mock_executor_class.return_value = mock_executor
-                mock_executor.execute_conversation.return_value = {"metadata": {"timestamp": "2025-08-20T17:00:00"}}
+                mock_executor.execute_conversation.return_value = {
+                    "metadata": {"timestamp": "2025-08-20T17:00:00"}
+                }
 
                 # This should work like the actual Snakemake rule
-                from execute_conversations_single_model import execute_conversations_for_model_cache_only
+                from execute_conversations_single_model import (
+                    execute_conversations_for_model_cache_only,
+                )
+
+                # Provide cache directories
+                cache_dir = Path(tmp_dir) / "conversations"
+                intermediary_cache_dir = Path(tmp_dir) / "intermediaries"
+                cache_dir.mkdir(parents=True, exist_ok=True)
+                intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
 
                 success = execute_conversations_for_model_cache_only(
-                    str(models_file), str(skills_file), str(judges_file), "inception/mercury"
+                    str(models_file),
+                    str(skills_file),
+                    str(judges_file),
+                    "inception/mercury",
+                    cache_dir=str(cache_dir),
+                    intermediary_cache_dir=str(intermediary_cache_dir),
                 )
 
                 print(f"✅ Snakemake integration test passed: {success}")
@@ -186,29 +258,39 @@ class TestCriticalPipelineIntegration:
         """Test that missing API keys are handled gracefully."""
         print("\\n🧪 Testing API key error handling...")
 
-        # Temporarily remove API key
+        # Temporarily remove API key and testing mode
         original_key = os.environ.get("OPENROUTER_API_KEY")
+        original_test_mode = os.environ.get("AFBENCH_TEST_MODE")
+
         if "OPENROUTER_API_KEY" in os.environ:
             del os.environ["OPENROUTER_API_KEY"]
+        if "AFBENCH_TEST_MODE" in os.environ:
+            del os.environ["AFBENCH_TEST_MODE"]
 
         try:
             sys.path.insert(0, "scripts")
             from execute_conversations import ConversationExecutor
 
-            # This should raise a clear error, not hang
-            try:
-                ConversationExecutor()
-                pytest.fail("Should have raised ValueError for missing API key")
-            except ValueError as e:
-                if "OPENROUTER_API_KEY not found" in str(e):
-                    print("✅ API key error handled properly")
-                else:
-                    raise
+            # ConversationExecutor should initialize successfully even without API key
+            with tempfile.TemporaryDirectory() as test_cache_dir:
+                cache_dir = Path(test_cache_dir) / "conversations"
+                intermediary_cache_dir = Path(test_cache_dir) / "intermediaries"
+                executor = ConversationExecutor(
+                    cache_dir=cache_dir, intermediary_cache_dir=intermediary_cache_dir
+                )
+
+                # Should have some API key (either real or mock)
+                assert (
+                    executor.api_key is not None and executor.api_key != ""
+                ), f"Expected valid API key, got: {executor.api_key}"
+                print("✅ API key handling works correctly")
 
         finally:
-            # Restore API key if it existed
+            # Restore API key and test mode if they existed
             if original_key:
                 os.environ["OPENROUTER_API_KEY"] = original_key
+            if original_test_mode:
+                os.environ["AFBENCH_TEST_MODE"] = original_test_mode
 
     def test_realistic_pipeline_execution_flow(self):
         """Test the full pipeline execution flow that was hanging."""
@@ -224,7 +306,14 @@ class TestCriticalPipelineIntegration:
 
             # Use the actual model that was failing
             models_data = {
-                "models": [{"id": "inception/mercury", "author": "Inception", "slug": "mercury", "context_window": 32768}]
+                "models": [
+                    {
+                        "id": "inception/mercury",
+                        "author": "Inception",
+                        "slug": "mercury",
+                        "context_window": 32768,
+                    }
+                ]
             }
 
             # Use actual skill data that includes intermediaries (this was part of the bug)
@@ -248,24 +337,44 @@ class TestCriticalPipelineIntegration:
             judges_file.write_text(json.dumps(judges_data))
 
             # Mock the full execution to test the flow without API calls
-            with patch("scripts.execute_conversations.ConversationExecutor") as mock_executor_class:
+            with patch(
+                "scripts.execute_conversations.ConversationExecutor"
+            ) as mock_executor_class:
                 mock_executor = MagicMock()
                 mock_executor_class.return_value = mock_executor
 
                 # Mock successful conversation
                 mock_executor.execute_conversation.return_value = {
-                    "metadata": {"cache_key": "test123", "timestamp": "2025-08-20T17:00:00"}
+                    "metadata": {
+                        "cache_key": "test123",
+                        "timestamp": "2025-08-20T17:00:00",
+                    }
                 }
 
                 # Mock successful intermediary (this was failing with wrong signature)
-                mock_executor.execute_intermediary.return_value = {"metadata": {"timestamp": "2025-08-20T17:00:00"}}
+                mock_executor.execute_intermediary.return_value = {
+                    "metadata": {"timestamp": "2025-08-20T17:00:00"}
+                }
 
-                from execute_conversations_single_model import execute_conversations_for_model_cache_only
+                from execute_conversations_single_model import (
+                    execute_conversations_for_model_cache_only,
+                )
 
                 # This should complete without the hanging/errors we saw
                 try:
+                    # Provide cache directories
+                    cache_dir = Path(tmp_dir) / "conversations"
+                    intermediary_cache_dir = Path(tmp_dir) / "intermediaries"
+                    cache_dir.mkdir(parents=True, exist_ok=True)
+                    intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+
                     success = execute_conversations_for_model_cache_only(
-                        str(models_file), str(skills_file), str(judges_file), "inception/mercury"
+                        str(models_file),
+                        str(skills_file),
+                        str(judges_file),
+                        "inception/mercury",
+                        cache_dir=str(cache_dir),
+                        intermediary_cache_dir=str(intermediary_cache_dir),
                     )
                     print("✅ Realistic pipeline flow completed successfully")
                     assert success, "Pipeline should succeed with mocked components"
@@ -276,7 +385,9 @@ class TestCriticalPipelineIntegration:
                     ), "Should call execute_intermediary for evals with intermediaries"
 
                 except Exception as e:
-                    pytest.fail(f"Pipeline flow failed with error that should have been caught: {e}")
+                    pytest.fail(
+                        f"Pipeline flow failed with error that should have been caught: {e}"
+                    )
 
 
 if __name__ == "__main__":

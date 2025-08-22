@@ -25,30 +25,46 @@ class TestJudgeCleanupInterference:
 
         # Check if cleanup targets the wrong directory
         if str(cleanup_dir) == "data/testonly/tournaments":
-            print("   🚨 CRITICAL BUG: JudgeExecutor.cache_dir points to data/tournaments")
-            print("   This means tournaments.json should be at data/tournaments/tournaments.json")
-            print("   But tournament generation tries to write to data/tournaments.json")
+            print(
+                "   🚨 CRITICAL BUG: JudgeExecutor.cache_dir points to data/tournaments"
+            )
+            print(
+                "   This means tournaments.json should be at data/tournaments/tournaments.json"
+            )
+            print(
+                "   But tournament generation tries to write to data/tournaments.json"
+            )
 
             # Check where tournaments.json should actually be written
             tournaments_in_cache_dir = cleanup_dir / "tournaments.json"
             tournaments_in_data_dir = Path("data/testonly/tournaments.json")
 
-            print(f"   tournaments.json in cache dir exists: {tournaments_in_cache_dir.exists()}")
-            print(f"   tournaments.json in data dir exists: {tournaments_in_data_dir.exists()}")
+            print(
+                f"   tournaments.json in cache dir exists: {tournaments_in_cache_dir.exists()}"
+            )
+            print(
+                f"   tournaments.json in data dir exists: {tournaments_in_data_dir.exists()}"
+            )
 
             if tournaments_in_cache_dir.exists():
-                print("   🎯 FOUND IT! tournaments.json is being written to the wrong location!")
+                print(
+                    "   🎯 FOUND IT! tournaments.json is being written to the wrong location!"
+                )
                 with open(tournaments_in_cache_dir) as f:
                     content = json.load(f)
                 tournaments_count = len(content.get("tournaments", []))
-                print(f"   tournaments.json in cache dir has {tournaments_count} tournaments")
+                print(
+                    f"   tournaments.json in cache dir has {tournaments_count} tournaments"
+                )
 
                 pytest.fail(
                     "tournaments.json is written to wrong location - should be data/tournaments.json not data/tournaments/tournaments.json"
                 )
             else:
                 print("   ❌ tournaments.json not found in either location")
-                pytest.fail("JudgeExecutor cache_dir conflicts with expected tournaments.json location")
+                pytest.fail(
+                    "JudgeExecutor cache_dir conflicts with expected tournaments.json location"
+                )
 
     def test_snakemake_output_path_vs_actual_write_path(self):
         """Test if Snakemake output path matches where tournament generation actually writes."""
@@ -88,7 +104,9 @@ class TestJudgeCleanupInterference:
                 tournaments_json_in_dir = tournaments_dir / "tournaments.json"
                 if tournaments_json_in_dir.exists():
                     print("   🎯 FOUND THE BUG!")
-                    print("   tournaments.json is being written INSIDE data/tournaments/ directory")
+                    print(
+                        "   tournaments.json is being written INSIDE data/tournaments/ directory"
+                    )
                     print("   But Snakemake expects it at data/tournaments.json")
                     pytest.fail(
                         "Output file path mismatch: written to data/tournaments/tournaments.json but expected at data/tournaments.json"

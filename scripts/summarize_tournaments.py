@@ -38,7 +38,9 @@ def load_judge_cache_files(tournaments_dir: Path) -> dict[str, list[dict[str, An
     return dict(matches)
 
 
-def calculate_match_result(judge_votes: list[dict[str, Any]]) -> tuple[str, dict[str, int], list[dict[str, str]]]:
+def calculate_match_result(
+    judge_votes: list[dict[str, Any]],
+) -> tuple[str, dict[str, int], list[dict[str, str]]]:
     """Calculate match result from multiple judge votes."""
     vote_counts = {"A": 0, "B": 0, "TIE": 0}
     judge_details = []
@@ -67,13 +69,19 @@ def calculate_match_result(judge_votes: list[dict[str, Any]]) -> tuple[str, dict
     return result, vote_counts, judge_details
 
 
-def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+def create_tournament_summary(
+    matches: dict[str, list[dict[str, Any]]],
+) -> dict[str, Any]:
     """Create tournament summary organized by skill and eval."""
-    tournaments_by_skill: dict[str, dict[str, list[dict[str, Any]]]] = defaultdict(lambda: defaultdict(list))
+    tournaments_by_skill: dict[str, dict[str, list[dict[str, Any]]]] = defaultdict(
+        lambda: defaultdict(list)
+    )
     skill_summaries: dict[str, dict[str, Any]] = defaultdict(
         lambda: {
             "matches": [],
-            "model_scores": defaultdict(lambda: {"wins": 0, "losses": 0, "ties": 0, "total": 0}),
+            "model_scores": defaultdict(
+                lambda: {"wins": 0, "losses": 0, "ties": 0, "total": 0}
+            ),
             "total_matches": 0,
         }
     )
@@ -139,7 +147,9 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
         model_rankings = []
         for model_id, scores in skill_data["model_scores"].items():
             win_rate = scores["wins"] / scores["total"] if scores["total"] > 0 else 0
-            points = scores["wins"] + (scores["ties"] * 0.5)  # 1 point for win, 0.5 for tie
+            points = scores["wins"] + (
+                scores["ties"] * 0.5
+            )  # 1 point for win, 0.5 for tie
 
             model_rankings.append(
                 {
@@ -161,7 +171,9 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
             model["rank"] = i + 1
 
         # Create skill-level match history (all matches across evals, sorted by timestamp)
-        all_skill_matches = sorted(skill_data["matches"], key=lambda x: x.get("timestamp", ""))
+        all_skill_matches = sorted(
+            skill_data["matches"], key=lambda x: x.get("timestamp", "")
+        )
 
         tournament_summaries[skill_id] = {
             "skill_id": skill_id,
@@ -174,7 +186,9 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
         # Add per-eval details
         for eval_id, eval_matches in evals.items():
             # Calculate per-eval model scores
-            eval_scores: dict[str, dict[str, int]] = defaultdict(lambda: {"wins": 0, "losses": 0, "ties": 0, "total": 0})
+            eval_scores: dict[str, dict[str, int]] = defaultdict(
+                lambda: {"wins": 0, "losses": 0, "ties": 0, "total": 0}
+            )
 
             for match in eval_matches:
                 model_a = match["model_a"]
@@ -197,7 +211,9 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
             # Create eval rankings
             eval_rankings = []
             for model_id, scores in eval_scores.items():
-                win_rate = scores["wins"] / scores["total"] if scores["total"] > 0 else 0
+                win_rate = (
+                    scores["wins"] / scores["total"] if scores["total"] > 0 else 0
+                )
                 points = scores["wins"] + (scores["ties"] * 0.5)
 
                 eval_rankings.append(
@@ -217,7 +233,9 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
                 model["rank"] = i + 1
 
             # Sort matches by timestamp for chronological order
-            eval_matches_sorted = sorted(eval_matches, key=lambda x: x.get("timestamp", ""))
+            eval_matches_sorted = sorted(
+                eval_matches, key=lambda x: x.get("timestamp", "")
+            )
 
             tournament_summaries[skill_id]["evals"][eval_id] = {
                 "eval_id": eval_id,
@@ -230,7 +248,9 @@ def create_tournament_summary(matches: dict[str, list[dict[str, Any]]]) -> dict[
     return tournament_summaries
 
 
-def main(tournaments_dir: Path | str | None = None, output_file: Path | str | None = None) -> None:
+def main(
+    tournaments_dir: Path | str | None = None, output_file: Path | str | None = None
+) -> None:
     """Main function for tournament summarization."""
     if tournaments_dir is None:
         # SAFETY: Require explicit data directory
@@ -288,11 +308,17 @@ def main(tournaments_dir: Path | str | None = None, output_file: Path | str | No
             tournament_summaries = create_tournament_summary(matches)
 
             # Calculate overall stats
-            total_matches = sum(skill["total_matches"] for skill in tournament_summaries.values())
+            total_matches = sum(
+                skill["total_matches"] for skill in tournament_summaries.values()
+            )
             total_skills = len(tournament_summaries)
-            total_evals = sum(len(skill["evals"]) for skill in tournament_summaries.values())
+            total_evals = sum(
+                len(skill["evals"]) for skill in tournament_summaries.values()
+            )
 
-            print(f"✅ Processed {total_matches} matches across {total_evals} evals in {total_skills} skills")
+            print(
+                f"✅ Processed {total_matches} matches across {total_evals} evals in {total_skills} skills"
+            )
 
             summary = {
                 "tournaments": tournament_summaries,
@@ -308,7 +334,9 @@ def main(tournaments_dir: Path | str | None = None, output_file: Path | str | No
             # Print quick summary
             for skill_id, skill_data in tournament_summaries.items():
                 print(f"\n🏆 {skill_id}:")
-                print(f"   📊 {skill_data['total_matches']} total matches across {len(skill_data['evals'])} evals")
+                print(
+                    f"   📊 {skill_data['total_matches']} total matches across {len(skill_data['evals'])} evals"
+                )
                 print("   🥇 Top 3 models:")
                 for model in skill_data["model_rankings"][:3]:
                     print(

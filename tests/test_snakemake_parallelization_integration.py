@@ -29,20 +29,30 @@ class TestSnakemakeWorkflowIntegration:
 
         # Check for the actually implemented parallelization rules
         assert "execute_conversations_for_model" in snakefile_content
-        assert "run_tournaments" in snakefile_content  # Uses cache-based approach instead of aggregate
+        assert (
+            "run_tournaments" in snakefile_content
+        )  # Uses cache-based approach instead of aggregate
         assert "get_model_ids" in snakefile_content
 
     def test_snakemake_wildcard_expansion_works(self):
         """Test that model ID wildcards expand correctly."""
         # Test with a rule that actually exists and uses model wildcards
         result = subprocess.run(
-            ["snakemake", "--dry-run", "-s", "Snakefile", "data/testonly/tournaments.json"],  # Test actual target
+            [
+                "snakemake",
+                "--dry-run",
+                "-s",
+                "Snakefile",
+                "data/testonly/tournaments.json",
+            ],  # Test actual target
             capture_output=True,
             text=True,
         )
 
         # Should show parallel model rules or complete successfully
-        assert result.returncode == 0 or "execute_conversations_for_model" in result.stdout
+        assert (
+            result.returncode == 0 or "execute_conversations_for_model" in result.stdout
+        )
         assert multiple_model_ids_found_in_output(result.stdout)
         assert result.returncode == 0
 
@@ -54,13 +64,25 @@ class TestSnakemakeWorkflowIntegration:
     def test_snakemake_dependency_graph_correct(self):
         """Test that dependency graph allows proper parallelization."""
         result = subprocess.run(
-            ["snakemake", "--dry-run", "--dag", "dot", "data/testonly/tournaments.json"], capture_output=True, text=True
+            [
+                "snakemake",
+                "--dry-run",
+                "--dag",
+                "dot",
+                "data/testonly/tournaments.json",
+            ],
+            capture_output=True,
+            text=True,
         )
 
         # Verify per-model rules can run in parallel
         # (No dependencies between different model executions)
         dag_output = result.stdout
-        assert "execute_conversations_for_model" in dag_output or "run_tournaments" in dag_output or result.returncode == 0
+        assert (
+            "execute_conversations_for_model" in dag_output
+            or "run_tournaments" in dag_output
+            or result.returncode == 0
+        )
         assert result.returncode == 0
 
 
@@ -72,7 +94,11 @@ class TestModelIdExtraction:
         """Create temporary models file for testing."""
         models_data = {
             "pool_info": {"name": "test", "model_count": 3},
-            "models": [{"id": "model/a", "slug": "a"}, {"id": "model/b", "slug": "b"}, {"id": "model/c", "slug": "c"}],
+            "models": [
+                {"id": "model/a", "slug": "a"},
+                {"id": "model/b", "slug": "b"},
+                {"id": "model/c", "slug": "c"},
+            ],
         }
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
@@ -118,7 +144,11 @@ class TestConversationAggregationWorkflow:
         """Create temporary per-model conversation files."""
         model_outputs = {
             "model_a": {
-                "execution_info": {"total_conversations": 2, "successful_conversations": 2, "models_count": 1},
+                "execution_info": {
+                    "total_conversations": 2,
+                    "successful_conversations": 2,
+                    "models_count": 1,
+                },
                 "conversations": [
                     {"metadata": {"model_id": "model_a", "eval_id": "eval1"}},
                     {"metadata": {"model_id": "model_a", "eval_id": "eval2"}},
@@ -132,14 +162,18 @@ class TestConversationAggregationWorkflow:
                     "failed_conversations": 1,
                     "models_count": 1,
                 },
-                "conversations": [{"metadata": {"model_id": "model_b", "eval_id": "eval1"}}],
+                "conversations": [
+                    {"metadata": {"model_id": "model_b", "eval_id": "eval1"}}
+                ],
                 "intermediaries": [{"id": "inter1", "model_id": "model_b"}],
             },
         }
 
         temp_files = {}
         for model_id, output in model_outputs.items():
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".json", delete=False
+            ) as f:
                 json.dump(output, f)
                 temp_files[model_id] = f.name
 
@@ -155,7 +189,9 @@ class TestConversationAggregationWorkflow:
 
         input_files = list(temp_per_model_files.values())
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as output_file:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as output_file:
             aggregate_main(input_files, output_file.name)
 
             # Verify aggregated output
@@ -199,14 +235,26 @@ class TestBackwardCompatibility:
         # Critical test - ensures downstream pipeline components work
 
         mock_aggregated_output = {
-            "execution_info": {"total_conversations": 2, "models_count": 2, "evals_count": 1},
+            "execution_info": {
+                "total_conversations": 2,
+                "models_count": 2,
+                "evals_count": 1,
+            },
             "conversations": [
                 {
-                    "metadata": {"model_id": "model_a", "eval_id": "eval_1", "skill_id": "skill_1"},
+                    "metadata": {
+                        "model_id": "model_a",
+                        "eval_id": "eval_1",
+                        "skill_id": "skill_1",
+                    },
                     "messages": [{"role": "user", "content": "test"}],
                 },
                 {
-                    "metadata": {"model_id": "model_b", "eval_id": "eval_1", "skill_id": "skill_1"},
+                    "metadata": {
+                        "model_id": "model_b",
+                        "eval_id": "eval_1",
+                        "skill_id": "skill_1",
+                    },
                     "messages": [{"role": "user", "content": "test"}],
                 },
             ],
@@ -225,7 +273,9 @@ def multiple_model_ids_found_in_output(output_text):
     """Helper to check if multiple model IDs appear in Snakemake output."""
     # Look for patterns indicating multiple model executions
     model_patterns = ["model", "thedrummer", "openai", "inception"]
-    found_patterns = sum(1 for pattern in model_patterns if pattern in output_text.lower())
+    found_patterns = sum(
+        1 for pattern in model_patterns if pattern in output_text.lower()
+    )
     return found_patterns >= 2
 
 

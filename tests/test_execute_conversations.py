@@ -21,10 +21,14 @@ class TestConversationExecutorInit:
                 cache_dir = Path(temp_dir) / "conversations"
                 intermediary_dir = Path(temp_dir) / "intermediaries"
 
-                executor = ConversationExecutor(cache_dir=cache_dir, intermediary_cache_dir=intermediary_dir)
+                executor = ConversationExecutor(
+                    cache_dir=cache_dir, intermediary_cache_dir=intermediary_dir
+                )
 
                 assert executor.api_key == "test-api-key"
-                assert executor.base_url == "https://openrouter.ai/api/v1/chat/completions"
+                assert (
+                    executor.base_url == "https://openrouter.ai/api/v1/chat/completions"
+                )
                 assert executor.cache_dir == cache_dir
                 assert executor.intermediary_cache_dir == intermediary_dir
                 assert cache_dir.exists()
@@ -45,7 +49,9 @@ class TestConversationExecutorInit:
                 executor = ConversationExecutor()
 
                 assert executor.cache_dir == Path("data/testonly/conversations")
-                assert executor.intermediary_cache_dir == Path("data/testonly/intermediaries")
+                assert executor.intermediary_cache_dir == Path(
+                    "data/testonly/intermediaries"
+                )
                 assert mock_mkdir.call_count >= 2
 
 
@@ -67,7 +73,10 @@ class TestRateLimiting:
 
             # Second request too soon - should sleep
             # current_time - last_request_time = 1.05 - 1.0 = 0.05 < 0.1, so sleep(0.05)
-            mock_time.side_effect = [1.05, 1.15]  # first call gets current, second call sets new last_time
+            mock_time.side_effect = [
+                1.05,
+                1.15,
+            ]  # first call gets current, second call sets new last_time
             executor._rate_limit()
             # Check that sleep was called with approximately the right value (floating point precision)
             mock_sleep.assert_called_once()
@@ -157,7 +166,9 @@ class TestCacheOperations:
             executor = ConversationExecutor(cache_dir=Path(temp_dir))
 
             # Test model ID with slashes and colons
-            path = executor._get_cache_path("skill_1", "eval_1", "company/model:version", "cache123")
+            path = executor._get_cache_path(
+                "skill_1", "eval_1", "company/model:version", "cache123"
+            )
 
             expected_filename = "eval_1_company_model_version_cache123.json"
             assert path.name == expected_filename
@@ -231,7 +242,9 @@ class TestAPIRequests:
 
         # Mock successful response
         mock_response = Mock()
-        mock_response.json.return_value = {"choices": [{"message": {"content": "Test response"}}]}
+        mock_response.json.return_value = {
+            "choices": [{"message": {"content": "Test response"}}]
+        }
         mock_response.raise_for_status.return_value = None
         mock_post.return_value = mock_response
 
@@ -363,7 +376,10 @@ class TestStepInputPreparation:
             with open(input_file, "w") as f:
                 f.write("Dynamic input")
 
-            step = {"prompt": "Use this {{variable}} in the prompt", "inputs": {"variable": f"${{file:{input_file}}}"}}
+            step = {
+                "prompt": "Use this {{variable}} in the prompt",
+                "inputs": {"variable": f"${{file:{input_file}}}"},
+            }
 
             result = executor._prepare_step_inputs(step, [])
 
@@ -374,7 +390,10 @@ class TestStepInputPreparation:
         """Test step input preparation with multiple variables."""
         executor = ConversationExecutor()
 
-        step = {"prompt": "{{var1}} and {{var2}} together", "inputs": {"var1": "Value1", "var2": "Value2"}}
+        step = {
+            "prompt": "{{var1}} and {{var2}} together",
+            "inputs": {"var1": "Value1", "var2": "Value2"},
+        }
 
         result = executor._prepare_step_inputs(step, [])
 
@@ -390,7 +409,9 @@ class TestIntermediaryExecution:
         with tempfile.TemporaryDirectory() as temp_dir:
             executor = ConversationExecutor(intermediary_cache_dir=Path(temp_dir))
 
-            path = executor._get_intermediary_cache_path("skill_1", "eval_1", "inter_1", "judge/model:v1", "cache123")
+            path = executor._get_intermediary_cache_path(
+                "skill_1", "eval_1", "inter_1", "judge/model:v1", "cache123"
+            )
 
             expected_filename = "eval_1_inter_1_judge_model_v1_cache123.json"
             assert path.name == expected_filename
@@ -401,13 +422,21 @@ class TestIntermediaryExecution:
         """Test intermediary variable substitution with 'final' part."""
         executor = ConversationExecutor()
 
-        intermediary = {"prompt": "Analyze this: {{result}}", "from": [{"step": "step1", "part": "final", "as": "result"}]}
-
-        conversation_result = {
-            "messages": [{"role": "user", "content": "Question"}, {"role": "assistant", "content": "Final answer"}]
+        intermediary = {
+            "prompt": "Analyze this: {{result}}",
+            "from": [{"step": "step1", "part": "final", "as": "result"}],
         }
 
-        result = executor._substitute_intermediary_variables(intermediary, conversation_result)
+        conversation_result = {
+            "messages": [
+                {"role": "user", "content": "Question"},
+                {"role": "assistant", "content": "Final answer"},
+            ]
+        }
+
+        result = executor._substitute_intermediary_variables(
+            intermediary, conversation_result
+        )
 
         assert result == "Analyze this: Final answer"
 
@@ -422,10 +451,15 @@ class TestIntermediaryExecution:
         }
 
         conversation_result = {
-            "messages": [{"role": "user", "content": "Question"}, {"role": "assistant", "content": "Answer"}]
+            "messages": [
+                {"role": "user", "content": "Question"},
+                {"role": "assistant", "content": "Answer"},
+            ]
         }
 
-        result = executor._substitute_intermediary_variables(intermediary, conversation_result)
+        result = executor._substitute_intermediary_variables(
+            intermediary, conversation_result
+        )
 
         assert result == "Review this conversation: user: Question\nassistant: Answer"
 
@@ -434,11 +468,18 @@ class TestIntermediaryExecution:
         """Test intermediary variable substitution with insufficient messages."""
         executor = ConversationExecutor()
 
-        intermediary = {"prompt": "Analyze: {{result}}", "from": [{"step": "step1", "part": "final", "as": "result"}]}
+        intermediary = {
+            "prompt": "Analyze: {{result}}",
+            "from": [{"step": "step1", "part": "final", "as": "result"}],
+        }
 
-        conversation_result = {"messages": [{"role": "user", "content": "Only question"}]}
+        conversation_result = {
+            "messages": [{"role": "user", "content": "Only question"}]
+        }
 
-        result = executor._substitute_intermediary_variables(intermediary, conversation_result)
+        result = executor._substitute_intermediary_variables(
+            intermediary, conversation_result
+        )
 
         assert "[NO_CONTENT_FOUND]" in result
 
@@ -447,11 +488,16 @@ class TestIntermediaryExecution:
         """Test intermediary variable substitution with unknown part type."""
         executor = ConversationExecutor()
 
-        intermediary = {"prompt": "Process: {{data}}", "from": [{"step": "step1", "part": "unknown", "as": "data"}]}
+        intermediary = {
+            "prompt": "Process: {{data}}",
+            "from": [{"step": "step1", "part": "unknown", "as": "data"}],
+        }
 
         conversation_result = {"messages": []}
 
-        result = executor._substitute_intermediary_variables(intermediary, conversation_result)
+        result = executor._substitute_intermediary_variables(
+            intermediary, conversation_result
+        )
 
         assert "[UNKNOWN_PART: unknown]" in result
 
@@ -464,7 +510,9 @@ class TestIntermediaryExecution:
 
             # Mock API response
             mock_response = Mock()
-            mock_response.json.return_value = {"choices": [{"message": {"content": "Intermediary analysis complete"}}]}
+            mock_response.json.return_value = {
+                "choices": [{"message": {"content": "Intermediary analysis complete"}}]
+            }
             mock_response.raise_for_status.return_value = None
             mock_post.return_value = mock_response
 
@@ -476,13 +524,18 @@ class TestIntermediaryExecution:
 
             conversation_result = {
                 "metadata": {"cache_key": "conv123"},
-                "messages": [{"role": "user", "content": "Question"}, {"role": "assistant", "content": "Model response"}],
+                "messages": [
+                    {"role": "user", "content": "Question"},
+                    {"role": "assistant", "content": "Model response"},
+                ],
             }
 
             judge_model = {"id": "judge-model"}
 
             with patch("builtins.print"):
-                result = executor.execute_intermediary(intermediary, conversation_result, judge_model, "skill_1", "eval_1")
+                result = executor.execute_intermediary(
+                    intermediary, conversation_result, judge_model, "skill_1", "eval_1"
+                )
 
             assert result["metadata"]["intermediary_id"] == "inter_1"
             assert result["metadata"]["judge_model_id"] == "judge-model"
@@ -511,7 +564,13 @@ class TestIntermediaryExecution:
             # Mock cache loading
             with patch.object(executor, "_load_from_cache", return_value=cache_data):
                 with patch("builtins.print"):
-                    result = executor.execute_intermediary(intermediary, conversation_result, judge_model, "skill_1", "eval_1")
+                    result = executor.execute_intermediary(
+                        intermediary,
+                        conversation_result,
+                        judge_model,
+                        "skill_1",
+                        "eval_1",
+                    )
 
             assert result == cache_data
             mock_post.assert_not_called()  # Should not make API call
@@ -530,7 +589,9 @@ class TestIntermediaryExecution:
             judge_model = {"id": "judge-model"}
 
             with patch("builtins.print"):
-                result = executor.execute_intermediary(intermediary, conversation_result, judge_model, "skill_1", "eval_1")
+                result = executor.execute_intermediary(
+                    intermediary, conversation_result, judge_model, "skill_1", "eval_1"
+                )
 
             assert result["metadata"]["error"] == "API Error"
             assert result["execution_info"]["status"] == "failed"
@@ -553,7 +614,9 @@ class TestIntermediaryExecution:
             judge_model = {"id": "judge-model"}
 
             with patch("builtins.print"):
-                result = executor.execute_intermediary(intermediary, conversation_result, judge_model, "skill_1", "eval_1")
+                result = executor.execute_intermediary(
+                    intermediary, conversation_result, judge_model, "skill_1", "eval_1"
+                )
 
             assert result["execution_info"]["status"] == "failed"
             assert "Invalid API response" in result["metadata"]["error"]
@@ -571,8 +634,16 @@ class TestConversationExecution:
 
             # Mock API responses for each step
             responses = [
-                Mock(json=lambda: {"choices": [{"message": {"content": "Step 1 response"}}]}),
-                Mock(json=lambda: {"choices": [{"message": {"content": "Step 2 response"}}]}),
+                Mock(
+                    json=lambda: {
+                        "choices": [{"message": {"content": "Step 1 response"}}]
+                    }
+                ),
+                Mock(
+                    json=lambda: {
+                        "choices": [{"message": {"content": "Step 2 response"}}]
+                    }
+                ),
             ]
             for response in responses:
                 response.raise_for_status.return_value = None
@@ -582,7 +653,10 @@ class TestConversationExecution:
             eval_data = {
                 "id": "eval_1",
                 "name": "Test Eval",
-                "chain": [{"id": "step1", "prompt": "First prompt"}, {"id": "step2", "prompt": "Second prompt"}],
+                "chain": [
+                    {"id": "step1", "prompt": "First prompt"},
+                    {"id": "step2", "prompt": "Second prompt"},
+                ],
             }
 
             with patch("builtins.print"):
@@ -626,7 +700,11 @@ class TestConversationExecution:
             mock_post.side_effect = requests.HTTPError("API Error")
 
             model = {"id": "test-model"}
-            eval_data = {"id": "eval_1", "name": "Test Eval", "chain": [{"id": "step1", "prompt": "Test prompt"}]}
+            eval_data = {
+                "id": "eval_1",
+                "name": "Test Eval",
+                "chain": [{"id": "step1", "prompt": "Test prompt"}],
+            }
 
             with patch("builtins.print"):
                 result = executor.execute_conversation(model, "skill_1", eval_data)
@@ -648,7 +726,11 @@ class TestConversationExecution:
             mock_post.return_value = mock_response
 
             model = {"id": "test-model"}
-            eval_data = {"id": "eval_1", "name": "Test Eval", "chain": [{"id": "step1", "prompt": "Test prompt"}]}
+            eval_data = {
+                "id": "eval_1",
+                "name": "Test Eval",
+                "chain": [{"id": "step1", "prompt": "Test prompt"}],
+            }
 
             with patch("builtins.print"):
                 result = executor.execute_conversation(model, "skill_1", eval_data)
@@ -744,7 +826,9 @@ class TestStaleCache:
             judges = []
 
             with patch("builtins.print"):
-                cleanup_stale_cache(models, judges, cache_dir, Path(temp_dir) / "intermediaries")
+                cleanup_stale_cache(
+                    models, judges, cache_dir, Path(temp_dir) / "intermediaries"
+                )
 
             # Should remove stale cache since no model matches
             assert not stale_cache.exists()

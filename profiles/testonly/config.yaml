@@ -1,11 +1,11 @@
-# AFBench Test-Only Profile
-# Usage: Only for automated tests - not for user runbooks
+# AFBench Testonly Profile
+# Usage: snakemake --profile testonly
 
-# Minimal execution settings for tests
+# Default execution settings for tests
 cores: 1
-keep-going: false
-printshellcmds: false
+keep-going: false  # Fail fast for tests
+printshellcmds: true
 
-# Test-only environment overrides
+# Use testonly configuration
 configfiles:
   - config/testonly_config.yaml

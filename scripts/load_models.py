@@ -6,16 +6,28 @@ import pandas as pd
 
 def validate_model_pool(df, pool_name):
     """Validate that model pool has required columns and data"""
-    required_columns = ["id", "author", "slug", "context_window", "pricing", "endpoint", "max_tokens"]
+    required_columns = [
+        "id",
+        "author",
+        "slug",
+        "context_window",
+        "pricing",
+        "endpoint",
+        "max_tokens",
+    ]
 
     missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
-        raise ValueError(f"Model pool '{pool_name}' missing required columns: {missing_columns}")
+        raise ValueError(
+            f"Model pool '{pool_name}' missing required columns: {missing_columns}"
+        )
 
     # Check for empty required fields
     for col in required_columns:
         if df[col].isna().any():
-            raise ValueError(f"Model pool '{pool_name}' has empty values in column '{col}'")
+            raise ValueError(
+                f"Model pool '{pool_name}' has empty values in column '{col}'"
+            )
 
     # Validate numeric columns (allowing string pricing for flexible formats)
     numeric_columns = ["context_window", "max_tokens"]
@@ -24,12 +36,16 @@ def validate_model_pool(df, pool_name):
             try:
                 df[col] = pd.to_numeric(df[col])
             except ValueError:
-                raise ValueError(f"Column '{col}' in pool '{pool_name}' contains non-numeric values")
+                raise ValueError(
+                    f"Column '{col}' in pool '{pool_name}' contains non-numeric values"
+                )
 
     # Pricing can be string or numeric (to allow formats like "input:0.001")
     # Just validate it's not empty
     if df["pricing"].isna().any() or (df["pricing"] == "").any():
-        raise ValueError(f"Column 'pricing' in pool '{pool_name}' contains empty values")
+        raise ValueError(
+            f"Column 'pricing' in pool '{pool_name}' contains empty values"
+        )
 
     return df
 
@@ -43,7 +59,12 @@ def load_model_pool(pool_path):
         df = validate_model_pool(df, pool_name)
 
         print(f"Loaded model pool '{pool_name}' with {len(df)} models")
-        return {"name": pool_name, "path": str(pool_path), "model_count": len(df), "models": df.to_dict("records")}
+        return {
+            "name": pool_name,
+            "path": str(pool_path),
+            "model_count": len(df),
+            "models": df.to_dict("records"),
+        }
     except Exception as e:
         print(f"Error loading model pool '{pool_name}': {e}")
         raise
@@ -94,7 +115,10 @@ def main():
     # Add pricing statistics only if we have numeric pricing data
     if len(numeric_pricing) > 0:
         summary["statistics"]["avg_pricing"] = float(numeric_pricing.mean())
-        summary["statistics"]["price_range"] = {"min": float(numeric_pricing.min()), "max": float(numeric_pricing.max())}
+        summary["statistics"]["price_range"] = {
+            "min": float(numeric_pricing.min()),
+            "max": float(numeric_pricing.max()),
+        }
 
     # Save loaded models data
     with open(output_path, "w") as f:

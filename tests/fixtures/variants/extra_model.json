@@ -1,0 +1,9 @@
+{
+  "id": "test/model-gamma",
+  "author": "TestCorp",
+  "slug": "model-gamma",
+  "context_window": 16384,
+  "pricing": "input:0.0003",
+  "endpoint": "mock",
+  "max_tokens": 3000
+}

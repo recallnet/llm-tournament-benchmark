@@ -38,7 +38,9 @@ class TestFullPipelineCaching:
 
         return result, elapsed
 
-    @pytest.mark.skip("DISABLED: This test runs the full pipeline which takes too long and costs money")
+    @pytest.mark.skip(
+        "DISABLED: This test runs the full pipeline which takes too long and costs money"
+    )
     @pytest.mark.skip("DISABLED: Full pipeline tests cost money and take too long")
     def test_fresh_pipeline_run(self, clean_pipeline_state):
         """Test: Fresh pipeline run creates all cache files."""
@@ -87,7 +89,9 @@ class TestFullPipelineCaching:
         assert result2.returncode == 0, f"Second run failed: {result2.stderr}"
 
         # Check no new judge cache files created
-        judge_cache_files_after = list(Path("data/testonly/judge_cache").rglob("*.json"))
+        judge_cache_files_after = list(
+            Path("data/testonly/judge_cache").rglob("*.json")
+        )
         final_cache_count = len(judge_cache_files_after)
 
         assert (
@@ -96,7 +100,9 @@ class TestFullPipelineCaching:
 
         # Second run should be significantly faster (using cache)
         speedup = elapsed1 / elapsed2
-        assert speedup > 2, f"Second run not fast enough: {elapsed2:.1f}s vs {elapsed1:.1f}s (speedup: {speedup:.1f}x)"
+        assert (
+            speedup > 2
+        ), f"Second run not fast enough: {elapsed2:.1f}s vs {elapsed1:.1f}s (speedup: {speedup:.1f}x)"
 
         print(f"✅ Second run completed in {elapsed2:.1f}s (speedup: {speedup:.1f}x)")
 
@@ -108,7 +114,9 @@ class TestFullPipelineCaching:
         subprocess.run(cmd, check=True, capture_output=True)
 
         cmd = ["snakemake", "afbench", "--profile", "profiles/testonly"]
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
 
         # Let it run for a few seconds then kill
         time.sleep(10)
@@ -132,14 +140,18 @@ class TestFullPipelineCaching:
         assert result.returncode == 0, f"Resume failed: {result.stderr}"
 
         # Check cache was preserved and extended
-        judge_cache_files_final = list(Path("data/testonly/judge_cache").rglob("*.json"))
+        judge_cache_files_final = list(
+            Path("data/testonly/judge_cache").rglob("*.json")
+        )
         final_cache_count = len(judge_cache_files_final)
 
         assert (
             final_cache_count >= partial_cache_count
         ), f"Cache lost during resume! Partial: {partial_cache_count}, Final: {final_cache_count}"
 
-        print(f"✅ Pipeline resumed successfully, cache preserved ({final_cache_count} files)")
+        print(
+            f"✅ Pipeline resumed successfully, cache preserved ({final_cache_count} files)"
+        )
 
     @pytest.mark.skip("DISABLED: Full pipeline tests cost money and take too long")
     def test_model_addition_invalidates_correctly(self, clean_pipeline_state):
@@ -148,7 +160,9 @@ class TestFullPipelineCaching:
         result1, _ = self.run_pipeline()
         assert result1.returncode == 0
 
-        initial_cache_count = len(list(Path("data/testonly/judge_cache").rglob("*.json")))
+        initial_cache_count = len(
+            list(Path("data/testonly/judge_cache").rglob("*.json"))
+        )
         initial_tournaments = Path("data/testonly/tournaments.json").read_text()
 
         # Add a model to the test pool
@@ -165,17 +179,27 @@ class TestFullPipelineCaching:
 
             # Run again
             result2, _ = self.run_pipeline()
-            assert result2.returncode == 0, f"Failed after model addition: {result2.stderr}"
+            assert (
+                result2.returncode == 0
+            ), f"Failed after model addition: {result2.stderr}"
 
             # Check tournaments were regenerated
             new_tournaments = Path("data/testonly/tournaments.json").read_text()
-            assert new_tournaments != initial_tournaments, "Tournaments not regenerated after model addition"
+            assert (
+                new_tournaments != initial_tournaments
+            ), "Tournaments not regenerated after model addition"
 
             # Check some cache was preserved (existing models vs existing models matches)
-            final_cache_count = len(list(Path("data/testonly/judge_cache").rglob("*.json")))
-            assert final_cache_count > initial_cache_count, "No new cache created for new model"
+            final_cache_count = len(
+                list(Path("data/testonly/judge_cache").rglob("*.json"))
+            )
+            assert (
+                final_cache_count > initial_cache_count
+            ), "No new cache created for new model"
 
-            print(f"✅ Model addition handled correctly (cache grew from {initial_cache_count} to {final_cache_count})")
+            print(
+                f"✅ Model addition handled correctly (cache grew from {initial_cache_count} to {final_cache_count})"
+            )
 
         finally:
             # Restore original pool
@@ -188,7 +212,9 @@ class TestFullPipelineCaching:
         result1, _ = self.run_pipeline()
         assert result1.returncode == 0
 
-        initial_cache_count = len(list(Path("data/testonly/judge_cache").rglob("*.json")))
+        initial_cache_count = len(
+            list(Path("data/testonly/judge_cache").rglob("*.json"))
+        )
 
         # Modify an eval
         eval_files = list(Path("skills").rglob("*.json"))
@@ -206,12 +232,18 @@ class TestFullPipelineCaching:
 
             # Run again
             result2, _ = self.run_pipeline()
-            assert result2.returncode == 0, f"Failed after eval modification: {result2.stderr}"
+            assert (
+                result2.returncode == 0
+            ), f"Failed after eval modification: {result2.stderr}"
 
             # Cache should have grown (new conversations for modified eval)
-            final_cache_count = len(list(Path("data/testonly/judge_cache").rglob("*.json")))
+            final_cache_count = len(
+                list(Path("data/testonly/judge_cache").rglob("*.json"))
+            )
 
-            print(f"✅ Eval modification handled (cache: {initial_cache_count} -> {final_cache_count})")
+            print(
+                f"✅ Eval modification handled (cache: {initial_cache_count} -> {final_cache_count})"
+            )
 
         finally:
             # Restore original eval
@@ -232,7 +264,9 @@ class TestFullPipelineCaching:
 
         # Pipeline should still complete (regenerating corrupted entry)
         result2, _ = self.run_pipeline()
-        assert result2.returncode == 0, f"Failed to recover from corruption: {result2.stderr}"
+        assert (
+            result2.returncode == 0
+        ), f"Failed to recover from corruption: {result2.stderr}"
 
         # Check corrupted file was fixed
         if judge_cache_files:
@@ -257,12 +291,16 @@ class TestFullPipelineCaching:
 
             # Collect key outputs
             tournaments = json.loads(Path("data/testonly/tournaments.json").read_text())
-            skill_ratings = json.loads(Path("data/testonly/skill_ratings.json").read_text())
+            skill_ratings = json.loads(
+                Path("data/testonly/skill_ratings.json").read_text()
+            )
 
             results.append({"tournaments": tournaments, "skill_ratings": skill_ratings})
 
         # Results should be identical
-        assert results[0] == results[1], "Pipeline not deterministic - results differ between runs"
+        assert (
+            results[0] == results[1]
+        ), "Pipeline not deterministic - results differ between runs"
 
         print("✅ Pipeline is deterministic")
 
@@ -281,7 +319,9 @@ def test_critical_cache_invariants():
             try:
                 data = json.loads(cache_file.read_text())
                 assert isinstance(data, dict), f"Cache file not dict: {cache_file}"
-                assert "vote" in data or "error" in data, f"Invalid cache structure: {cache_file}"
+                assert (
+                    "vote" in data or "error" in data
+                ), f"Invalid cache structure: {cache_file}"
             except json.JSONDecodeError:
                 pytest.fail(f"Corrupted cache file: {cache_file}")
 

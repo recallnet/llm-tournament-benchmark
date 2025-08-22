@@ -14,7 +14,6 @@ This fixes the restart loop where:
 
 import json
 from pathlib import Path
-from typing import Set
 
 
 class TournamentRestartDetector:
@@ -24,7 +23,7 @@ class TournamentRestartDetector:
         self.conversations_dir = conversations_dir
         self.tournaments_file = tournaments_file
 
-    def get_skills_with_conversations(self) -> Set[str]:
+    def get_skills_with_conversations(self) -> set[str]:
         """Find all skills that have conversation files."""
         skills_with_conversations = set()
 
@@ -40,7 +39,7 @@ class TournamentRestartDetector:
 
         return skills_with_conversations
 
-    def get_skills_with_tournaments(self) -> Set[str]:
+    def get_skills_with_tournaments(self) -> set[str]:
         """Find all skills that have completed tournaments."""
         skills_with_tournaments = set()
 
@@ -62,7 +61,7 @@ class TournamentRestartDetector:
 
         return skills_with_tournaments
 
-    def get_unprocessed_skills(self) -> Set[str]:
+    def get_unprocessed_skills(self) -> set[str]:
         """
         Find skills that have conversations but no tournaments.
 
@@ -86,24 +85,29 @@ class TournamentRestartDetector:
         unprocessed_skills = self.get_unprocessed_skills()
 
         return {
-            "conversations_skills": sorted(list(conversations_skills)),
-            "tournament_skills": sorted(list(tournament_skills)),
-            "unprocessed_skills": sorted(list(unprocessed_skills)),
+            "conversations_skills": sorted(conversations_skills),
+            "tournament_skills": sorted(tournament_skills),
+            "unprocessed_skills": sorted(unprocessed_skills),
             "total_conversations_skills": len(conversations_skills),
             "total_tournament_skills": len(tournament_skills),
             "total_unprocessed": len(unprocessed_skills),
             "should_run_tournaments": self.should_run_tournaments(),
-            "restart_detection_working": len(unprocessed_skills) > 0 or len(conversations_skills) == 0,
+            "restart_detection_working": len(unprocessed_skills) > 0
+            or len(conversations_skills) == 0,
         }
 
 
-def detect_tournament_restart_work(conversations_dir: str, tournaments_file: str) -> dict:
+def detect_tournament_restart_work(
+    conversations_dir: str, tournaments_file: str
+) -> dict:
     """
     Main function to detect if tournament work needs to be done.
 
     This replaces the broken config-driven approach with data-driven detection.
     """
-    detector = TournamentRestartDetector(Path(conversations_dir), Path(tournaments_file))
+    detector = TournamentRestartDetector(
+        Path(conversations_dir), Path(tournaments_file)
+    )
 
     return detector.get_restart_status()
 

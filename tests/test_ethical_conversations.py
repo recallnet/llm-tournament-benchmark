@@ -36,7 +36,11 @@ def test_ethical_conversation_generation():
         evals = skills_data["evals"]
 
         # Find one ethical_loopholes eval
-        ethical_evals = [e for e in evals if e.get("_metadata", {}).get("skill") == "ethical_loopholes"]
+        ethical_evals = [
+            e
+            for e in evals
+            if e.get("_metadata", {}).get("skill") == "ethical_loopholes"
+        ]
 
         if not ethical_evals:
             print("❌ No ethical_loopholes evals found")
@@ -66,7 +70,9 @@ def test_ethical_conversation_generation():
         signal.alarm(10)  # 10 second timeout
 
         try:
-            result = executor._execute_conversation_for_model(test_model, test_eval, judges)
+            result = executor._execute_conversation_for_model(
+                test_model, test_eval, judges
+            )
             signal.alarm(0)  # Cancel timeout
 
             execution_time = time.time() - start_time

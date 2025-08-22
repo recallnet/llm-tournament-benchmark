@@ -1,0 +1,961 @@
+{
+  "skill_id": "persuasiveness",
+  "model_ratings": {
+    "thedrummer/unslopnemo-12b": {
+      "mu": 1461.8237457622852,
+      "sigma": 54.41280666266029,
+      "conservative": 1298.5853257743042
+    },
+    "openai/gpt-oss-120b": {
+      "mu": 1541.6688354456364,
+      "sigma": 54.469666025336245,
+      "conservative": 1378.2598373696278
+    },
+    "openai/gpt-oss-20b": {
+      "mu": 1622.197691362448,
+      "sigma": 56.54868264431575,
+      "conservative": 1452.551643429501
+    },
+    "inception/mercury": {
+      "mu": 1373.8302543068835,
+      "sigma": 56.900698932965255,
+      "conservative": 1203.1281575079877
+    }
+  },
+  "model_rankings": [
+    {
+      "model_id": "openai/gpt-oss-20b",
+      "rating": 1622.2,
+      "sigma": 56.55,
+      "conservative_rating": 1452.55,
+      "rank": 1
+    },
+    {
+      "model_id": "openai/gpt-oss-120b",
+      "rating": 1541.67,
+      "sigma": 54.47,
+      "conservative_rating": 1378.26,
+      "rank": 2
+    },
+    {
+      "model_id": "thedrummer/unslopnemo-12b",
+      "rating": 1461.82,
+      "sigma": 54.41,
+      "conservative_rating": 1298.59,
+      "rank": 3
+    },
+    {
+      "model_id": "inception/mercury",
+      "rating": 1373.83,
+      "sigma": 56.9,
+      "conservative_rating": 1203.13,
+      "rank": 4
+    }
+  ],
+  "match_progression": [
+    {
+      "match_number": 1,
+      "match_id": "8f0532df335fa735",
+      "model_a": "inception/mercury",
+      "model_b": "thedrummer/unslopnemo-12b",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:37:30.687293",
+      "rating_changes": {
+        "inception/mercury": {
+          "before": {
+            "mu": 1500.0,
+            "sigma": 100.0
+          },
+          "after": {
+            "mu": 1464.67529914866,
+            "sigma": 95.49041652940471
+          }
+        },
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1500.0,
+            "sigma": 100.0
+          },
+          "after": {
+            "mu": 1535.32470085134,
+            "sigma": 95.49041652940471
+          }
+        }
+      }
+    },
+    {
+      "match_number": 2,
+      "match_id": "78c67406cd832f5c",
+      "model_a": "openai/gpt-oss-120b",
+      "model_b": "openai/gpt-oss-20b",
+      "winner": "TIE",
+      "timestamp": "2025-08-21T23:37:43.752712",
+      "rating_changes": {
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1500.0,
+            "sigma": 100.0
+          },
+          "after": {
+            "mu": 1500.0,
+            "sigma": 95.49041652940471
+          }
+        },
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1500.0,
+            "sigma": 100.0
+          },
+          "after": {
+            "mu": 1500.0,
+            "sigma": 95.49041652940471
+          }
+        }
+      }
+    },
+    {
+      "match_number": 3,
+      "match_id": "8a8dee67301bd13a",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "openai/gpt-oss-20b",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:37:52.865548",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1535.32470085134,
+            "sigma": 95.49041652940471
+          },
+          "after": {
+            "mu": 1564.6712957025888,
+            "sigma": 91.25966750414754
+          }
+        },
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1500.0,
+            "sigma": 95.49041652940471
+          },
+          "after": {
+            "mu": 1470.653405148751,
+            "sigma": 91.25966750414754
+          }
+        }
+      }
+    },
+    {
+      "match_number": 4,
+      "match_id": "1a4152e19cbb03b3",
+      "model_a": "openai/gpt-oss-120b",
+      "model_b": "inception/mercury",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:37:53.932830",
+      "rating_changes": {
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1500.0,
+            "sigma": 95.49041652940471
+          },
+          "after": {
+            "mu": 1461.8888359412383,
+            "sigma": 91.25966750414754
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1464.67529914866,
+            "sigma": 95.49041652940471
+          },
+          "after": {
+            "mu": 1502.7864632074218,
+            "sigma": 91.25966750414754
+          }
+        }
+      }
+    },
+    {
+      "match_number": 5,
+      "match_id": "bb580dcc0dc635d8",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "openai/gpt-oss-120b",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:38:01.866214",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1564.6712957025888,
+            "sigma": 91.25966750414754
+          },
+          "after": {
+            "mu": 1584.7178141393895,
+            "sigma": 87.74611833640516
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1461.8888359412383,
+            "sigma": 91.25966750414754
+          },
+          "after": {
+            "mu": 1441.8423175044377,
+            "sigma": 87.74611833640516
+          }
+        }
+      }
+    },
+    {
+      "match_number": 6,
+      "match_id": "18b44644f9a9166c",
+      "model_a": "inception/mercury",
+      "model_b": "openai/gpt-oss-20b",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:38:14.254516",
+      "rating_changes": {
+        "inception/mercury": {
+          "before": {
+            "mu": 1502.7864632074218,
+            "sigma": 91.25966750414754
+          },
+          "after": {
+            "mu": 1531.0303233339905,
+            "sigma": 87.21086372163604
+          }
+        },
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1470.653405148751,
+            "sigma": 91.25966750414754
+          },
+          "after": {
+            "mu": 1442.4095450221826,
+            "sigma": 87.21086372163604
+          }
+        }
+      }
+    },
+    {
+      "match_number": 7,
+      "match_id": "74f6b1c58bdeafc2",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "openai/gpt-oss-120b",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:38:15.843258",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1584.7178141393895,
+            "sigma": 87.74611833640516
+          },
+          "after": {
+            "mu": 1537.6454825190335,
+            "sigma": 84.87563389121574
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1441.8423175044377,
+            "sigma": 87.74611833640516
+          },
+          "after": {
+            "mu": 1488.9146491247936,
+            "sigma": 84.87563389121574
+          }
+        }
+      }
+    },
+    {
+      "match_number": 8,
+      "match_id": "3e64408352e9edf9",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:38:25.258447",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1442.4095450221826,
+            "sigma": 87.21086372163604
+          },
+          "after": {
+            "mu": 1483.8092799993626,
+            "sigma": 83.75652379046497
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1531.0303233339905,
+            "sigma": 87.21086372163604
+          },
+          "after": {
+            "mu": 1489.6305883568104,
+            "sigma": 83.75652379046497
+          }
+        }
+      }
+    },
+    {
+      "match_number": 9,
+      "match_id": "6e66b604a004742e",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "openai/gpt-oss-120b",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:38:42.466751",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1483.8092799993626,
+            "sigma": 83.75652379046497
+          },
+          "after": {
+            "mu": 1455.0579509285278,
+            "sigma": 80.06186991397556
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1488.9146491247936,
+            "sigma": 84.87563389121574
+          },
+          "after": {
+            "mu": 1518.4394302895876,
+            "sigma": 80.97586154536873
+          }
+        }
+      }
+    },
+    {
+      "match_number": 10,
+      "match_id": "a68ac5108d631f3d",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "inception/mercury",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:38:47.886880",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1537.6454825190335,
+            "sigma": 84.87563389121574
+          },
+          "after": {
+            "mu": 1501.4894974495253,
+            "sigma": 81.13119083392304
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1489.6305883568104,
+            "sigma": 83.75652379046497
+          },
+          "after": {
+            "mu": 1524.8394056148088,
+            "sigma": 80.20889080783039
+          }
+        }
+      }
+    },
+    {
+      "match_number": 11,
+      "match_id": "9ea5f2edc8c2ac0a",
+      "model_a": "openai/gpt-oss-120b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:38:56.109770",
+      "rating_changes": {
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1518.4394302895876,
+            "sigma": 80.97586154536873
+          },
+          "after": {
+            "mu": 1547.9715179146708,
+            "sigma": 77.27899091619408
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1524.8394056148088,
+            "sigma": 80.20889080783039
+          },
+          "after": {
+            "mu": 1495.8641001150318,
+            "sigma": 76.65249845200387
+          }
+        }
+      }
+    },
+    {
+      "match_number": 12,
+      "match_id": "e32ce3f53ebe3273",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "thedrummer/unslopnemo-12b",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:38:57.419309",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1455.0579509285278,
+            "sigma": 80.06186991397556
+          },
+          "after": {
+            "mu": 1488.7724070950942,
+            "sigma": 76.67510726368117
+          }
+        },
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1501.4894974495253,
+            "sigma": 81.13119083392304
+          },
+          "after": {
+            "mu": 1466.8684351870982,
+            "sigma": 77.55662258881296
+          }
+        }
+      }
+    },
+    {
+      "match_number": 13,
+      "match_id": "714856112d8f905c",
+      "model_a": "openai/gpt-oss-120b",
+      "model_b": "openai/gpt-oss-20b",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:39:11.800658",
+      "rating_changes": {
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1547.9715179146708,
+            "sigma": 77.27899091619408
+          },
+          "after": {
+            "mu": 1513.3237143524968,
+            "sigma": 74.0111629122608
+          }
+        },
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1488.7724070950942,
+            "sigma": 76.67510726368117
+          },
+          "after": {
+            "mu": 1522.8808281650931,
+            "sigma": 73.50985797111967
+          }
+        }
+      }
+    },
+    {
+      "match_number": 14,
+      "match_id": "b223e2f30eb058ba",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:39:13.395508",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1466.8684351870982,
+            "sigma": 77.55662258881296
+          },
+          "after": {
+            "mu": 1498.0439167617164,
+            "sigma": 74.06581003962324
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1495.8641001150318,
+            "sigma": 76.65249845200387
+          },
+          "after": {
+            "mu": 1465.411243599852,
+            "sigma": 73.32435082221971
+          }
+        }
+      }
+    },
+    {
+      "match_number": 15,
+      "match_id": "0206575776ad05bf",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "openai/gpt-oss-20b",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:39:28.773025",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1498.0439167617164,
+            "sigma": 74.06581003962324
+          },
+          "after": {
+            "mu": 1474.9044973314003,
+            "sigma": 70.74281489222197
+          }
+        },
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1522.8808281650931,
+            "sigma": 73.50985797111967
+          },
+          "after": {
+            "mu": 1545.6741740017378,
+            "sigma": 70.28720960599921
+          }
+        }
+      }
+    },
+    {
+      "match_number": 16,
+      "match_id": "a0b859b9cd71c65d",
+      "model_a": "openai/gpt-oss-120b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:39:38.400640",
+      "rating_changes": {
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1513.3237143524968,
+            "sigma": 74.0111629122608
+          },
+          "after": {
+            "mu": 1533.6484307501762,
+            "sigma": 70.8091188485626
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1465.411243599852,
+            "sigma": 73.32435082221971
+          },
+          "after": {
+            "mu": 1445.4619968718987,
+            "sigma": 70.24144384439428
+          }
+        }
+      }
+    },
+    {
+      "match_number": 17,
+      "match_id": "45c50af7ce8290b6",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:39:51.616683",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1545.6741740017378,
+            "sigma": 70.28720960599921
+          },
+          "after": {
+            "mu": 1558.956173033488,
+            "sigma": 67.81900459997155
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1445.4619968718987,
+            "sigma": 70.24144384439428
+          },
+          "after": {
+            "mu": 1432.1972886688457,
+            "sigma": 67.77974860008696
+          }
+        }
+      }
+    },
+    {
+      "match_number": 18,
+      "match_id": "f2873138067b4157",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "openai/gpt-oss-120b",
+      "winner": "TIE",
+      "timestamp": "2025-08-21T23:39:54.698809",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1474.9044973314003,
+            "sigma": 70.74281489222197
+          },
+          "after": {
+            "mu": 1482.0130858766263,
+            "sigma": 67.82897353446299
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1533.6484307501762,
+            "sigma": 70.8091188485626
+          },
+          "after": {
+            "mu": 1526.5265108788603,
+            "sigma": 67.884161041074
+          }
+        }
+      }
+    },
+    {
+      "match_number": 19,
+      "match_id": "29768aa9687183a5",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "thedrummer/unslopnemo-12b",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:40:17.291037",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1558.956173033488,
+            "sigma": 67.81900459997155
+          },
+          "after": {
+            "mu": 1573.7876300566625,
+            "sigma": 65.22040243232517
+          }
+        },
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1482.0130858766263,
+            "sigma": 67.82897353446299
+          },
+          "after": {
+            "mu": 1467.1772682920473,
+            "sigma": 65.22882023993176
+          }
+        }
+      }
+    },
+    {
+      "match_number": 20,
+      "match_id": "0a8aae9ced2f5912",
+      "model_a": "openai/gpt-oss-120b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:40:18.954924",
+      "rating_changes": {
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1526.5265108788603,
+            "sigma": 67.884161041074
+          },
+          "after": {
+            "mu": 1539.597094559584,
+            "sigma": 65.46967385170547
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1432.1972886688457,
+            "sigma": 67.77974860008696
+          },
+          "after": {
+            "mu": 1419.1668816633992,
+            "sigma": 65.38028624663998
+          }
+        }
+      }
+    },
+    {
+      "match_number": 21,
+      "match_id": "785e38cd8524652a",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "openai/gpt-oss-120b",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:40:36.151257",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1573.7876300566625,
+            "sigma": 65.22040243232517
+          },
+          "after": {
+            "mu": 1592.5631267830188,
+            "sigma": 62.406159466897726
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1539.597094559584,
+            "sigma": 65.46967385170547
+          },
+          "after": {
+            "mu": 1520.677804458576,
+            "sigma": 62.611416667798366
+          }
+        }
+      }
+    },
+    {
+      "match_number": 22,
+      "match_id": "a7c9c633d838e631",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:40:42.114453",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1467.1772682920473,
+            "sigma": 65.22882023993176
+          },
+          "after": {
+            "mu": 1484.3327907472292,
+            "sigma": 62.50036701537095
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1419.1668816633992,
+            "sigma": 65.38028624663998
+          },
+          "after": {
+            "mu": 1401.9315941243003,
+            "sigma": 62.62598151846697
+          }
+        }
+      }
+    },
+    {
+      "match_number": 23,
+      "match_id": "cc957bb107410ae4",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:40:55.808099",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1592.5631267830188,
+            "sigma": 62.406159466897726
+          },
+          "after": {
+            "mu": 1597.1429493605829,
+            "sigma": 61.380255611423124
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1401.9315941243003,
+            "sigma": 62.62598151846697
+          },
+          "after": {
+            "mu": 1397.3194504647436,
+            "sigma": 61.585453174699325
+          }
+        }
+      }
+    },
+    {
+      "match_number": 24,
+      "match_id": "681123da70bda184",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "openai/gpt-oss-120b",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:40:57.105441",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1484.3327907472292,
+            "sigma": 62.50036701537095
+          },
+          "after": {
+            "mu": 1466.756839799702,
+            "sigma": 59.818108483753775
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1520.677804458576,
+            "sigma": 62.611416667798366
+          },
+          "after": {
+            "mu": 1538.3162681186063,
+            "sigma": 59.909720134234675
+          }
+        }
+      }
+    },
+    {
+      "match_number": 25,
+      "match_id": "d13ca84e8b5ed45d",
+      "model_a": "inception/mercury",
+      "model_b": "openai/gpt-oss-20b",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:41:23.733184",
+      "rating_changes": {
+        "inception/mercury": {
+          "before": {
+            "mu": 1397.3194504647436,
+            "sigma": 61.585453174699325
+          },
+          "after": {
+            "mu": 1393.3280165353701,
+            "sigma": 60.67354922927999
+          }
+        },
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1597.1429493605829,
+            "sigma": 61.380255611423124
+          },
+          "after": {
+            "mu": 1601.1078294041538,
+            "sigma": 60.480512886488924
+          }
+        }
+      }
+    },
+    {
+      "match_number": 26,
+      "match_id": "fb59c7469032728d",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "openai/gpt-oss-120b",
+      "winner": "B",
+      "timestamp": "2025-08-21T23:41:25.041793",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1466.756839799702,
+            "sigma": 59.818108483753775
+          },
+          "after": {
+            "mu": 1454.0715985097231,
+            "sigma": 57.57290076682344
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1538.3162681186063,
+            "sigma": 59.909720134234675
+          },
+          "after": {
+            "mu": 1551.0403940726458,
+            "sigma": 57.65052346005897
+          }
+        }
+      }
+    },
+    {
+      "match_number": 27,
+      "match_id": "e48e00c1052b3884",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "openai/gpt-oss-120b",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:41:45.438084",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1601.1078294041538,
+            "sigma": 60.480512886488924
+          },
+          "after": {
+            "mu": 1616.6046210847685,
+            "sigma": 57.81575508803742
+          }
+        },
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1551.0403940726458,
+            "sigma": 57.65052346005897
+          },
+          "after": {
+            "mu": 1536.9599141693088,
+            "sigma": 55.45735241375666
+          }
+        }
+      }
+    },
+    {
+      "match_number": 28,
+      "match_id": "68baa8c58d3c9b13",
+      "model_a": "thedrummer/unslopnemo-12b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:41:46.868946",
+      "rating_changes": {
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1454.0715985097231,
+            "sigma": 57.57290076682344
+          },
+          "after": {
+            "mu": 1466.9751917421834,
+            "sigma": 55.486278856002755
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1393.3280165353701,
+            "sigma": 60.67354922927999
+          },
+          "after": {
+            "mu": 1378.997126894841,
+            "sigma": 58.09146602626451
+          }
+        }
+      }
+    },
+    {
+      "match_number": 29,
+      "match_id": "f565b824728a9387",
+      "model_a": "openai/gpt-oss-20b",
+      "model_b": "thedrummer/unslopnemo-12b",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:42:01.051211",
+      "rating_changes": {
+        "openai/gpt-oss-20b": {
+          "before": {
+            "mu": 1616.6046210847685,
+            "sigma": 57.81575508803742
+          },
+          "after": {
+            "mu": 1622.197691362448,
+            "sigma": 56.54868264431575
+          }
+        },
+        "thedrummer/unslopnemo-12b": {
+          "before": {
+            "mu": 1466.9751917421834,
+            "sigma": 55.486278856002755
+          },
+          "after": {
+            "mu": 1461.8237457622852,
+            "sigma": 54.41280666266029
+          }
+        }
+      }
+    },
+    {
+      "match_number": 30,
+      "match_id": "52fc91802a56b379",
+      "model_a": "openai/gpt-oss-120b",
+      "model_b": "inception/mercury",
+      "winner": "A",
+      "timestamp": "2025-08-21T23:42:10.305896",
+      "rating_changes": {
+        "openai/gpt-oss-120b": {
+          "before": {
+            "mu": 1536.9599141693088,
+            "sigma": 55.45735241375666
+          },
+          "after": {
+            "mu": 1541.6688354456364,
+            "sigma": 54.469666025336245
+          }
+        },
+        "inception/mercury": {
+          "before": {
+            "mu": 1378.997126894841,
+            "sigma": 58.09146602626451
+          },
+          "after": {
+            "mu": 1373.8302543068835,
+            "sigma": 56.900698932965255
+          }
+        }
+      }
+    }
+  ],
+  "total_matches": 30,
+  "total_models": 4,
+  "timestamp": "2025-08-21T23:45:10.147886",
+  "cache_key": "bae6276164a2178b"
+}

@@ -98,7 +98,11 @@ def reverse_sanitize_model_id(sanitized_id: str) -> str:
             model_parts = parts[1:]
             # Try to detect where model ends and tag begins
             # This is heuristic and may not always be correct
-            return f"{author}/{model_parts[0]}:{model_parts[1]}" if len(model_parts) >= 2 else f"{author}/{model_parts[0]}"
+            return (
+                f"{author}/{model_parts[0]}:{model_parts[1]}"
+                if len(model_parts) >= 2
+                else f"{author}/{model_parts[0]}"
+            )
 
     # Fallback: just replace first underscore with slash
     return sanitized_id.replace("_", "/", 1) if "_" in sanitized_id else sanitized_id
@@ -116,6 +120,56 @@ def get_sanitized_model_ids(models_file: str) -> list[str]:
     """
     original_ids = get_model_ids(models_file)
     return [sanitize_model_id_for_filename(model_id) for model_id in original_ids]
+
+
+def get_expected_conversation_files(
+    models_file: str, skills_file: str, model_id: str, conversations_dir: str
+) -> list[str]:
+    """
+    Get list of expected conversation files for a specific model.
+
+    Args:
+        models_file: Path to loaded_models.json
+        skills_file: Path to loaded_skills.json
+        model_id: Original model ID (e.g., "openai/gpt-4")
+        conversations_dir: Path to conversations directory
+
+    Returns:
+        List of expected conversation file paths for this model
+    """
+    import hashlib
+
+    # Load skills to get all evals
+    skills_path = Path(skills_file)
+    if not skills_path.exists():
+        return []
+
+    with open(skills_path) as f:
+        skills_data = json.load(f)
+
+    expected_files = []
+    conversations_base = Path(conversations_dir)
+
+    # For each skill and eval, generate expected filename
+    for skill in skills_data.get("skills", []):
+        skill_id = skill.get("id", "")
+        for eval_data in skill.get("evals", []):
+            eval_id = eval_data.get("id", "")
+
+            if skill_id and eval_id:
+                # Generate conversation filename using same logic as conversation execution
+                # Format: {eval_id}_{model_id_sanitized}_{hash}.json
+                model_id_sanitized = model_id.replace("/", "_").replace(":", "_")
+
+                # Create a hash from eval + model combination for uniqueness
+                hash_input = f"{skill_id}_{eval_id}_{model_id}"
+                file_hash = hashlib.md5(hash_input.encode()).hexdigest()[:16]
+
+                filename = f"{eval_id}_{model_id_sanitized}_{file_hash}.json"
+                file_path = conversations_base / skill_id / filename
+                expected_files.append(str(file_path))
+
+    return expected_files
 
 
 if __name__ == "__main__":

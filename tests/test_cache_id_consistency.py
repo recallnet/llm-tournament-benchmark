@@ -6,7 +6,6 @@ Ensures that cache keys are stable, unique, and properly invalidated.
 
 import hashlib
 import json
-import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -40,7 +39,8 @@ def test_conversation_cache_key_consistency(isolated_conversations_cache):
 
     # Test cache key generation with isolated directories
     executor = ConversationExecutor(
-        isolated_conversations_cache["conversations"], isolated_conversations_cache["intermediaries"]
+        isolated_conversations_cache["conversations"],
+        isolated_conversations_cache["intermediaries"],
     )
 
     model = models_data["models"][0]
@@ -63,7 +63,9 @@ def test_conversation_cache_key_consistency(isolated_conversations_cache):
     key_modified = executor._generate_cache_key(model["id"], eval_data_modified)
 
     if key1 == key_modified:
-        print(f"   ❌ Cache key should change when eval modified: {key1} == {key_modified}")
+        print(
+            f"   ❌ Cache key should change when eval modified: {key1} == {key_modified}"
+        )
         return False
 
     print(f"   ✅ Cache key changes with content: {key1} -> {key_modified}")
@@ -74,7 +76,9 @@ def test_conversation_cache_key_consistency(isolated_conversations_cache):
         key_model2 = executor._generate_cache_key(model2["id"], eval_data)
 
         if key1 == key_model2:
-            print(f"   ❌ Cache key should differ for different models: {key1} == {key_model2}")
+            print(
+                f"   ❌ Cache key should differ for different models: {key1} == {key_model2}"
+            )
             return False
 
         print(f"   ✅ Different models have different keys: {key1} vs {key_model2}")
@@ -102,7 +106,9 @@ def test_tournament_cache_key_dependencies():
         if matches:
             first_match = matches[0]
             print(f"   📊 Sample match ID: {first_match.get('match_id')}")
-            print(f"   📊 Match has conversation references: {'conversation_a_id' in first_match}")
+            print(
+                f"   📊 Match has conversation references: {'conversation_a_id' in first_match}"
+            )
 
         print("   ✅ Tournament cache structure validated")
         return True
@@ -125,7 +131,15 @@ def test_skill_ratings_cache_key_dependencies(isolated_skill_cache):
 
     # Test with mock tournament data
     mock_tournament_summaries = {
-        "test_skill": {"match_history": [{"match_id": "match_1", "winner": "model_a", "timestamp": "2025-01-01T00:00:00"}]}
+        "test_skill": {
+            "match_history": [
+                {
+                    "match_id": "match_1",
+                    "winner": "model_a",
+                    "timestamp": "2025-01-01T00:00:00",
+                }
+            ]
+        }
     }
 
     from calculate_skill_ratings import SkillRatingCalculator
@@ -134,24 +148,36 @@ def test_skill_ratings_cache_key_dependencies(isolated_skill_cache):
 
     # Generate cache key
     key1 = calculator._generate_cache_key(
-        models_data["models"], judges_data["judges"], skills_data["evals"], mock_tournament_summaries
+        models_data["models"],
+        judges_data["judges"],
+        skills_data["evals"],
+        mock_tournament_summaries,
     )
 
     # Modify tournament data
     mock_tournament_summaries_modified = {
         "test_skill": {
             "match_history": [
-                {"match_id": "match_2", "winner": "model_a", "timestamp": "2025-01-01T00:00:00"}  # Changed match ID
+                {
+                    "match_id": "match_2",
+                    "winner": "model_a",
+                    "timestamp": "2025-01-01T00:00:00",
+                }  # Changed match ID
             ]
         }
     }
 
     key2 = calculator._generate_cache_key(
-        models_data["models"], judges_data["judges"], skills_data["evals"], mock_tournament_summaries_modified
+        models_data["models"],
+        judges_data["judges"],
+        skills_data["evals"],
+        mock_tournament_summaries_modified,
     )
 
     if key1 == key2:
-        print(f"   ❌ Cache key should change when tournament data changes: {key1} == {key2}")
+        print(
+            f"   ❌ Cache key should change when tournament data changes: {key1} == {key2}"
+        )
         return False
 
     print(f"   ✅ Cache key changes with tournament data: {key1} -> {key2}")
@@ -163,15 +189,20 @@ def test_cache_file_naming_consistency(isolated_conversations_cache):
     print("\n🔍 Testing cache file naming consistency...")
 
     # Create a mock conversation file to test naming consistency
-    test_metadata = {"cache_key": "abc123", "model_id": "test/model", "eval_id": "eval-test"}
-    test_conv_data = {"conversation": [{"role": "user", "content": "test"}], "metadata": test_metadata}
+    test_metadata = {
+        "cache_key": "abc123",
+        "model_id": "test/model",
+        "eval_id": "eval-test",
+    }
+    test_conv_data = {
+        "conversation": [{"role": "user", "content": "test"}],
+        "metadata": test_metadata,
+    }
 
     # Create test file in isolated cache
     test_skill_dir = isolated_conversations_cache["conversations"] / "test-skill"
     test_skill_dir.mkdir()
-    test_filename = (
-        f"{test_metadata['eval_id']}_{test_metadata['model_id'].replace('/', '_')}_{test_metadata['cache_key']}.json"
-    )
+    test_filename = f"{test_metadata['eval_id']}_{test_metadata['model_id'].replace('/', '_')}_{test_metadata['cache_key']}.json"
     test_file = test_skill_dir / test_filename
 
     with open(test_file, "w") as f:
@@ -200,7 +231,9 @@ def test_cache_file_naming_consistency(isolated_conversations_cache):
             # Verify all components are in filename
             for component in expected_components:
                 if component and component not in filename:
-                    print(f"   ❌ Component '{component}' not found in filename '{filename}'")
+                    print(
+                        f"   ❌ Component '{component}' not found in filename '{filename}'"
+                    )
                     return False
 
             print(f"   ✅ {filename}: components match metadata")
@@ -221,7 +254,9 @@ def test_cache_invalidation_propagation():
         temp_path = Path(temp_dir)
 
         # Create original test data
-        skills_data = {"evals": [{"id": "eval-1", "chain": [{"prompt": "Original prompt"}]}]}
+        skills_data = {
+            "evals": [{"id": "eval-1", "chain": [{"prompt": "Original prompt"}]}]
+        }
 
         # Save original
         with open(temp_path / "skills_original.json", "w") as f:
@@ -274,7 +309,8 @@ def test_cache_collision_prevention(isolated_conversations_cache):
     }
 
     executor = ConversationExecutor(
-        isolated_conversations_cache["conversations"], isolated_conversations_cache["intermediaries"]
+        isolated_conversations_cache["conversations"],
+        isolated_conversations_cache["intermediaries"],
     )
 
     # Generate cache keys for different combinations
@@ -291,7 +327,9 @@ def test_cache_collision_prevention(isolated_conversations_cache):
             cache_keys.add(key)
             combinations.append((model["id"], eval_data["id"]))
 
-    print(f"   ✅ No collisions in {len(cache_keys)} cache keys from {len(combinations)} combinations")
+    print(
+        f"   ✅ No collisions in {len(cache_keys)} cache keys from {len(combinations)} combinations"
+    )
     return True
 
 

@@ -6,7 +6,6 @@ and best/worst skill bug can be reproduced with the real data structure.
 """
 
 import json
-import os
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -30,7 +29,9 @@ class TestRealDataBugReproduction:
     @patch("app.st.header")
     @patch("app.st.selectbox")
     @patch("app.st.subheader")
-    def test_reproduce_bug_with_real_file_structure(self, mock_subheader, mock_selectbox, mock_header, mock_dataframe):
+    def test_reproduce_bug_with_real_file_structure(
+        self, mock_subheader, mock_selectbox, mock_header, mock_dataframe
+    ):
         """
         Test using the real file structure to reproduce the exact bug.
         """
@@ -53,8 +54,12 @@ class TestRealDataBugReproduction:
 
             # Check if tournament_summaries.json exists, otherwise use tournaments.json
             tournament_file = None
-            tournament_summaries_path = Path("/Users/andrewhill/Coding/afbench/data/tournament_summaries.json")
-            tournaments_path = Path("/Users/andrewhill/Coding/afbench/data/tournaments.json")
+            tournament_summaries_path = Path(
+                "/Users/andrewhill/Coding/afbench/data/tournament_summaries.json"
+            )
+            tournaments_path = Path(
+                "/Users/andrewhill/Coding/afbench/data/tournaments.json"
+            )
 
             if tournament_summaries_path.exists():
                 tournament_file = str(tournament_summaries_path)
@@ -67,11 +72,16 @@ class TestRealDataBugReproduction:
             else:
                 # Create minimal tournament data from skill ratings
                 tournament_data = {
-                    "tournaments": {skill: {"model_rankings": []} for skill in skill_ratings_data["skill_ratings"].keys()}
+                    "tournaments": {
+                        skill: {"model_rankings": []}
+                        for skill in skill_ratings_data["skill_ratings"].keys()
+                    }
                 }
 
             print("✅ Loaded real data files successfully")
-            print(f"Available skills: {list(skill_ratings_data['skill_ratings'].keys())}")
+            print(
+                f"Available skills: {list(skill_ratings_data['skill_ratings'].keys())}"
+            )
             print(f"Models: {[m['id'] for m in models_data['models']]}")
 
             # Reconstruct the exact data structure the app expects
@@ -114,7 +124,9 @@ class TestRealDataBugReproduction:
                 print("\nDEBUG: Models table results:")
                 for _, row in models_table.iterrows():
                     model_id = row["Model ID"]
-                    print(f"  {model_id}: best={row['Best Skill']}, worst={row['Worst Skill']}")
+                    print(
+                        f"  {model_id}: best={row['Best Skill']}, worst={row['Worst Skill']}"
+                    )
 
                     # Check for the bug: best and worst skills being the same
                     if row["Best Skill"] == row["Worst Skill"]:
@@ -132,7 +144,9 @@ class TestRealDataBugReproduction:
 
                         # Check for 1500.0 default bug
                         if rating == 1500.0:
-                            print(f"    🐛 BUG: {skill} shows default 1500.0 instead of real rating!")
+                            print(
+                                f"    🐛 BUG: {skill} shows default 1500.0 instead of real rating!"
+                            )
 
             # Now let's debug why ratings might be defaulting to 1500
             print(f"\nDEBUG: Manual rating lookup test for {first_model}:")
@@ -141,14 +155,20 @@ class TestRealDataBugReproduction:
             for skill in list(ratings.keys())[:3]:  # Test first 3 skills
                 # This is the exact lookup from site/app.py line 161-162
                 skill_ratings = ratings.get(skill, {})
-                model_rating = skill_ratings.get("model_ratings", {}).get(first_model, {}).get("mu", 1500)
+                model_rating = (
+                    skill_ratings.get("model_ratings", {})
+                    .get(first_model, {})
+                    .get("mu", 1500)
+                )
                 print(f"  {skill}: lookup result = {model_rating}")
 
                 # Debug the lookup chain
                 print(f"    skill_ratings keys: {list(skill_ratings.keys())}")
                 if "model_ratings" in skill_ratings:
                     model_ratings_dict = skill_ratings["model_ratings"]
-                    print(f"    model_ratings keys: {list(model_ratings_dict.keys())[:5]}...")  # First 5
+                    print(
+                        f"    model_ratings keys: {list(model_ratings_dict.keys())[:5]}..."
+                    )  # First 5
                     if first_model in model_ratings_dict:
                         model_data = model_ratings_dict[first_model]
                         print(f"    {first_model} data keys: {list(model_data.keys())}")
@@ -166,18 +186,24 @@ class TestRealDataBugReproduction:
 
             for skill, tournament_data in tournaments.items():
                 model_rankings = tournament_data.get("model_rankings", [])
-                model_ids_in_tournament = [r.get("model_id") for r in model_rankings if "model_id" in r]
+                model_ids_in_tournament = [
+                    r.get("model_id") for r in model_rankings if "model_id" in r
+                ]
                 if first_model in model_ids_in_tournament:
                     participating_skills.append(skill)
                     print(f"  ✅ Participates in: {skill}")
                 else:
                     print(f"  ❌ Missing from: {skill} tournament")
 
-            print(f"  Total participating skills: {len(participating_skills)} out of {len(tournaments)}")
+            print(
+                f"  Total participating skills: {len(participating_skills)} out of {len(tournaments)}"
+            )
 
             if len(participating_skills) <= 1:
                 print("    🐛 IDENTIFIED: Single tournament participation bug!")
-                print("    This causes best=worst skill because rating comparison only runs for participating tournaments")
+                print(
+                    "    This causes best=worst skill because rating comparison only runs for participating tournaments"
+                )
 
         except Exception as e:
             print(f"❌ Error loading real data: {e}")
@@ -192,8 +218,12 @@ class TestRealDataBugReproduction:
             # Check what tournament files exist
             tournament_files = []
 
-            tournament_summaries_path = Path("/Users/andrewhill/Coding/afbench/data/tournament_summaries.json")
-            tournaments_path = Path("/Users/andrewhill/Coding/afbench/data/tournaments.json")
+            tournament_summaries_path = Path(
+                "/Users/andrewhill/Coding/afbench/data/tournament_summaries.json"
+            )
+            tournaments_path = Path(
+                "/Users/andrewhill/Coding/afbench/data/tournaments.json"
+            )
 
             if tournament_summaries_path.exists():
                 tournament_files.append("tournament_summaries.json")

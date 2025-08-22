@@ -4,10 +4,8 @@ Global pytest configuration and fixtures for safe testing.
 CRITICAL SAFETY: This file prevents tests from accidentally destroying production cache data.
 """
 
-import os
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -62,12 +60,17 @@ def production_data_safety_guard(monkeypatch):
         """Check if path touches forbidden production directories."""
         try:
             path = Path(path_str).resolve()
-            return any(forbidden in path.parents or path == forbidden for forbidden in forbidden_paths)
+            return any(
+                forbidden in path.parents or path == forbidden
+                for forbidden in forbidden_paths
+            )
         except (ValueError, OSError):
             # Fallback string check
             path_str = str(path_str)
             return (
-                path_str.startswith(("data/", "./data/")) or "data/production" in path_str or "data/quick" in path_str
+                path_str.startswith(("data/", "./data/"))
+                or "data/production" in path_str
+                or "data/quick" in path_str
             ) and not path_str.startswith("data/testonly/")
 
     # Block dangerous operations on production paths
@@ -75,7 +78,9 @@ def production_data_safety_guard(monkeypatch):
 
     def safe_rmtree(path, *args, **kwargs):
         if is_forbidden_path(path):
-            raise PermissionError(f"🔒 PRODUCTION DATA SAFETY: Tests cannot delete {path}")
+            raise PermissionError(
+                f"🔒 PRODUCTION DATA SAFETY: Tests cannot delete {path}"
+            )
         return original_rmtree(path, *args, **kwargs)
 
     monkeypatch.setattr(shutil, "rmtree", safe_rmtree)
@@ -85,7 +90,9 @@ def production_data_safety_guard(monkeypatch):
 
     def safe_path_mkdir(self, mode=0o777, parents=False, exist_ok=False):
         if is_forbidden_path(self):
-            raise PermissionError(f"🔒 PRODUCTION DATA SAFETY: Tests cannot create {self}")
+            raise PermissionError(
+                f"🔒 PRODUCTION DATA SAFETY: Tests cannot create {self}"
+            )
         return original_path_mkdir(self, mode=mode, parents=parents, exist_ok=exist_ok)
 
     monkeypatch.setattr(Path, "mkdir", safe_path_mkdir)
@@ -107,5 +114,8 @@ def pytest_collection_modifyitems(config, items):
     """
     for item in items:
         # Mark any test that might use production data paths
-        if any(keyword in str(item.fspath) for keyword in ["judge", "cache", "conversation", "tournament"]):
+        if any(
+            keyword in str(item.fspath)
+            for keyword in ["judge", "cache", "conversation", "tournament"]
+        ):
             item.add_marker(pytest.mark.production_safety)

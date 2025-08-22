@@ -5,7 +5,12 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from scripts.run_tournaments import JudgeExecutor, SwissTournament, TournamentMatch, main
+from scripts.run_tournaments import (
+    JudgeExecutor,
+    SwissTournament,
+    TournamentMatch,
+    main,
+)
 
 
 class TestCriticalCoverage:
@@ -67,7 +72,9 @@ class TestCriticalCoverage:
 
             # Run cleanup - should remove old_skill directory
             with patch("builtins.print"):
-                executor.cleanup_invalid_match_cache(valid_models, valid_judges, valid_evals)
+                executor.cleanup_invalid_match_cache(
+                    valid_models, valid_judges, valid_evals
+                )
 
             # Directory should be removed
             assert not old_skill_dir.exists()
@@ -92,7 +99,9 @@ class TestCriticalCoverage:
 
             # Should handle corrupted file gracefully
             with patch("builtins.print"):
-                executor.cleanup_invalid_match_cache(valid_models, valid_judges, valid_evals)
+                executor.cleanup_invalid_match_cache(
+                    valid_models, valid_judges, valid_evals
+                )
 
             # Corrupted file should be removed
             assert not corrupted_cache.exists()
@@ -105,7 +114,9 @@ class TestCriticalCoverage:
             executor = JudgeExecutor(cache_dir=cache_dir)
 
             match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
-            cache_path = executor._get_judge_cache_path(match, "judge_1", "cache_key_123")
+            cache_path = executor._get_judge_cache_path(
+                match, "judge_1", "cache_key_123"
+            )
 
             # Test save operation
             judge_result = {"vote": "A", "explanation": "A is better"}
@@ -156,7 +167,9 @@ class TestCriticalCoverage:
     @patch("json.load")
     @patch("json.dump")
     @patch("builtins.print")
-    def test_main_function_direct_execution(self, mock_print, mock_json_dump, mock_json_load, mock_open):
+    def test_main_function_direct_execution(
+        self, mock_print, mock_json_dump, mock_json_load, mock_open
+    ):
         """Test main function direct execution path (lines 606-612)."""
         # Mock data - sufficient models to trigger tournament logic
         mock_json_load.side_effect = [
@@ -191,7 +204,12 @@ class TestCriticalCoverage:
 
         # Test scenario: sufficient rounds with clear winner
         tournament.rounds = [[], [], []]  # 3 rounds
-        tournament.scores = {"model_0": 2.5, "model_1": 1.5, "model_2": 1.0, "model_3": 0.0}  # Clear winner
+        tournament.scores = {
+            "model_0": 2.5,
+            "model_1": 1.5,
+            "model_2": 1.0,
+            "model_3": 0.0,
+        }  # Clear winner
         assert tournament.is_tournament_complete()
 
         # Test scenario: tied for first place
@@ -211,10 +229,14 @@ class TestCriticalCoverage:
         match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
         eval_config = {"judge": {"system": "You are a judge"}}
 
-        key = executor._generate_judge_cache_key_with_prompt(match, "judge_1", "prompt_text", eval_config)
+        key = executor._generate_judge_cache_key_with_prompt(
+            match, "judge_1", "prompt_text", eval_config
+        )
 
         # Should be consistent
-        key2 = executor._generate_judge_cache_key_with_prompt(match, "judge_1", "prompt_text", eval_config)
+        key2 = executor._generate_judge_cache_key_with_prompt(
+            match, "judge_1", "prompt_text", eval_config
+        )
 
         assert key == key2
         assert len(key) == 16  # 16-char hash

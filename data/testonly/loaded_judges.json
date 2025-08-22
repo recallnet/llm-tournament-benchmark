@@ -2,28 +2,37 @@
   "pool_info": {
     "name": "testonly",
     "path": "judge_pools/testonly.csv",
-    "judge_count": 1,
-    "timestamp": "2025-08-20T17:50:53.762719"
+    "judge_count": 2,
+    "timestamp": "2025-08-21T11:31:59.166068"
   },
   "statistics": {
     "authors": {
-      "OpenAI": 1
+      "TestCorp": 2
     },
-    "avg_context_window": 8192.0,
+    "avg_context_window": 4096.0,
     "avg_max_tokens": 1000.0,
     "context_window_range": {
-      "min": 8192,
-      "max": 8192
+      "min": 4096,
+      "max": 4096
     }
   },
   "judges": [
     {
-      "id": "openai/gpt-oss-20b",
-      "author": "OpenAI",
-      "slug": "gpt-oss-20b",
-      "context_window": 8192,
+      "id": "test/judge-gamma",
+      "author": "TestCorp",
+      "slug": "judge-gamma",
+      "context_window": 4096,
       "pricing": "input:0.0001",
-      "endpoint": "openrouter",
+      "endpoint": "mock",
+      "max_tokens": 1000
+    },
+    {
+      "id": "test/judge-delta",
+      "author": "TestCorp",
+      "slug": "judge-delta",
+      "context_window": 4096,
+      "pricing": "input:0.0001",
+      "endpoint": "mock",
       "max_tokens": 1000
     }
   ]

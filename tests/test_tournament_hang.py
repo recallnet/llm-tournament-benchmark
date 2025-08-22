@@ -45,7 +45,9 @@ def test_tournament_script_timeout():
     total_evals = skills_data["load_info"]["total_evals"]
     expected_tournaments = total_evals * 6  # 6 matches per eval typically
 
-    print(f"📊 Expected ~{expected_tournaments} tournament matches for {total_evals} evals")
+    print(
+        f"📊 Expected ~{expected_tournaments} tournament matches for {total_evals} evals"
+    )
 
     # Check current tournament files
     tournament_files = list(get_judge_cache_dir().rglob("*.json"))

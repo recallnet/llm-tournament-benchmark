@@ -7,7 +7,12 @@ from unittest.mock import Mock, mock_open, patch
 
 import pytest
 
-from scripts.calculate_skill_ratings import CONSERVATIVE_MULTIPLIER, DEFAULT_MU, SkillRatingCalculator, main
+from scripts.calculate_skill_ratings import (
+    CONSERVATIVE_MULTIPLIER,
+    DEFAULT_MU,
+    SkillRatingCalculator,
+    main,
+)
 
 
 class TestSpecificLineCoverage:
@@ -26,13 +31,19 @@ class TestSpecificLineCoverage:
         """Test cleanup filename parsing with underscore (line 116)."""
         # Create cache file with no underscore in filename
         cache_file = calculator.cache_dir / "noscore.json"
-        cache_data = {"skill_id": "noscore", "model_ratings": {"model_a": {"mu": 1500.0, "sigma": 100.0}}, "total_matches": 1}
+        cache_data = {
+            "skill_id": "noscore",
+            "model_ratings": {"model_a": {"mu": 1500.0, "sigma": 100.0}},
+            "total_matches": 1,
+        }
         with open(cache_file, "w") as f:
             json.dump(cache_data, f)
 
         models = [{"id": "model_a"}]
         judges = [{"id": "judge_1"}]
-        evals = [{"id": "eval_1", "_metadata": {"skill": "existing_skill"}}]  # Different skill
+        evals = [
+            {"id": "eval_1", "_metadata": {"skill": "existing_skill"}}
+        ]  # Different skill
 
         with patch("builtins.print"):
             calculator.cleanup_invalid_rating_cache(models, judges, evals)
@@ -82,13 +93,17 @@ class TestSpecificLineCoverage:
             json.dump(cached_data, f)
 
         # Should use cached data
-        result = calculator.calculate_skill_ratings("test_skill", {"match_history": []}, "test_cache_key")
+        result = calculator.calculate_skill_ratings(
+            "test_skill", {"match_history": []}, "test_cache_key"
+        )
         assert result == cached_data
 
     def test_calculate_skill_ratings_no_matches_warning(self, calculator):
         """Test calculate_skill_ratings with no matches warning (lines 166-167)."""
         with patch("builtins.print") as mock_print:
-            result = calculator.calculate_skill_ratings("empty_skill", {"match_history": []}, "key")
+            result = calculator.calculate_skill_ratings(
+                "empty_skill", {"match_history": []}, "key"
+            )
 
             # Should print warning about no matches
             mock_print.assert_any_call("    ⚠️  No matches found for skill empty_skill")
@@ -232,7 +247,9 @@ class TestSkillRatingCalculatorEdgeCases:
             ]
         }
 
-        result = calculator.calculate_skill_ratings("test_skill", tournament_data, "test_key")
+        result = calculator.calculate_skill_ratings(
+            "test_skill", tournament_data, "test_key"
+        )
 
         # Should handle missing timestamps gracefully
         assert result["total_matches"] == 2
@@ -254,16 +271,25 @@ class TestSkillRatingCalculatorEdgeCases:
             ]
         }
 
-        result = calculator.calculate_skill_ratings("test_skill", tournament_data, "test_key")
+        result = calculator.calculate_skill_ratings(
+            "test_skill", tournament_data, "test_key"
+        )
 
         # Check conservative ratings are calculated correctly
         for model_ranking in result["model_rankings"]:
-            expected_conservative = model_ranking["rating"] - CONSERVATIVE_MULTIPLIER * model_ranking["sigma"]
-            assert abs(model_ranking["conservative_rating"] - expected_conservative) < 0.01
+            expected_conservative = (
+                model_ranking["rating"]
+                - CONSERVATIVE_MULTIPLIER * model_ranking["sigma"]
+            )
+            assert (
+                abs(model_ranking["conservative_rating"] - expected_conservative) < 0.01
+            )
 
         # Check in model_ratings too
-        for model_id, rating_info in result["model_ratings"].items():
-            expected_conservative = rating_info["mu"] - CONSERVATIVE_MULTIPLIER * rating_info["sigma"]
+        for _model_id, rating_info in result["model_ratings"].items():
+            expected_conservative = (
+                rating_info["mu"] - CONSERVATIVE_MULTIPLIER * rating_info["sigma"]
+            )
             assert abs(rating_info["conservative"] - expected_conservative) < 0.01
 
 
@@ -272,7 +298,7 @@ class TestMainFunctionScenarios:
 
     def test_main_no_summaries_file(self):
         """Test main function when tournament summaries file doesn't exist."""
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory():
             with patch("scripts.calculate_skill_ratings.Path") as mock_path_class:
                 # Mock Path objects
                 summaries_file = Mock()
@@ -289,7 +315,7 @@ class TestMainFunctionScenarios:
                     "data/testonly/skill_ratings.json": output_file,
                 }[x]
 
-                with patch("builtins.open", mock_open()) as mock_file:
+                with patch("builtins.open", mock_open()):
                     with patch("json.dump") as mock_json_dump:
                         with patch("builtins.print"):
                             main()
@@ -298,12 +324,17 @@ class TestMainFunctionScenarios:
                 mock_json_dump.assert_called_once()
                 result_data = mock_json_dump.call_args[0][0]
                 assert result_data["execution_info"]["status"] == "no_tournament_data"
-                assert "No tournament summaries found" in result_data["execution_info"]["message"]
+                assert (
+                    "No tournament summaries found"
+                    in result_data["execution_info"]["message"]
+                )
 
     @patch("builtins.open", new_callable=mock_open)
     @patch("json.load")
     @patch("json.dump")
-    def test_main_no_tournaments_in_data(self, mock_json_dump, mock_json_load, mock_open_func):
+    def test_main_no_tournaments_in_data(
+        self, mock_json_dump, mock_json_load, mock_open_func
+    ):
         """Test main function when summaries exist but contain no tournaments."""
         # Mock file existence
         with patch("pathlib.Path.exists", return_value=True):
@@ -315,7 +346,7 @@ class TestMainFunctionScenarios:
                 {"evals": [{"id": "eval_1", "_metadata": {"skill": "skill_1"}}]},
             ]
 
-            with patch("pathlib.Path.mkdir") as mock_mkdir:
+            with patch("pathlib.Path.mkdir"):
                 with patch("builtins.print"):
                     main()
 
@@ -328,7 +359,9 @@ class TestMainFunctionScenarios:
     @patch("builtins.open", new_callable=mock_open)
     @patch("json.load")
     @patch("json.dump")
-    def test_main_successful_execution(self, mock_json_dump, mock_json_load, mock_open_func):
+    def test_main_successful_execution(
+        self, mock_json_dump, mock_json_load, mock_open_func
+    ):
         """Test main function with successful skill rating calculation."""
         # Mock file existence
         with patch("pathlib.Path.exists", return_value=True):
@@ -355,17 +388,26 @@ class TestMainFunctionScenarios:
             ]
 
             # Mock SkillRatingCalculator methods to avoid actual calculations
-            with patch("scripts.calculate_skill_ratings.SkillRatingCalculator") as MockCalculator:
+            with patch(
+                "scripts.calculate_skill_ratings.SkillRatingCalculator"
+            ) as MockCalculator:
                 mock_calc_instance = Mock()
                 mock_calc_instance.calculate_skill_ratings.return_value = {
                     "skill_id": "skill_1",
                     "model_ratings": {},
-                    "model_rankings": [{"rank": 1, "model_id": "model_a", "rating": 1600.0, "sigma": 90.0}],
+                    "model_rankings": [
+                        {
+                            "rank": 1,
+                            "model_id": "model_a",
+                            "rating": 1600.0,
+                            "sigma": 90.0,
+                        }
+                    ],
                     "total_matches": 1,
                 }
                 MockCalculator.return_value = mock_calc_instance
 
-                with patch("pathlib.Path.mkdir") as mock_mkdir:
+                with patch("pathlib.Path.mkdir"):
                     with patch("builtins.print"):
                         main()
 
@@ -394,8 +436,8 @@ class TestMainFunctionScenarios:
                     "data/testonly/skill_ratings.json": output_file,
                 }[x]
 
-                with patch("builtins.open", mock_open()) as mock_file:
-                    with patch("json.dump") as mock_json_dump:
+                with patch("builtins.open", mock_open()):
+                    with patch("json.dump"):
                         with patch("builtins.print"):
                             main()
 
@@ -405,19 +447,25 @@ class TestMainFunctionScenarios:
     @patch("builtins.open", new_callable=mock_open)
     @patch("json.load")
     @patch("json.dump")
-    def test_main_skill_rating_calculator_cleanup_and_cache(self, mock_json_dump, mock_json_load, mock_open_func):
+    def test_main_skill_rating_calculator_cleanup_and_cache(
+        self, mock_json_dump, mock_json_load, mock_open_func
+    ):
         """Test main function calls cleanup and uses caching appropriately."""
         with patch("pathlib.Path.exists", return_value=True):
             # Mock JSON loading
             mock_json_load.side_effect = [
-                {"tournaments": {"skill_1": {"match_history": []}}},  # No matches but valid structure
+                {
+                    "tournaments": {"skill_1": {"match_history": []}}
+                },  # No matches but valid structure
                 {"models": [{"id": "model_a"}]},
                 {"judges": [{"id": "judge_1"}]},
                 {"evals": [{"id": "eval_1", "_metadata": {"skill": "skill_1"}}]},
             ]
 
             with patch("pathlib.Path.mkdir"):
-                with patch("scripts.calculate_skill_ratings.SkillRatingCalculator") as MockCalculator:
+                with patch(
+                    "scripts.calculate_skill_ratings.SkillRatingCalculator"
+                ) as MockCalculator:
                     mock_calc_instance = Mock()
                     mock_calc_instance.calculate_skill_ratings.return_value = {
                         "skill_id": "skill_1",
@@ -425,7 +473,9 @@ class TestMainFunctionScenarios:
                         "model_rankings": [],
                         "total_matches": 0,
                     }
-                    mock_calc_instance._generate_cache_key.return_value = "test_cache_key"
+                    mock_calc_instance._generate_cache_key.return_value = (
+                        "test_cache_key"
+                    )
                     MockCalculator.return_value = mock_calc_instance
 
                     with patch("builtins.print"):
@@ -448,7 +498,9 @@ class TestMainFunctionScenarios:
                 importlib.reload(__import__("scripts.calculate_skill_ratings"))
 
                 # Since we can't easily reload, let's directly test the condition
-                if "__main__" == "__main__":  # This simulates the condition in the module
+                if (
+                    "__main__" == "__main__"
+                ):  # This simulates the condition in the module
                     mock_main()
 
                 mock_main.assert_called()
@@ -481,7 +533,9 @@ class TestSkillRatingCalculatorAdvanced:
             ]
         }
 
-        result_a_wins = calculator.calculate_skill_ratings("skill_a_wins", base_tournament, "key_a")
+        result_a_wins = calculator.calculate_skill_ratings(
+            "skill_a_wins", base_tournament, "key_a"
+        )
 
         # Test B wins
         b_wins_tournament = {
@@ -496,7 +550,9 @@ class TestSkillRatingCalculatorAdvanced:
             ]
         }
 
-        result_b_wins = calculator.calculate_skill_ratings("skill_b_wins", b_wins_tournament, "key_b")
+        result_b_wins = calculator.calculate_skill_ratings(
+            "skill_b_wins", b_wins_tournament, "key_b"
+        )
 
         # Test Tie
         tie_tournament = {
@@ -511,7 +567,9 @@ class TestSkillRatingCalculatorAdvanced:
             ]
         }
 
-        result_tie = calculator.calculate_skill_ratings("skill_tie", tie_tournament, "key_tie")
+        result_tie = calculator.calculate_skill_ratings(
+            "skill_tie", tie_tournament, "key_tie"
+        )
 
         # Different outcomes should produce different final ratings
         rating_a_when_a_wins = result_a_wins["model_ratings"]["model_a"]["mu"]
@@ -520,7 +578,9 @@ class TestSkillRatingCalculatorAdvanced:
 
         assert rating_a_when_a_wins > DEFAULT_MU  # A should go up when winning
         assert rating_a_when_b_wins < DEFAULT_MU  # A should go down when losing
-        assert abs(rating_a_when_tie - DEFAULT_MU) < abs(rating_a_when_a_wins - DEFAULT_MU)  # Tie closer to default
+        assert abs(rating_a_when_tie - DEFAULT_MU) < abs(
+            rating_a_when_a_wins - DEFAULT_MU
+        )  # Tie closer to default
 
     def test_match_progression_detailed_tracking(self, calculator):
         """Test detailed match progression tracking with rating changes."""
@@ -543,7 +603,9 @@ class TestSkillRatingCalculatorAdvanced:
             ]
         }
 
-        result = calculator.calculate_skill_ratings("test_skill", tournament_data, "test_key")
+        result = calculator.calculate_skill_ratings(
+            "test_skill", tournament_data, "test_key"
+        )
 
         progression = result["match_progression"]
 
@@ -566,7 +628,9 @@ class TestSkillRatingCalculatorAdvanced:
         # Second match should use updated ratings as starting point
         match_2 = progression[1]
         b_before_match2 = match_2["rating_changes"]["model_b"]["before"]["mu"]
-        assert abs(b_before_match2 - b_after) < 0.01  # Should start where previous match left off
+        assert (
+            abs(b_before_match2 - b_after) < 0.01
+        )  # Should start where previous match left off
 
     def test_cache_key_includes_match_details(self, calculator):
         """Test that cache key changes when match details change."""
@@ -576,13 +640,25 @@ class TestSkillRatingCalculatorAdvanced:
 
         # Same match structure but different outcomes
         tournament_1 = {
-            "skill_1": {"match_history": [{"match_id": "match_1", "winner": "A", "timestamp": "2024-01-01T00:00:00"}]}
+            "skill_1": {
+                "match_history": [
+                    {
+                        "match_id": "match_1",
+                        "winner": "A",
+                        "timestamp": "2024-01-01T00:00:00",
+                    }
+                ]
+            }
         }
 
         tournament_2 = {
             "skill_1": {
                 "match_history": [
-                    {"match_id": "match_1", "winner": "B", "timestamp": "2024-01-01T00:00:00"}  # Different winner
+                    {
+                        "match_id": "match_1",
+                        "winner": "B",
+                        "timestamp": "2024-01-01T00:00:00",
+                    }  # Different winner
                 ]
             }
         }
@@ -590,4 +666,6 @@ class TestSkillRatingCalculatorAdvanced:
         key_1 = calculator._generate_cache_key(models, judges, evals, tournament_1)
         key_2 = calculator._generate_cache_key(models, judges, evals, tournament_2)
 
-        assert key_1 != key_2  # Different match outcomes should produce different cache keys
+        assert (
+            key_1 != key_2
+        )  # Different match outcomes should produce different cache keys

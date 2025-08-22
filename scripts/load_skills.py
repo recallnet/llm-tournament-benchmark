@@ -23,7 +23,11 @@ EVAL_SCHEMA = {
                     "id": {"type": "string"},
                     "prompt": {"type": "string"},
                     "inputs": {"type": "object"},
-                    "depends_on": {"type": "array", "items": {"type": "string"}, "uniqueItems": True},
+                    "depends_on": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "uniqueItems": True,
+                    },
                     "carry": {"type": "string", "enum": ["full", "final", "none"]},
                 },
                 "additionalProperties": False,
@@ -46,9 +50,18 @@ EVAL_SCHEMA = {
                             "type": "object",
                             "required": ["step", "part", "as"],
                             "properties": {
-                                "step": {"type": "string", "description": "chain step id"},
-                                "part": {"type": "string", "enum": ["final", "history"]},
-                                "as": {"type": "string", "description": "variable name exposed to the prompt"},
+                                "step": {
+                                    "type": "string",
+                                    "description": "chain step id",
+                                },
+                                "part": {
+                                    "type": "string",
+                                    "enum": ["final", "history"],
+                                },
+                                "as": {
+                                    "type": "string",
+                                    "description": "variable name exposed to the prompt",
+                                },
                             },
                             "additionalProperties": False,
                         },
@@ -62,11 +75,17 @@ EVAL_SCHEMA = {
             "required": ["prompt", "view"],
             "properties": {
                 "system": {"type": "string"},
-                "prompt": {"type": "string", "description": "Use {{A}} and {{B}} placeholders."},
+                "prompt": {
+                    "type": "string",
+                    "description": "Use {{A}} and {{B}} placeholders.",
+                },
                 "view": {
                     "type": "object",
                     "required": ["A", "B"],
-                    "properties": {"A": {"$ref": "#/$defs/ViewList"}, "B": {"$ref": "#/$defs/ViewList"}},
+                    "properties": {
+                        "A": {"$ref": "#/$defs/ViewList"},
+                        "B": {"$ref": "#/$defs/ViewList"},
+                    },
                     "additionalProperties": False,
                 },
             },
@@ -82,7 +101,10 @@ EVAL_SCHEMA = {
                 "required": ["kind", "id", "part"],
                 "properties": {
                     "kind": {"type": "string", "enum": ["step", "intermediary"]},
-                    "id": {"type": "string", "description": "step id (from chain) or intermediary id"},
+                    "id": {
+                        "type": "string",
+                        "description": "step id (from chain) or intermediary id",
+                    },
                     "part": {"type": "string", "enum": ["final", "history"]},
                     "label": {"type": "string"},
                 },
@@ -161,7 +183,9 @@ def load_skill_evals(skill_dir):
     json_files = list(skill_dir.glob("*.json"))
 
     if not json_files:
-        error_msg = f"🚨 RED ALARM: No JSON files found in skill '{skill_name}' at {skill_dir}"
+        error_msg = (
+            f"🚨 RED ALARM: No JSON files found in skill '{skill_name}' at {skill_dir}"
+        )
         print(error_msg)
         raise ValueError(error_msg)
 
@@ -184,7 +208,11 @@ def load_skill_evals(skill_dir):
                 raise ValueError("Eval missing required 'name' field")
 
             # Add metadata
-            eval_data["_metadata"] = {"skill": skill_name, "file_path": str(json_file), "file_name": json_file.name}
+            eval_data["_metadata"] = {
+                "skill": skill_name,
+                "file_path": str(json_file),
+                "file_name": json_file.name,
+            }
 
             evals.append(eval_data)
             print(f"   ✅ Successfully loaded eval '{eval_data['id']}'")
@@ -230,7 +258,9 @@ def main():
     # Access Snakemake parameters
     output_path = Path(snakemake.output[0])
     skills_dir = Path(snakemake.params.get("skills_dir", "skills"))
-    selected_skills = snakemake.params.get("selected_skills", None)  # None means load all
+    selected_skills = snakemake.params.get(
+        "selected_skills", None
+    )  # None means load all
 
     print("🎯 ===== SKILLS & EVALS LOADING SYSTEM =====")
     print(f"📁 Skills directory: {skills_dir}")
@@ -245,7 +275,9 @@ def main():
 
     if selected_skills:
         # Filter to only selected skills
-        missing_skills = [s for s in selected_skills if s not in [d.name for d in skill_dirs]]
+        missing_skills = [
+            s for s in selected_skills if s not in [d.name for d in skill_dirs]
+        ]
         if missing_skills:
             error_msg = f"🚨 RED ALARM: Selected skills not found: {missing_skills}"
             print(error_msg)
@@ -254,7 +286,9 @@ def main():
         skill_dirs = [d for d in skill_dirs if d.name in selected_skills]
         print(f"🎯 Loading selected skills: {selected_skills}")
     else:
-        print(f"🔍 Found {len(skill_dirs)} skill directories: {[d.name for d in skill_dirs]}")
+        print(
+            f"🔍 Found {len(skill_dirs)} skill directories: {[d.name for d in skill_dirs]}"
+        )
 
     if not skill_dirs:
         error_msg = f"🚨 RED ALARM: No skill directories found in {skills_dir}"
@@ -284,7 +318,9 @@ def main():
             }
 
         except Exception as e:
-            error_msg = f"🚨 RED ALARM: Critical failure in skill '{skill_dir.name}': {e}"
+            error_msg = (
+                f"🚨 RED ALARM: Critical failure in skill '{skill_dir.name}': {e}"
+            )
             print(error_msg)
             raise ValueError(error_msg) from e
 
@@ -320,12 +356,23 @@ def main():
         },
         "skills": skill_summary,
         "eval_statistics": {
-            "total_steps": sum(analysis["step_count"] for analysis in eval_analysis.values()),
-            "avg_steps_per_eval": (
-                sum(analysis["step_count"] for analysis in eval_analysis.values()) / len(all_evals) if all_evals else 0
+            "total_steps": sum(
+                analysis["step_count"] for analysis in eval_analysis.values()
             ),
-            "evals_with_dependencies": sum(1 for analysis in eval_analysis.values() if analysis["dependencies"] > 0),
-            "evals_with_custom_inputs": sum(1 for analysis in eval_analysis.values() if analysis["has_custom_inputs"]),
+            "avg_steps_per_eval": (
+                sum(analysis["step_count"] for analysis in eval_analysis.values())
+                / len(all_evals)
+                if all_evals
+                else 0
+            ),
+            "evals_with_dependencies": sum(
+                1 for analysis in eval_analysis.values() if analysis["dependencies"] > 0
+            ),
+            "evals_with_custom_inputs": sum(
+                1
+                for analysis in eval_analysis.values()
+                if analysis["has_custom_inputs"]
+            ),
         },
         "eval_analysis": eval_analysis,
         "evals": all_evals,
@@ -347,8 +394,12 @@ def main():
     print(f"✅ Total evals loaded: {len(all_evals)}")
     print(f"✅ Total files processed: {total_files_processed}")
     print(f"✅ Skills loaded: {', '.join(skill_summary.keys())}")
-    print(f"✅ Average steps per eval: {summary['eval_statistics']['avg_steps_per_eval']:.1f}")
-    print(f"✅ Evals with dependencies: {summary['eval_statistics']['evals_with_dependencies']}")
+    print(
+        f"✅ Average steps per eval: {summary['eval_statistics']['avg_steps_per_eval']:.1f}"
+    )
+    print(
+        f"✅ Evals with dependencies: {summary['eval_statistics']['evals_with_dependencies']}"
+    )
     print("✅ All schema validations: PASSED")
     print("✅ All eval IDs: UNIQUE")
     print("✅ No critical errors detected")

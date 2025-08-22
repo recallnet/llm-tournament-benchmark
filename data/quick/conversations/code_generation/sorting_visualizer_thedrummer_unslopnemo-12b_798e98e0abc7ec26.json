@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "sorting_visualizer",
+    "eval_name": "Sorting Algorithms Visualizer",
+    "model_id": "thedrummer/unslopnemo-12b",
+    "model_slug": "unslopnemo-12b",
+    "model_author": "TheDrummer",
+    "timestamp": "2025-08-21T22:29:51.606161",
+    "cache_key": "798e98e0abc7ec26",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that creates a comprehensive sorting algorithms visualizer.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Implement 5 sorting algorithms: Bubble, Quick, Merge, Heap, Radix\n- Visual bars with color coding: red (comparing), yellow (swapping), green (sorted), blue (pivot)\n- Algorithm selection dropdown and speed control slider\n- Toggle between step-by-step and continuous modes\n- Real-time complexity analysis display (O-notation)\n- Scramble button with patterns: Random, Reverse, Nearly Sorted\n- Call stack depth visualization for recursive algorithms\n- Real-time comparison and swap counters\n- Working area highlighting for divide-and-conquer\n- Smooth 60 FPS performance, no external libraries\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "```javascript\nconst canvas_elem = document.querySelector('#sorting-canvas');\nconst ctx = canvas_elem.getContext('2d');\nconst W = 800, H = 500; // canvas dimensions\ncanvas_elem.width = W;\ncanvas_elem.height = H;\n\nclass Bar {\n  constructor(x, y, w, h, value) {\n    this.x = x;\n    this.y = y;\n    this.w = w;\n    this.h = h;\n    this.val = value;\n  }\n\n  draw(ctx, color) {\n    ctx.beginPath();\n    ctx.rect(this.x, this.y, this.w, this.h);\n    ctx.fillStyle = color;\n    ctx.fill();\n    ctx.closePath();\n  }\n}\n\nfunction makeArray(n, pattern) {\n  let arr = [];\n  for (let i = 0; i < n; i++) {\n    if (pattern === 'Random') {\n      arr.push(Math.floor(Math.random() * n));\n    } else if (pattern === 'Reverse') {\n      arr.push(n - i - 1);\n    } else {\n      arr.push(i);\n      if (Math.random() < 0.1) {\n        for (let j = 0; j < 20; j++) {\n          arr.push(i);\n        }\n      }\n    }\n  }\n  return arr;\n}\n\nfunction bubbleSort(arr) {\n  let len = arr.length;\n  for (let i = 0; i < len - 1; i++) {\n    for (let j = 0; j < len - 1 - i; j++) {\n      if (arr[j] > arr[j + 1]) {\n        let temp = arr[j];\n        arr[j] = arr[j + 1];\n        arr[j + 1] = temp;\n      }\n    }\n  }\n  return arr;\n}\n\nfunction partition(arr, low, high) {\n  let pivotIndex = Math.floor((low + high) / 2);\n  let pivotValue = arr[pivotIndex];\n  let i = low;\n  let j = high;\n  while (i <= j) {\n    while (arr[i] < pivotValue) {\n      i++;\n    }\n    while (arr[j] > pivotValue) {\n      j--;\n    }\n    if (i <= j) {\n      let temp = arr[i];\n      arr[i] = arr[j];\n      arr[j] = temp;\n      i++;\n      j--;\n    }\n  }\n  return i;\n}\n\nfunction quickSort(arr, low, high) {\n  if (low < high) {\n    let pivotIndex = partition(arr, low, high);\n    quickSort(arr, low, pivotIndex - 1);\n    quickSort(arr, pivotIndex + 1, high);\n  }\n  return arr;\n}\n\nfunction mergeSort(arr, low, high) {\n  if (low >= high) return;\n  let mid = Math.floor((low + high) / 2);\n  mergeSort(arr, low, mid);\n  mergeSort(arr, mid + 1, high);\n  merge(arr, low, mid, high);\n  return arr;\n}\n\nfunction merge(arr, low, mid, high) {\n  let temp = [...arr.slice(low, mid + 1)];\n  let i = 0, j = 0, k = low;\n  while (i < temp.length && j < arr.slice(mid + 1).length) {\n    if (temp[i] <= arr[j + mid + 1]) {\n      arr[k++] = temp[i++];\n    } else {\n      arr[k++] = arr[j + mid + 1];\n      j++;\n    }\n  }\n  while (i < temp.length) {\n    arr[k++] = temp[i++];\n  }\n}\n\nfunction heapSort(arr) {\n  let len = arr.length;\n  for (let i = Math.floor(len / 2) - 1; i >= 0; i--) {\n    heapify(arr, i, len);\n  }\n  for (let i = len - 1; i > 0; i--) {\n    let temp = arr[0];\n    arr[0] = arr[i];\n    arr[i] = temp;\n    heapify(arr, 0, i);\n  }\n  return arr;\n}\n\nfunction heapify(arr, i, len) {\n  let max = i;\n  let left = 2 * i + 1;\n  let right = 2 * i + 2;\n  if (left < len && arr[left] > arr[max]) {\n    max = left;\n  }\n  if (right < len && arr[right] > arr[max]) {\n    max = right;\n  }\n  if (max !== i) {\n    let temp = arr[i];\n    arr[i] = arr[max];\n    arr[max] = temp;\n    heapify(arr, max, len);\n  }\n}\n\nfunction countingSort(arr, exp) {\n  let count = new Array(10).fill(0);\n  for (let i = 0; i < arr.length; i++) {\n    let index = Math.floor(arr[i] / Math.pow(10, exp));\n    count[index]++;\n  }\n  for (let i = 1; i < count.length; i++) {\n    count[i] += count[i - 1];\n  }\n  let output = new Array(arr.length);\n  for (let i = arr.length - 1; i >= 0; i--) {\n    let index = Math.floor(arr[i] / Math.pow(10, exp)) % 10;\n    output[count[index] - 1] = arr[i];\n    count[index]--;\n  }\n  for (let i = 0; i < output.length; i++) {\n    arr[i] = output[i];\n  }\n  return arr;\n}\n\nfunction radixSort(arr) {\n  let max = Math.max.apply(null, arr);\n  for (let exp = 1; max / exp > 0; exp *= 10) {\n    arr = countingSort(arr, Math.floor(Math.log10(exp)));\n  }\n  return arr;\n}\n\nfunction drawBars(arr) {\n  const margin = 10;\n  const barWidth = (W - 2 * margin) / arr.length;\n  ctx.clearRect(0, 0, W, H);\n  for (let i = 0; i < arr.length; i++) {\n    ctx.beginPath();\n    ctx.rect(margin + i * barWidth, H - arr[i], barWidth - 2, -H);\n    ctx.strokeStyle = 'black';\n    ctx.stroke();\n    ctx.closePath();\n  }\n}\n\nconst arr = makeArray(100, Math.random() < 0.5 ? 'Random' : 'Reverse');\ndrawBars(arr);\n\n```"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

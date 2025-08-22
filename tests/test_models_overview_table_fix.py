@@ -72,26 +72,68 @@ class TestModelsOverviewTableFix:
             "tournaments": {
                 "harm_avoidance": {
                     "model_rankings": [
-                        {"model_id": "thedrummer/unslopnemo-12b", "wins": 14, "losses": 1, "total_matches": 15, "rank": 1}
+                        {
+                            "model_id": "thedrummer/unslopnemo-12b",
+                            "wins": 14,
+                            "losses": 1,
+                            "total_matches": 15,
+                            "rank": 1,
+                        }
                     ]
                 },
                 "code_generation": {
                     "model_rankings": [
-                        {"model_id": "thedrummer/unslopnemo-12b", "wins": 1, "losses": 20, "total_matches": 21, "rank": 4}
+                        {
+                            "model_id": "thedrummer/unslopnemo-12b",
+                            "wins": 1,
+                            "losses": 20,
+                            "total_matches": 21,
+                            "rank": 4,
+                        }
                     ]
                 },
             },
             "ratings": {
-                "harm_avoidance": {"model_ratings": {"thedrummer/unslopnemo-12b": {"mu": 1652.8, "sigma": 64.0}}},
-                "hidden_messages": {"model_ratings": {"thedrummer/unslopnemo-12b": {"mu": 1539.5, "sigma": 34.6}}},
-                "document_summarization": {"model_ratings": {"thedrummer/unslopnemo-12b": {"mu": 1476.8, "sigma": 55.9}}},
-                "empathy": {"model_ratings": {"thedrummer/unslopnemo-12b": {"mu": 1525.8, "sigma": 44.2}}},
-                "respect_no_em_dash_requests": {"model_ratings": {"thedrummer/unslopnemo-12b": {"mu": 1497.7, "sigma": 38.8}}},
-                "code_generation": {
-                    "model_ratings": {"thedrummer/unslopnemo-12b": {"mu": 1314.4, "sigma": 57.6}}  # LOWEST RATING
+                "harm_avoidance": {
+                    "model_ratings": {
+                        "thedrummer/unslopnemo-12b": {"mu": 1652.8, "sigma": 64.0}
+                    }
                 },
-                "persuasiveness": {"model_ratings": {"thedrummer/unslopnemo-12b": {"mu": 1410.2, "sigma": 55.0}}},
-                "ethical_loopholes": {"model_ratings": {"thedrummer/unslopnemo-12b": {"mu": 1375.7, "sigma": 48.3}}},
+                "hidden_messages": {
+                    "model_ratings": {
+                        "thedrummer/unslopnemo-12b": {"mu": 1539.5, "sigma": 34.6}
+                    }
+                },
+                "document_summarization": {
+                    "model_ratings": {
+                        "thedrummer/unslopnemo-12b": {"mu": 1476.8, "sigma": 55.9}
+                    }
+                },
+                "empathy": {
+                    "model_ratings": {
+                        "thedrummer/unslopnemo-12b": {"mu": 1525.8, "sigma": 44.2}
+                    }
+                },
+                "respect_no_em_dash_requests": {
+                    "model_ratings": {
+                        "thedrummer/unslopnemo-12b": {"mu": 1497.7, "sigma": 38.8}
+                    }
+                },
+                "code_generation": {
+                    "model_ratings": {
+                        "thedrummer/unslopnemo-12b": {"mu": 1314.4, "sigma": 57.6}
+                    }  # LOWEST RATING
+                },
+                "persuasiveness": {
+                    "model_ratings": {
+                        "thedrummer/unslopnemo-12b": {"mu": 1410.2, "sigma": 55.0}
+                    }
+                },
+                "ethical_loopholes": {
+                    "model_ratings": {
+                        "thedrummer/unslopnemo-12b": {"mu": 1375.7, "sigma": 48.3}
+                    }
+                },
             },
         }
 
@@ -117,14 +159,21 @@ class TestModelsOverviewTableFix:
                 print(f"  {model_id}:")
                 print(f"    Best skill: {best_skill}")
                 print(f"    Worst skill: {worst_skill}")
-                print(f"    Same best/worst: {'🐛 YES' if best_skill == worst_skill else '✅ NO'}")
+                print(
+                    f"    Same best/worst: {'🐛 YES' if best_skill == worst_skill else '✅ NO'}"
+                )
 
                 # Verify correctness
                 if model_id == "thedrummer/unslopnemo-12b":
-                    if best_skill == "harm_avoidance" and worst_skill == "code_generation":
+                    if (
+                        best_skill == "harm_avoidance"
+                        and worst_skill == "code_generation"
+                    ):
                         print(f"    🎉 CORRECT: Best={best_skill}, Worst={worst_skill}")
                     else:
-                        print("    ❌ WRONG: Expected best=harm_avoidance, worst=code_generation")
+                        print(
+                            "    ❌ WRONG: Expected best=harm_avoidance, worst=code_generation"
+                        )
                         print(f"    Got: best={best_skill}, worst={worst_skill}")
 
                         # Debug the rating calculation
@@ -152,14 +201,18 @@ class TestModelsOverviewTableFix:
         print("Analysis of our previous testing approach:")
         print("1. ✅ We tested the detailed performance table (2nd table) - WORKED")
         print("2. ❌ We didn't specifically test models overview table (1st table)")
-        print("3. ❌ Most tests used mock data that didn't reveal the rating lookup bug")
+        print(
+            "3. ❌ Most tests used mock data that didn't reveal the rating lookup bug"
+        )
         print("4. ❌ Real data tests focused on data loading, not UI table generation")
         print("5. ❌ We fixed site/app.py but not admin_ui.py (wrong file issue)")
 
         print("\nLessons learned:")
         print("1. 🎯 Test BOTH tables separately when there are multiple data displays")
         print("2. 🎯 Use realistic data that matches production scenarios")
-        print("3. 🎯 Verify we're testing the actual running code, not a different file")
+        print(
+            "3. 🎯 Verify we're testing the actual running code, not a different file"
+        )
         print("4. 🎯 Test the specific UI components users interact with")
 
         print("\nThis is why comprehensive testing is iterative - each bug teaches us")

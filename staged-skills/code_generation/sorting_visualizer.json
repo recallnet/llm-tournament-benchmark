@@ -9,8 +9,8 @@
     }
   ],
   "judge": {
-    "system": "You are a JavaScript code quality expert with expertise in algorithm visualization and educational software. Evaluate code based on functionality, performance, best practices, and requirements fulfillment.",
-    "prompt": "Evaluate the JavaScript sorting algorithms visualizer implementation on a scale of 0-10 points:\n\n**Algorithm Implementation (4 points)**: Does it correctly implement all five sorting algorithms (Bubble, Quick, Merge, Heap, Radix) with accurate logic and complexity analysis?\n\n**Visualization Quality (3 points)**: Does it provide clear visual feedback with proper color coding, call stack visualization for recursive algorithms, and working area highlighting?\n\n**Interactive Features (2 points)**: Does it include functional controls (algorithm selection, speed control, step/continuous modes, scramble patterns) and real-time statistics?\n\n**Performance & Code Quality (1 point)**: Does it run smoothly at 60 FPS with well-structured, educational code?\n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
+    "system": "Judge functionality, correctness, and feature completeness. Do not penalize minified or differently formatted code if it works correctly.",
+    "prompt": "Evaluate the JavaScript sorting algorithms visualizer implementation. \n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B as the winner.",
     "view": {
       "A": [{ "kind": "step", "id": "generate_code", "part": "final" }],
       "B": [{ "kind": "step", "id": "generate_code", "part": "final" }]

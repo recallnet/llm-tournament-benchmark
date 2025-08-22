@@ -35,7 +35,9 @@ class MockSessionState(dict):
 
 streamlit_mock = MagicMock()
 streamlit_mock.session_state = MockSessionState()
-streamlit_mock.columns = lambda n: [MagicMock() for _ in range(len(n) if isinstance(n, list) else n)]
+streamlit_mock.columns = lambda n: [
+    MagicMock() for _ in range(len(n) if isinstance(n, list) else n)
+]
 streamlit_mock.markdown = MagicMock()
 streamlit_mock.header = MagicMock()
 streamlit_mock.dataframe = MagicMock()
@@ -65,7 +67,11 @@ class TestGitHubIssueIntegrationSafety:
         dangerous_data = pd.DataFrame(
             {
                 "Model": ["test/model&name", "model with spaces", 'model"with"quotes'],
-                "Skill": ['<script>alert("xss")</script>', "skill & other", "normal_skill"],
+                "Skill": [
+                    '<script>alert("xss")</script>',
+                    "skill & other",
+                    "normal_skill",
+                ],
                 "Rating": [1500.0, 1600.0, 1700.0],
                 "Description": [
                     'Contains "quotes" and \n newlines \t tabs',
@@ -107,12 +113,18 @@ class TestGitHubIssueIntegrationSafety:
         github_url = f"https://github.com/recallnet/beam/issues/new?title={title_encoded}&body={body_encoded}"
 
         print(f"URL length: {len(github_url)}")
-        print(f"URL contains unencoded chars: {'&' in github_url.split('?')[1] and 'body=' not in github_url.split('&')[0]}")
+        print(
+            f"URL contains unencoded chars: {'&' in github_url.split('?')[1] and 'body=' not in github_url.split('&')[0]}"
+        )
 
         # Verify URL is properly encoded
-        assert "<script>" not in github_url, "Dangerous script tags should be URL encoded"
+        assert (
+            "<script>" not in github_url
+        ), "Dangerous script tags should be URL encoded"
         assert "alert(" not in github_url, "JavaScript should be URL encoded"
-        assert github_url.startswith("https://github.com/"), "URL should be properly formed"
+        assert github_url.startswith(
+            "https://github.com/"
+        ), "URL should be properly formed"
         assert "title=" in github_url, "URL should contain title parameter"
         assert "body=" in github_url, "URL should contain body parameter"
 
@@ -136,15 +148,36 @@ class TestGitHubIssueIntegrationSafety:
 
         # Create realistic test data
         test_data = {
-            "models": {"models": [{"id": "test_model", "author": "Test", "context_window": 32768, "endpoint": "test"}]},
-            "judges": {"judges": [{"id": "test_judge", "author": "Test", "context_window": 64000}]},
+            "models": {
+                "models": [
+                    {
+                        "id": "test_model",
+                        "author": "Test",
+                        "context_window": 32768,
+                        "endpoint": "test",
+                    }
+                ]
+            },
+            "judges": {
+                "judges": [
+                    {"id": "test_judge", "author": "Test", "context_window": 64000}
+                ]
+            },
             "tournaments": {
                 "test_skill": {
-                    "model_rankings": [{"model_id": "test_model", "wins": 5, "losses": 2, "rank": 1}],
-                    "match_history": [{"judges": ["test_judge"], "match_id": "match_1"}],
+                    "model_rankings": [
+                        {"model_id": "test_model", "wins": 5, "losses": 2, "rank": 1}
+                    ],
+                    "match_history": [
+                        {"judges": ["test_judge"], "match_id": "match_1"}
+                    ],
                 }
             },
-            "ratings": {"test_skill": {"model_ratings": {"test_model": {"mu": 1600.0, "sigma": 50.0}}}},
+            "ratings": {
+                "test_skill": {
+                    "model_ratings": {"test_model": {"mu": 1600.0, "sigma": 50.0}}
+                }
+            },
         }
 
         # Test Models page
@@ -153,7 +186,9 @@ class TestGitHubIssueIntegrationSafety:
             admin_ui.show_models_page(test_data)
             models_context = streamlit_mock.session_state.get("issue_context", {})
             print(f"  Models context: {models_context}")
-            assert models_context.get("page") == "Models", "Models page context should be set"
+            assert (
+                models_context.get("page") == "Models"
+            ), "Models page context should be set"
             print("  ✅ Models page works with context tracking")
         except Exception as e:
             print(f"  ❌ Models page failed: {e}")
@@ -165,7 +200,9 @@ class TestGitHubIssueIntegrationSafety:
             admin_ui.show_judges_page(test_data)
             judges_context = streamlit_mock.session_state.get("issue_context", {})
             print(f"  Judges context: {judges_context}")
-            assert judges_context.get("page") == "Judges", "Judges page context should be set"
+            assert (
+                judges_context.get("page") == "Judges"
+            ), "Judges page context should be set"
             print("  ✅ Judges page works with context tracking")
         except Exception as e:
             print(f"  ❌ Judges page failed: {e}")
@@ -190,7 +227,9 @@ class TestGitHubIssueIntegrationSafety:
                 "ID": range(1000),
                 "Name": [f"item_{i}" for i in range(1000)],
                 "Value": [i * 1.5 for i in range(1000)],
-                "Description": [f"Description for item {i} with some text" for i in range(1000)],
+                "Description": [
+                    f"Description for item {i} with some text" for i in range(1000)
+                ],
             }
         )
 
@@ -211,7 +250,9 @@ class TestGitHubIssueIntegrationSafety:
 
         # Test markdown generation performance
         start_time = time.time()
-        markdown = reporter._dataframe_to_markdown(large_data.head(10))  # Only first 10 rows for markdown
+        markdown = reporter._dataframe_to_markdown(
+            large_data.head(10)
+        )  # Only first 10 rows for markdown
         markdown_time = time.time() - start_time
 
         print(f"Time to generate markdown for 10 rows: {markdown_time:.4f} seconds")
@@ -219,7 +260,9 @@ class TestGitHubIssueIntegrationSafety:
 
         # Performance should be reasonable (less than 1 second for these operations)
         assert capture_time < 1.0, f"Table capture took too long: {capture_time:.4f}s"
-        assert markdown_time < 0.1, f"Markdown generation took too long: {markdown_time:.4f}s"
+        assert (
+            markdown_time < 0.1
+        ), f"Markdown generation took too long: {markdown_time:.4f}s"
 
         print("✅ Table capture performance is acceptable")
 
@@ -257,7 +300,9 @@ class TestGitHubIssueIntegrationSafety:
 
         # Test with None values in data
         try:
-            none_data = pd.DataFrame({"A": [1, None, 3], "B": [None, "text", None], "C": [1.5, None, 2.5]})
+            none_data = pd.DataFrame(
+                {"A": [1, None, 3], "B": [None, "text", None], "C": [1.5, None, 2.5]}
+            )
             markdown = reporter._dataframe_to_markdown(none_data)
             print(f"DataFrame with None values handled: {'None' in markdown}")
             assert "None" in markdown, "Should preserve None values as strings"
@@ -270,7 +315,8 @@ class TestGitHubIssueIntegrationSafety:
         try:
             very_long_string = "A" * 5000  # Very long string
             issue_content = reporter.generate_issue_content(
-                issue_title="Test with very long content", issue_description=very_long_string
+                issue_title="Test with very long content",
+                issue_description=very_long_string,
             )
 
             title_encoded = urllib.parse.quote(issue_content["title"])
@@ -327,7 +373,9 @@ class TestGitHubIssueIntegrationSafety:
 
             # Generate issue content and verify it contains current context
             issue_content = reporter.generate_issue_content()
-            assert page in issue_content["title"], f"Title should contain page name {page}"
+            assert (
+                page in issue_content["title"]
+            ), f"Title should contain page name {page}"
 
             print(f"  ✅ Step {i+1} navigation successful")
 
@@ -344,7 +392,9 @@ class TestGitHubIssueIntegrationSafety:
 
         # Create multiple different tables
         table1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
-        table2 = pd.DataFrame({"X": [10, 20, 30], "Y": ["a", "b", "c"], "Z": [1.1, 2.2, 3.3]})
+        table2 = pd.DataFrame(
+            {"X": [10, 20, 30], "Y": ["a", "b", "c"], "Z": [1.1, 2.2, 3.3]}
+        )
         table3 = pd.DataFrame({"Model": ["m1", "m2"], "Score": [100, 200]})
 
         # Capture all tables
@@ -396,10 +446,12 @@ class TestGitHubIssueIntegrationSafety:
         huge_table = pd.DataFrame(
             {
                 "Very Long Column Name With Lots Of Text": [
-                    f"Very long value {i} with lots of descriptive text that goes on and on" for i in range(50)
+                    f"Very long value {i} with lots of descriptive text that goes on and on"
+                    for i in range(50)
                 ],
                 "Another Very Long Column Name": [
-                    f"More long text for row {i} with additional descriptive content" for i in range(50)
+                    f"More long text for row {i} with additional descriptive content"
+                    for i in range(50)
                 ],
                 "Third Column With Even Longer Name And More Content": [
                     f"Even more verbose text for entry {i}" for i in range(50)
@@ -420,7 +472,9 @@ class TestGitHubIssueIntegrationSafety:
                         "columns": list(huge_table.columns),
                         "data": huge_table.to_dict("records"),
                         "shape": huge_table.shape,
-                        "markdown": reporter._dataframe_to_markdown(huge_table.head(5)),  # Limit for URL
+                        "markdown": reporter._dataframe_to_markdown(
+                            huge_table.head(5)
+                        ),  # Limit for URL
                     }
                 },
             }
@@ -448,7 +502,9 @@ class TestGitHubIssueIntegrationSafety:
             print("✅ URL length is within safe browser limits")
 
         if url_length > 8192:
-            print("⚠️  URL exceeds 8192 character limit - likely to fail in most browsers")
+            print(
+                "⚠️  URL exceeds 8192 character limit - likely to fail in most browsers"
+            )
 
         # Verify URL is still properly formed despite length
         assert github_url.startswith("https://github.com/recallnet/beam/issues/new?")

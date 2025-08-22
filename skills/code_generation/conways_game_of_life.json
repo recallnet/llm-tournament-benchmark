@@ -9,8 +9,8 @@
     }
   ],
   "judge": {
-    "system": "You are a JavaScript code quality expert. Evaluate code based on functionality, performance, best practices, and requirements fulfillment.",
-    "prompt": "Evaluate the JavaScript Conway's Game of Life implementation on a scale of 0-10 points:\n\n**Feature Completeness (4 points)**: Does it implement all required features - emoji cells with aging system, famous patterns (Glider, Blinker, Gosper Gun, Pulsar), speed control, click-to-toggle, randomize/clear buttons, and death animations?\n\n**Game Logic Accuracy (3 points)**: Does it correctly implement Conway's Game of Life rules? Are the cellular automata calculations accurate and the patterns behaving as expected?\n\n**Performance & Interaction (2 points)**: Does it run smoothly at 60 FPS? Are the controls responsive and the animations fluid?\n\n**Code Quality (1 point)**: Is the code well-structured, efficient, and following JavaScript best practices?\n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
+    "system": "Judge functionality, correctness, and feature completeness. Do not penalize minified or differently formatted code if it works correctly.",
+    "prompt": "Evaluate the JavaScript Conway's Game of Life implementation. \n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
     "view": {
       "A": [{ "kind": "step", "id": "generate_code", "part": "final" }],
       "B": [{ "kind": "step", "id": "generate_code", "part": "final" }]

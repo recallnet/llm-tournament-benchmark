@@ -46,7 +46,9 @@ class TestJudgeCacheArchitectureSafety:
             )
 
         if f'Path("{judge_cache_dir}")' not in source:
-            pytest.fail(f"🚨 CRITICAL: summarize_tournaments.py doesn't use JudgeExecutor cache dir {judge_cache_dir}")
+            pytest.fail(
+                f"🚨 CRITICAL: summarize_tournaments.py doesn't use JudgeExecutor cache dir {judge_cache_dir}"
+            )
 
         print("✅ summarize_tournaments.py uses correct cache directory")
 
@@ -79,13 +81,17 @@ class TestJudgeCacheArchitectureSafety:
             assert new_cache.exists(), "New cache should exist after move"
 
             moved_files = list(new_cache.rglob("*.json"))
-            assert len(moved_files) == len(test_files), f"Data loss: expected {len(test_files)}, found {len(moved_files)}"
+            assert len(moved_files) == len(
+                test_files
+            ), f"Data loss: expected {len(test_files)}, found {len(moved_files)}"
 
             # Verify file contents preserved
             for moved_file in moved_files:
                 with open(moved_file) as f:
                     data = json.load(f)
-                assert "test" in data and data["test"] is True, "File content corrupted during move"
+                assert (
+                    "test" in data and data["test"] is True
+                ), "File content corrupted during move"
 
             print(f"✅ All {len(moved_files)} files preserved with correct content")
 
@@ -98,7 +104,10 @@ class TestJudgeCacheArchitectureSafety:
         expected_cache_dir = str(judge_executor.cache_dir)
 
         # Scripts that should use judge cache
-        scripts_to_check = ["scripts/run_tournaments.py", "scripts/summarize_tournaments.py"]
+        scripts_to_check = [
+            "scripts/run_tournaments.py",
+            "scripts/summarize_tournaments.py",
+        ]
 
         inconsistent_scripts = []
 
@@ -110,18 +119,32 @@ class TestJudgeCacheArchitectureSafety:
                 content = f.read()
 
             # Check for hardcoded old paths
-            old_paths = ["data/testonly/tournaments", '"data/testonly/tournaments"', "'data/tournaments'"]
+            old_paths = [
+                "data/testonly/tournaments",
+                '"data/testonly/tournaments"',
+                "'data/tournaments'",
+            ]
             for old_path in old_paths:
                 if old_path in content and "tournaments.json" not in content:
-                    inconsistent_scripts.append(f"{script_path}: contains hardcoded '{old_path}'")
+                    inconsistent_scripts.append(
+                        f"{script_path}: contains hardcoded '{old_path}'"
+                    )
 
             # Verify it uses the correct path
             expected_path = f'"{expected_cache_dir}"'
-            if expected_path not in content and expected_cache_dir != "data/testonly/tournaments":
-                inconsistent_scripts.append(f"{script_path}: missing expected path '{expected_path}'")
+            if (
+                expected_path not in content
+                and expected_cache_dir != "data/testonly/tournaments"
+            ):
+                inconsistent_scripts.append(
+                    f"{script_path}: missing expected path '{expected_path}'"
+                )
 
         if inconsistent_scripts:
-            error_msg = "🚨 CRITICAL: Scripts have inconsistent judge cache paths:\n" + "\n".join(inconsistent_scripts)
+            error_msg = (
+                "🚨 CRITICAL: Scripts have inconsistent judge cache paths:\n"
+                + "\n".join(inconsistent_scripts)
+            )
             pytest.fail(error_msg)
 
         print(f"✅ All scripts use consistent judge cache path: {expected_cache_dir}")
@@ -132,7 +155,7 @@ class TestJudgeCacheArchitectureSafety:
 
         with tempfile.TemporaryDirectory() as temp_dir:
             judge_executor = JudgeExecutor(Path(temp_dir))
-        actual_cache_dir = str(judge_executor.cache_dir)
+        str(judge_executor.cache_dir)
 
         # Find tests that hardcode the old path
         hardcoded_test_files = []
@@ -154,13 +177,17 @@ class TestJudgeCacheArchitectureSafety:
                     hardcoded_test_files.append(f"{test_file}: hardcodes '{old_path}'")
 
         if hardcoded_test_files:
-            print("🚨 CRITICAL: Tests hardcode judge cache paths and will break on architecture changes:")
+            print(
+                "🚨 CRITICAL: Tests hardcode judge cache paths and will break on architecture changes:"
+            )
             for issue in hardcoded_test_files[:10]:  # Show first 10
                 print(f"   {issue}")
             if len(hardcoded_test_files) > 10:
                 print(f"   ... and {len(hardcoded_test_files) - 10} more")
 
-            pytest.fail(f"Found {len(hardcoded_test_files)} tests with hardcoded judge cache paths")
+            pytest.fail(
+                f"Found {len(hardcoded_test_files)} tests with hardcoded judge cache paths"
+            )
 
         print("✅ No tests hardcode judge cache paths")
 
@@ -175,7 +202,9 @@ class TestJudgeCacheArchitectureSafety:
         # Check if judge cache exists
         if judge_cache_dir.exists():
             judge_files = list(judge_cache_dir.rglob("*.json"))
-            print(f"✅ Judge cache found: {len(judge_files)} files in {judge_cache_dir}")
+            print(
+                f"✅ Judge cache found: {len(judge_files)} files in {judge_cache_dir}"
+            )
         else:
             print(f"⚠️ Judge cache directory doesn't exist: {judge_cache_dir}")
 
@@ -208,12 +237,16 @@ class TestJudgeCacheArchitectureSafety:
 
         if judge_cache_dir.exists():
             cache_files = list(judge_cache_dir.rglob("*.json"))
-            print(f"✅ Current judge cache: {len(cache_files)} files in {judge_cache_dir}")
+            print(
+                f"✅ Current judge cache: {len(cache_files)} files in {judge_cache_dir}"
+            )
 
             if len(cache_files) == 0:
                 print("⚠️ WARNING: Judge cache is empty - may indicate recent data loss")
             elif len(cache_files) < 50:
-                print(f"⚠️ WARNING: Judge cache seems small ({len(cache_files)} files) - verify this is expected")
+                print(
+                    f"⚠️ WARNING: Judge cache seems small ({len(cache_files)} files) - verify this is expected"
+                )
             else:
                 print(f"✅ Judge cache appears healthy with {len(cache_files)} files")
         else:
@@ -228,7 +261,6 @@ class TestJudgeCacheArchitectureSafety:
             print("✅ No directory conflicts detected")
 
         # 3. Check test compatibility
-        failing_tests = []
         # This would normally run pytest programmatically, but for speed we'll check key indicators
 
         test_indicators = [
@@ -236,7 +268,7 @@ class TestJudgeCacheArchitectureSafety:
             ("JudgeExecutor.cache_dir", "Tests should use dynamic cache dir"),
         ]
 
-        for indicator, description in test_indicators:
+        for indicator, _description in test_indicators:
             test_files_with_indicator = []
             for test_file in Path("tests/").rglob("*.py"):
                 with open(test_file) as f:
@@ -244,7 +276,9 @@ class TestJudgeCacheArchitectureSafety:
                         test_files_with_indicator.append(str(test_file))
 
             if indicator == "data/testonly/tournaments" and test_files_with_indicator:
-                print(f"⚠️ {len(test_files_with_indicator)} test files may need updates for new architecture")
+                print(
+                    f"⚠️ {len(test_files_with_indicator)} test files may need updates for new architecture"
+                )
 
         print("✅ Data loss prevention checklist completed")
 

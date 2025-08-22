@@ -15,15 +15,32 @@ class TestSafeFinalCoverage:
         # Test actual behavior of current implementation
         test_cases = [
             (2, 1),  # 2 models need 1 round
-            (3, 2),  # 3 models: min(3-1, max(3, ceil(log2(3)))) = min(2, max(3, 2)) = min(2, 3) = 2
-            (4, 3),  # 4 models: min(4-1, max(3, ceil(log2(4)))) = min(3, max(3, 2)) = min(3, 3) = 3
-            (5, 3),  # 5 models: min(5-1, max(3, ceil(log2(5)))) = min(4, max(3, 3)) = min(4, 3) = 3
-            (8, 3),  # 8 models: min(8-1, max(3, ceil(log2(8)))) = min(7, max(3, 3)) = min(7, 3) = 3
-            (16, 4),  # 16 models: min(16-1, max(3, ceil(log2(16)))) = min(15, max(3, 4)) = min(15, 4) = 4
+            (
+                3,
+                2,
+            ),  # 3 models: min(3-1, max(3, ceil(log2(3)))) = min(2, max(3, 2)) = min(2, 3) = 2
+            (
+                4,
+                3,
+            ),  # 4 models: min(4-1, max(3, ceil(log2(4)))) = min(3, max(3, 2)) = min(3, 3) = 3
+            (
+                5,
+                3,
+            ),  # 5 models: min(5-1, max(3, ceil(log2(5)))) = min(4, max(3, 3)) = min(4, 3) = 3
+            (
+                8,
+                3,
+            ),  # 8 models: min(8-1, max(3, ceil(log2(8)))) = min(7, max(3, 3)) = min(7, 3) = 3
+            (
+                16,
+                4,
+            ),  # 16 models: min(16-1, max(3, ceil(log2(16)))) = min(15, max(3, 4)) = min(15, 4) = 4
         ]
 
         for num_models, expected_rounds in test_cases:
-            models = [{"id": f"model_{i}", "name": f"Model {i}"} for i in range(num_models)]
+            models = [
+                {"id": f"model_{i}", "name": f"Model {i}"} for i in range(num_models)
+            ]
             tournament = SwissTournament("skill_1", "eval_1", models)
 
             calculated_rounds = tournament._calculate_rounds_needed()
@@ -45,7 +62,10 @@ class TestSafeFinalCoverage:
     def test_swiss_tournament_edge_case_pairings(self):
         """Test Swiss tournament handles edge cases in pairing generation."""
         # Test with 2 models (minimum)
-        models = [{"id": "model_a", "name": "Model A"}, {"id": "model_b", "name": "Model B"}]
+        models = [
+            {"id": "model_a", "name": "Model A"},
+            {"id": "model_b", "name": "Model B"},
+        ]
         tournament = SwissTournament("skill_1", "eval_1", models)
 
         pairings = tournament._get_pairings_for_round(1)
@@ -57,9 +77,15 @@ class TestSafeFinalCoverage:
         match = TournamentMatch("model_a", "model_b", "eval_1", "skill_1")
 
         # Test scenario: Multiple judges with clear majority
-        match.add_judge_result("judge_1", "A", [{"role": "user", "content": "msg1"}], "A is better")
-        match.add_judge_result("judge_2", "A", [{"role": "user", "content": "msg2"}], "A wins")
-        match.add_judge_result("judge_3", "B", [{"role": "user", "content": "msg3"}], "B is good")
+        match.add_judge_result(
+            "judge_1", "A", [{"role": "user", "content": "msg1"}], "A is better"
+        )
+        match.add_judge_result(
+            "judge_2", "A", [{"role": "user", "content": "msg2"}], "A wins"
+        )
+        match.add_judge_result(
+            "judge_3", "B", [{"role": "user", "content": "msg3"}], "B is good"
+        )
 
         result = match.calculate_result()
         assert result == "A"  # A should win with 2/3 votes
@@ -82,13 +108,18 @@ class TestSafeFinalCoverage:
 
             # Should handle non-existent directory gracefully
             with patch("builtins.print"):
-                executor.cleanup_invalid_match_cache(valid_models, valid_judges, valid_evals)
+                executor.cleanup_invalid_match_cache(
+                    valid_models, valid_judges, valid_evals
+                )
 
             # Should complete without error
 
     def test_tournament_serialization_with_matches(self):
         """Test tournament serialization includes match data."""
-        models = [{"id": "model_a", "name": "Model A"}, {"id": "model_b", "name": "Model B"}]
+        models = [
+            {"id": "model_a", "name": "Model A"},
+            {"id": "model_b", "name": "Model B"},
+        ]
         tournament = SwissTournament("skill_1", "eval_1", models)
 
         # Add completed match
@@ -182,7 +213,11 @@ class TestSafeFinalCoverage:
             cache_path = executor._get_judge_cache_path(match, "judge_1", "test_key")
 
             # Test save then load
-            test_data = {"vote": "A", "explanation": "A is better", "metadata": {"test": True}}
+            test_data = {
+                "vote": "A",
+                "explanation": "A is better",
+                "metadata": {"test": True},
+            }
             executor._save_judge_cache(cache_path, test_data)
 
             loaded_data = executor._load_judge_cache(cache_path)

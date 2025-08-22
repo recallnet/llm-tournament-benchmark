@@ -55,7 +55,9 @@ class TestCachingBulletproofSafety:
                 print(f"✅ Cache validation: {valid_samples}/{sample_size} files valid")
 
                 if valid_samples < sample_size:
-                    pytest.fail(f"Cache corruption detected: only {valid_samples}/{sample_size} files valid")
+                    pytest.fail(
+                        f"Cache corruption detected: only {valid_samples}/{sample_size} files valid"
+                    )
             else:
                 print("⚠️ Cache directory exists but is empty")
         else:
@@ -67,10 +69,16 @@ class TestCachingBulletproofSafety:
             conv_files = list(conversation_cache.rglob("*.json"))
             print(f"📊 Conversation cache: {len(conv_files)} files")
 
-            if len(conv_files) > 0 and (not judge_cache_dir.exists() or len(cache_files) == 0):
-                print("❌ CRITICAL: Conversation cache exists but judge cache is empty/missing")
+            if len(conv_files) > 0 and (
+                not judge_cache_dir.exists() or len(cache_files) == 0
+            ):
+                print(
+                    "❌ CRITICAL: Conversation cache exists but judge cache is empty/missing"
+                )
                 print("This indicates recent data loss or incomplete pipeline state")
-                pytest.fail("Cache inconsistency: conversation cache exists but judge cache missing")
+                pytest.fail(
+                    "Cache inconsistency: conversation cache exists but judge cache missing"
+                )
 
         print("✅ Pre-pipeline cache audit completed")
 
@@ -86,7 +94,10 @@ class TestCachingBulletproofSafety:
 
         # Create test cache if none exists
         test_cache_created = False
-        if not judge_cache_dir.exists() or len(list(judge_cache_dir.rglob("*.json"))) == 0:
+        if (
+            not judge_cache_dir.exists()
+            or len(list(judge_cache_dir.rglob("*.json"))) == 0
+        ):
             print("Creating minimal test cache for destruction test...")
 
             test_skill_dir = judge_cache_dir / "test_skill"
@@ -122,7 +133,9 @@ class TestCachingBulletproofSafety:
 
             try:
                 # Test cleanup (should not delete valid cache)
-                judge_executor.cleanup_invalid_match_cache(mock_models, mock_judges, mock_evals)
+                judge_executor.cleanup_invalid_match_cache(
+                    mock_models, mock_judges, mock_evals
+                )
 
                 # Verify cache still exists
                 remaining_cache_files = list(judge_cache_dir.rglob("*.json"))
@@ -130,11 +143,18 @@ class TestCachingBulletproofSafety:
 
                 if test_cache_created:
                     # Our test cache should still exist
-                    test_file_exists = any("test_cache_safety.json" in str(f) for f in remaining_cache_files)
+                    test_file_exists = any(
+                        "test_cache_safety.json" in str(f)
+                        for f in remaining_cache_files
+                    )
                     if not test_file_exists:
-                        pytest.fail("Cleanup operation deleted test cache file - cache destruction detected!")
+                        pytest.fail(
+                            "Cleanup operation deleted test cache file - cache destruction detected!"
+                        )
 
-                print(f"✅ Cleanup preserved cache: {initial_count} → {remaining_count} files")
+                print(
+                    f"✅ Cleanup preserved cache: {initial_count} → {remaining_count} files"
+                )
 
             except Exception as e:
                 print(f"⚠️ Cleanup test failed: {e}")
@@ -142,14 +162,18 @@ class TestCachingBulletproofSafety:
         # Verify cache directory structure is correct
         tournaments_json = Path("data/testonly/tournaments.json")
         if str(judge_cache_dir) == str(tournaments_json.parent):
-            pytest.fail(f"CRITICAL: Judge cache dir {judge_cache_dir} conflicts with tournaments.json location!")
+            pytest.fail(
+                f"CRITICAL: Judge cache dir {judge_cache_dir} conflicts with tournaments.json location!"
+            )
 
         print("✅ Cache destruction prevention test passed")
 
         # Clean up test cache if we created it
         if test_cache_created:
             try:
-                test_cache_file = judge_cache_dir / "test_skill" / "test_cache_safety.json"
+                test_cache_file = (
+                    judge_cache_dir / "test_skill" / "test_cache_safety.json"
+                )
                 if test_cache_file.exists():
                     test_cache_file.unlink()
                 test_skill_dir = judge_cache_dir / "test_skill"
@@ -183,7 +207,9 @@ class TestCachingBulletproofSafety:
             expected_path = f'Path("{judge_cache_dir}")'
 
             if expected_path not in source:
-                pytest.fail(f"summarize_tournaments.py doesn't use expected cache path: {expected_path}")
+                pytest.fail(
+                    f"summarize_tournaments.py doesn't use expected cache path: {expected_path}"
+                )
 
             print(f"✅ summarize_tournaments.py uses {judge_cache_dir}")
 
@@ -204,7 +230,9 @@ class TestCachingBulletproofSafety:
         # Test 4: No conflicts with tournaments.json
         tournaments_json = Path("data/testonly/tournaments.json")
         if str(judge_cache_dir) == str(tournaments_json.parent):
-            pytest.fail("CRITICAL: Cache directory conflicts with tournaments.json location!")
+            pytest.fail(
+                "CRITICAL: Cache directory conflicts with tournaments.json location!"
+            )
 
         print("✅ All components compatible with cache architecture")
 
@@ -249,10 +277,14 @@ class TestCachingBulletproofSafety:
                 backup_files = list(backup_dir.rglob("*.json"))
                 original_files = list(judge_cache_dir.rglob("*.json"))
 
-                print(f"✅ Backup created: {len(original_files)} → {len(backup_files)} files")
+                print(
+                    f"✅ Backup created: {len(original_files)} → {len(backup_files)} files"
+                )
 
                 if len(backup_files) != len(original_files):
-                    pytest.fail(f"Backup incomplete: {len(original_files)} → {len(backup_files)}")
+                    pytest.fail(
+                        f"Backup incomplete: {len(original_files)} → {len(backup_files)}"
+                    )
 
             # Test restore
             restore_dir = Path(temp_dir) / "cache_restore"
@@ -268,7 +300,9 @@ class TestCachingBulletproofSafety:
                         data = json.load(f)
 
                     if "test_id" not in data["metadata"]:
-                        pytest.fail(f"Backup/restore corrupted file content: {restored_file}")
+                        pytest.fail(
+                            f"Backup/restore corrupted file content: {restored_file}"
+                        )
 
             print("✅ Backup/restore procedures work correctly")
 
@@ -325,7 +359,7 @@ class TestCachingBulletproofSafety:
                 with open(test_cache_file) as f:
                     data = json.load(f)
 
-                if data["metadata"]["failure_test"] != True:
+                if data["metadata"]["failure_test"] is not True:
                     pytest.fail(f"Cache file corrupted after {scenario}")
 
             except Exception as e:
@@ -354,7 +388,9 @@ class TestCachingBulletproofSafety:
         if judge_cache_dir.exists():
             cache_files = list(judge_cache_dir.rglob("*.json"))
 
-        print(f"1. ✅ Current cache audit: {len(cache_files)} files in {judge_cache_dir}")
+        print(
+            f"1. ✅ Current cache audit: {len(cache_files)} files in {judge_cache_dir}"
+        )
 
         # Check 2: Component consistency
         components = ["JudgeExecutor", "summarize_tournaments.py", "Snakemake wrapper"]
@@ -382,14 +418,19 @@ class TestCachingBulletproofSafety:
         except Exception as e:
             print(f"⚠️ Component consistency check error: {e}")
 
-        print(f"2. ✅ Component consistency: {consistent_components}/{len(components)} components consistent")
+        print(
+            f"2. ✅ Component consistency: {consistent_components}/{len(components)} components consistent"
+        )
 
         # Check 3: Test compatibility
         hardcoded_tests = 0
         for test_file in Path("tests/").rglob("*.py"):
             with open(test_file) as f:
                 content = f.read()
-            if '"data/testonly/tournaments"' in content and "tournaments.json" not in content:
+            if (
+                '"data/testonly/tournaments"' in content
+                and "tournaments.json" not in content
+            ):
                 hardcoded_tests += 1
 
         if hardcoded_tests > 0:
@@ -398,7 +439,6 @@ class TestCachingBulletproofSafety:
             print("3. ✅ Test compatibility: All tests use dynamic paths")
 
         # Check 4: Backup exists
-        backup_exists = False
         # Check if user has backups (we can't verify this automatically)
         print("4. ⚠️ Backup verification: Manual verification required")
 
@@ -407,7 +447,9 @@ class TestCachingBulletproofSafety:
         conflicts = str(judge_cache_dir) == str(tournaments_json.parent)
 
         if conflicts:
-            print("5. ❌ Directory conflicts: Judge cache conflicts with tournaments.json!")
+            print(
+                "5. ❌ Directory conflicts: Judge cache conflicts with tournaments.json!"
+            )
             pytest.fail("Directory conflict detected")
         else:
             print("5. ✅ Directory conflicts: None detected")
@@ -427,7 +469,9 @@ class TestCachingBulletproofSafety:
         if safety_score < 4:
             print("❌ ARCHITECTURE CHANGE NOT SAFE - Fix issues before proceeding")
             if hardcoded_tests > 0:
-                pytest.fail(f"Fix {hardcoded_tests} hardcoded test paths before architecture changes")
+                pytest.fail(
+                    f"Fix {hardcoded_tests} hardcoded test paths before architecture changes"
+                )
             if conflicts:
                 pytest.fail("Fix directory conflicts before architecture changes")
             if consistent_components < 2:

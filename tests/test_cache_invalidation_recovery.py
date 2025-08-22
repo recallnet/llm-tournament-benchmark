@@ -42,14 +42,22 @@ class TestCacheInvalidationRecovery:
             path = Path(file_path)
             if path.exists():
                 if path.is_file():
-                    states[file_path] = {"exists": True, "mtime": path.stat().st_mtime, "size": path.stat().st_size}
+                    states[file_path] = {
+                        "exists": True,
+                        "mtime": path.stat().st_mtime,
+                        "size": path.stat().st_size,
+                    }
                 elif path.is_dir():
                     # For directories, get aggregate info
                     files = list(path.rglob("*"))
                     file_files = [f for f in files if f.is_file()]
                     states[file_path] = {
                         "exists": True,
-                        "mtime": max(f.stat().st_mtime for f in file_files) if file_files else 0,
+                        "mtime": (
+                            max(f.stat().st_mtime for f in file_files)
+                            if file_files
+                            else 0
+                        ),
                         "size": sum(f.stat().st_size for f in file_files),
                         "file_count": len(file_files),
                     }
@@ -79,9 +87,15 @@ class TestCacheInvalidationRecovery:
         print(f"   ❌ Missing: {len(missing_files)}")
 
         # Check specific categories
-        missing_inputs = [f for f in self.pipeline_files["inputs"] if not states[f]["exists"]]
-        missing_markers = [f for f in self.pipeline_files["cache_markers"] if not states[f]["exists"]]
-        missing_outputs = [f for f in self.pipeline_files["outputs"] if not states[f]["exists"]]
+        missing_inputs = [
+            f for f in self.pipeline_files["inputs"] if not states[f]["exists"]
+        ]
+        missing_markers = [
+            f for f in self.pipeline_files["cache_markers"] if not states[f]["exists"]
+        ]
+        missing_outputs = [
+            f for f in self.pipeline_files["outputs"] if not states[f]["exists"]
+        ]
 
         print(f"   Missing inputs: {len(missing_inputs)}")
         print(f"   Missing cache markers: {len(missing_markers)}")
@@ -106,7 +120,9 @@ class TestCacheInvalidationRecovery:
 
         # If markers exist but no outputs, tournaments failed
         if not missing_markers and missing_outputs:
-            inconsistencies.append("Conversation cache complete but tournaments missing")
+            inconsistencies.append(
+                "Conversation cache complete but tournaments missing"
+            )
 
         # If outputs exist without inputs, impossible state
         if not missing_outputs and missing_inputs:
@@ -129,7 +145,9 @@ class TestCacheInvalidationRecovery:
 
         # This test documents the current state - it might fail until we fix the pipeline
         if missing_outputs and not missing_markers:
-            pytest.fail("Pipeline in broken state: cache markers exist but outputs missing")
+            pytest.fail(
+                "Pipeline in broken state: cache markers exist but outputs missing"
+            )
 
     def test_tournaments_json_only_invalidation(self):
         """Test scenario where only tournaments.json is missing/invalid."""
@@ -150,7 +168,9 @@ class TestCacheInvalidationRecovery:
 
         if not tournaments_exists and (summaries_exists or ratings_exists):
             print("   🎯 SCENARIO: Only tournaments.json is missing")
-            print("   Expected behavior: Pipeline should regenerate tournaments.json and downstream")
+            print(
+                "   Expected behavior: Pipeline should regenerate tournaments.json and downstream"
+            )
 
             # Check if conversation cache is intact
             conversations_dir = Path("data/testonly/conversations")
@@ -159,7 +179,9 @@ class TestCacheInvalidationRecovery:
                 print(f"   Conversation cache: {len(conv_files)} files available")
 
                 if len(conv_files) > 0:
-                    print("   ✅ Conversation cache available for tournament regeneration")
+                    print(
+                        "   ✅ Conversation cache available for tournament regeneration"
+                    )
 
                     # Test what Snakemake would do
                     cache_markers = self.pipeline_files["cache_markers"]
@@ -167,10 +189,14 @@ class TestCacheInvalidationRecovery:
 
                     if all_markers_exist:
                         print("   ✅ All cache markers exist")
-                        print("   🎯 Pipeline should regenerate tournaments.json → summaries → ratings")
+                        print(
+                            "   🎯 Pipeline should regenerate tournaments.json → summaries → ratings"
+                        )
 
                         # This represents the ideal fix
-                        pytest.fail("tournaments.json missing with valid cache - pipeline should regenerate")
+                        pytest.fail(
+                            "tournaments.json missing with valid cache - pipeline should regenerate"
+                        )
 
     def test_full_cache_invalidation_scenario(self):
         """Test scenario where all caches need to be invalidated and regenerated."""
@@ -218,11 +244,15 @@ class TestCacheInvalidationRecovery:
 
                 missing_skills = set(expected_skills) - skills_with_cache
                 if missing_skills:
-                    print(f"   ❌ Skills missing conversation cache: {sorted(missing_skills)}")
+                    print(
+                        f"   ❌ Skills missing conversation cache: {sorted(missing_skills)}"
+                    )
                 else:
                     print("   ✅ All skills have conversation cache")
 
-        print("   🎯 Full regeneration test: Pipeline should be able to regenerate all outputs")
+        print(
+            "   🎯 Full regeneration test: Pipeline should be able to regenerate all outputs"
+        )
 
     def test_partial_cache_invalidation_scenarios(self):
         """Test various partial cache invalidation scenarios."""
@@ -231,7 +261,9 @@ class TestCacheInvalidationRecovery:
         scenarios = [
             {
                 "name": "Missing one cache marker",
-                "missing": ["data/testonly/conversations_cache_thedrummer_unslopnemo-12b.done"],
+                "missing": [
+                    "data/testonly/conversations_cache_thedrummer_unslopnemo-12b.done"
+                ],
                 "expected": "Should regenerate conversations for one model and downstream",
             },
             {
@@ -284,11 +316,17 @@ class TestCacheInvalidationRecovery:
                     "data/testonly/loaded_judges.json",
                     "data/testonly/loaded_skills.json",
                 ],
-                "outputs": ["data/testonly/conversations_cache_*.done", "data/testonly/conversations/"],
+                "outputs": [
+                    "data/testonly/conversations_cache_*.done",
+                    "data/testonly/conversations/",
+                ],
             },
             {
                 "rule": "run_tournaments",
-                "inputs": ["data/testonly/conversations_cache_*.done", "data/testonly/loaded_*.json"],
+                "inputs": [
+                    "data/testonly/conversations_cache_*.done",
+                    "data/testonly/loaded_*.json",
+                ],
                 "outputs": ["data/testonly/tournaments.json"],
             },
             {
@@ -369,7 +407,10 @@ class TestCacheInvalidationRecovery:
         invalidation_groups = [
             {
                 "name": "Conversation Phase",
-                "files": ["data/testonly/conversations/", "data/testonly/conversations_cache_*.done"],
+                "files": [
+                    "data/testonly/conversations/",
+                    "data/testonly/conversations_cache_*.done",
+                ],
                 "description": "If conversations are invalid, remove all conversation cache",
             },
             {
@@ -382,7 +423,11 @@ class TestCacheInvalidationRecovery:
                 ],
                 "description": "If tournaments are invalid, remove all tournament results",
             },
-            {"name": "Complete Pipeline", "files": ["*"], "description": "Nuclear option: remove all generated files"},
+            {
+                "name": "Complete Pipeline",
+                "files": ["*"],
+                "description": "Nuclear option: remove all generated files",
+            },
         ]
 
         print(f"   📊 Defined {len(invalidation_groups)} atomic invalidation groups:")
@@ -394,11 +439,17 @@ class TestCacheInvalidationRecovery:
 
         # Test current state against atomic groups
         current_state = self.get_file_states(
-            ["data/testonly/tournaments.json", "data/testonly/tournament_summaries.json", "data/testonly/skill_ratings.json"]
+            [
+                "data/testonly/tournaments.json",
+                "data/testonly/tournament_summaries.json",
+                "data/testonly/skill_ratings.json",
+            ]
         )
 
         tournaments_exists = current_state["data/testonly/tournaments.json"]["exists"]
-        summaries_exists = current_state["data/testonly/tournament_summaries.json"]["exists"]
+        summaries_exists = current_state["data/testonly/tournament_summaries.json"][
+            "exists"
+        ]
         ratings_exists = current_state["data/testonly/skill_ratings.json"]["exists"]
 
         # Check if Tournament Phase group is in inconsistent state
@@ -413,7 +464,9 @@ class TestCacheInvalidationRecovery:
             print("   🎯 SOLUTION: Implement atomic invalidation for Tournament Phase")
             print("   Either ALL files in group exist or NONE exist")
 
-            pytest.fail("Tournament phase files in non-atomic state - need atomic invalidation")
+            pytest.fail(
+                "Tournament phase files in non-atomic state - need atomic invalidation"
+            )
 
 
 if __name__ == "__main__":

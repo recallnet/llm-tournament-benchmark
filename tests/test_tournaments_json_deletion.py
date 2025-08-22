@@ -49,17 +49,28 @@ class TestTournamentsJsonDeletion:
                     for pattern in deletion_patterns:
                         if re.search(pattern, line, re.IGNORECASE):
                             potential_deletions.append(
-                                {"file": script_path, "line": i, "content": line.strip(), "pattern": pattern}
+                                {
+                                    "file": script_path,
+                                    "line": i,
+                                    "content": line.strip(),
+                                    "pattern": pattern,
+                                }
                             )
 
         print(f"   Found {len(potential_deletions)} potential deletion points:")
         for deletion in potential_deletions:
-            print(f"   📁 {deletion['file']}:{deletion['line']} - {deletion['content']}")
+            print(
+                f"   📁 {deletion['file']}:{deletion['line']} - {deletion['content']}"
+            )
 
         # Check if tournaments.json is explicitly mentioned
-        tournaments_deletions = [d for d in potential_deletions if "tournament" in d["content"].lower()]
+        tournaments_deletions = [
+            d for d in potential_deletions if "tournament" in d["content"].lower()
+        ]
         if tournaments_deletions:
-            print(f"   🚨 Found {len(tournaments_deletions)} tournament-specific deletions")
+            print(
+                f"   🚨 Found {len(tournaments_deletions)} tournament-specific deletions"
+            )
             for td in tournaments_deletions:
                 print(f"      ⚠️  {td['file']}:{td['line']} - {td['content']}")
 
@@ -70,7 +81,9 @@ class TestTournamentsJsonDeletion:
         # Check current state of tournament-related files
         tournament_files = {
             "tournaments.json": Path("data/testonly/tournaments.json"),
-            "tournament_summaries.json": Path("data/testonly/tournament_summaries.json"),
+            "tournament_summaries.json": Path(
+                "data/testonly/tournament_summaries.json"
+            ),
             "skill_ratings.json": Path("data/testonly/skill_ratings.json"),
             "tournaments_cache_dir": Path("data/testonly/tournaments/"),
         }
@@ -82,7 +95,11 @@ class TestTournamentsJsonDeletion:
                 mtime = path.stat().st_mtime
                 size = path.stat().st_size
             elif exists and path.is_dir():
-                mtime = max(f.stat().st_mtime for f in path.rglob("*") if f.is_file()) if any(path.rglob("*")) else 0
+                mtime = (
+                    max(f.stat().st_mtime for f in path.rglob("*") if f.is_file())
+                    if any(path.rglob("*"))
+                    else 0
+                )
                 size = sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
             else:
                 mtime = 0
@@ -90,7 +107,9 @@ class TestTournamentsJsonDeletion:
 
             current_state[name] = {"exists": exists, "mtime": mtime, "size": size}
 
-            print(f"   {name}: {'✅' if exists else '❌'} (size: {size}, mtime: {mtime})")
+            print(
+                f"   {name}: {'✅' if exists else '❌'} (size: {size}, mtime: {mtime})"
+            )
 
         # Check for inconsistent state
         tournaments_exists = current_state["tournaments.json"]["exists"]
@@ -102,17 +121,23 @@ class TestTournamentsJsonDeletion:
 
         # tournaments.json should exist if summaries exist (dependency chain)
         if summaries_exists and not tournaments_exists:
-            inconsistencies.append("tournament_summaries.json exists but tournaments.json is missing")
+            inconsistencies.append(
+                "tournament_summaries.json exists but tournaments.json is missing"
+            )
 
         # skill_ratings.json should not exist if tournaments.json is missing
         if ratings_exists and not tournaments_exists:
-            inconsistencies.append("skill_ratings.json exists but tournaments.json is missing")
+            inconsistencies.append(
+                "skill_ratings.json exists but tournaments.json is missing"
+            )
 
         # If judge cache exists, tournaments.json should exist
         if cache_exists and not tournaments_exists:
             cache_files = list(Path("data/testonly/tournaments/").rglob("*.json"))
             if cache_files:
-                inconsistencies.append(f"Judge cache has {len(cache_files)} files but tournaments.json is missing")
+                inconsistencies.append(
+                    f"Judge cache has {len(cache_files)} files but tournaments.json is missing"
+                )
 
         if inconsistencies:
             print("   🚨 INCONSISTENT STATE DETECTED:")
@@ -135,9 +160,6 @@ class TestTournamentsJsonDeletion:
         judge_executor = JudgeExecutor()
 
         # Mock current data to see what it would delete
-        mock_models = [{"id": "test_model"}]
-        mock_judges = [{"id": "test_judge"}]
-        mock_evals = [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]
 
         # Check if this function could affect tournaments.json
         tournaments_path = Path("data/testonly/tournaments.json")
@@ -150,24 +172,33 @@ class TestTournamentsJsonDeletion:
         print(f"      Cleanup targets directory: {cache_dir}")
 
         if cache_dir == Path("data/testonly/tournaments"):
-            print("      🚨 WARNING: Cleanup function targets same directory as tournaments cache!")
+            print(
+                "      🚨 WARNING: Cleanup function targets same directory as tournaments cache!"
+            )
             print("      This could explain why tournaments.json gets deleted")
 
         # Check if cleanup could remove the wrong files
         if cache_dir.exists():
             all_files = list(cache_dir.rglob("*"))
             json_files = [f for f in all_files if f.suffix == ".json"]
-            print(f"      Files in cache directory: {len(all_files)} total, {len(json_files)} JSON files")
+            print(
+                f"      Files in cache directory: {len(all_files)} total, {len(json_files)} JSON files"
+            )
 
             # Look for files that could be confused with tournaments.json
             suspicious_files = [
                 f
                 for f in json_files
                 if "tournament" in f.name
-                and not any(skill in str(f.parent) for skill in ["harm_avoidance", "code_generation", "empathy"])
+                and not any(
+                    skill in str(f.parent)
+                    for skill in ["harm_avoidance", "code_generation", "empathy"]
+                )
             ]
             if suspicious_files:
-                print(f"      🚨 Suspicious files that could be mistakenly deleted: {suspicious_files}")
+                print(
+                    f"      🚨 Suspicious files that could be mistakenly deleted: {suspicious_files}"
+                )
 
     def test_snakemake_rule_output_deletion(self):
         """Test if Snakemake rules delete their own outputs on failure."""
@@ -184,20 +215,37 @@ class TestTournamentsJsonDeletion:
             log_files = list(snakemake_log_dir.glob("*.snakemake.log"))
             if log_files:
                 # Check recent logs for deletion patterns
-                recent_logs = sorted(log_files, key=lambda f: f.stat().st_mtime)[-3:]  # Last 3 logs
+                recent_logs = sorted(log_files, key=lambda f: f.stat().st_mtime)[
+                    -3:
+                ]  # Last 3 logs
 
                 deletion_evidence = []
                 for log_file in recent_logs:
                     with open(log_file) as f:
                         log_content = f.read()
 
-                    deletion_keywords = ["removing", "deleting", "unlink", "tournaments.json"]
+                    deletion_keywords = [
+                        "removing",
+                        "deleting",
+                        "unlink",
+                        "tournaments.json",
+                    ]
                     for keyword in deletion_keywords:
                         if keyword in log_content.lower():
                             lines = log_content.split("\n")
-                            matching_lines = [line for line in lines if keyword.lower() in line.lower()]
+                            matching_lines = [
+                                line
+                                for line in lines
+                                if keyword.lower() in line.lower()
+                            ]
                             for line in matching_lines:
-                                deletion_evidence.append({"log_file": log_file.name, "keyword": keyword, "line": line.strip()})
+                                deletion_evidence.append(
+                                    {
+                                        "log_file": log_file.name,
+                                        "keyword": keyword,
+                                        "line": line.strip(),
+                                    }
+                                )
 
                 if deletion_evidence:
                     print("   🚨 Found deletion evidence in logs:")
@@ -210,7 +258,9 @@ class TestTournamentsJsonDeletion:
 
         # Test hypothesis: Snakemake deletes output files when rules fail
         print("   💡 HYPOTHESIS: Snakemake may delete output files on rule failure")
-        print("   This would explain why tournaments.json disappears but dependencies remain")
+        print(
+            "   This would explain why tournaments.json disappears but dependencies remain"
+        )
 
     def test_prevent_silent_tournament_failures(self):
         """Test that tournament generation failures are not silent."""
@@ -243,12 +293,16 @@ class TestTournamentsJsonDeletion:
                 # We won't actually run it (could take forever), but we can test the setup
                 try:
                     # Just test if the function exists and is callable
-                    assert callable(main_with_cache_dir), "main_with_cache_dir should be callable"
+                    assert callable(
+                        main_with_cache_dir
+                    ), "main_with_cache_dir should be callable"
                     print("   ✅ main_with_cache_dir function is available")
                 except Exception as e:
                     print(f"   ❌ main_with_cache_dir has issues: {e}")
 
-                pytest.fail("tournaments.json is missing but inputs exist - should regenerate")
+                pytest.fail(
+                    "tournaments.json is missing but inputs exist - should regenerate"
+                )
             else:
                 print(f"   ❌ Missing required inputs: {missing_inputs}")
         else:

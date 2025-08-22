@@ -29,10 +29,10 @@ def test_conversation_generation_speed():
     print("🧪 Testing conversation generation performance limits...")
 
     # Load required data
-    with open("data/testonly/loaded_models.json") as f:
+    with open("data/testonly/loaded_models.json", encoding="utf-8") as f:
         models = json.load(f)["models"]
 
-    with open("data/testonly/loaded_skills.json") as f:
+    with open("data/testonly/loaded_skills.json", encoding="utf-8") as f:
         skills = json.load(f)["evals"]
 
     total_conversations = len(models) * len(skills)
@@ -53,7 +53,9 @@ def test_conversation_generation_speed():
         return True
 
     print("❌ PERFORMANCE ISSUE: Conversation generation taking too long")
-    print(f"💡 Expected time: ~{total_conversations * 3}s ({total_conversations * 3 / 60:.1f}m)")
+    print(
+        f"💡 Expected time: ~{total_conversations * 3}s ({total_conversations * 3 / 60:.1f}m)"
+    )
     print("🚨 Actual time: >10 minutes (UNACCEPTABLE)")
 
     # This should be a hard failure
@@ -68,10 +70,10 @@ def test_single_conversation_timeout():
         from execute_conversations import execute_single_conversation
 
         # Load test data
-        with open("data/testonly/loaded_models.json") as f:
+        with open("data/testonly/loaded_models.json", encoding="utf-8") as f:
             models = json.load(f)["models"]
 
-        with open("data/testonly/loaded_skills.json") as f:
+        with open("data/testonly/loaded_skills.json", encoding="utf-8") as f:
             skills = json.load(f)["evals"]
 
         # Test first model/eval combination
@@ -88,7 +90,9 @@ def test_single_conversation_timeout():
 
         try:
             # This should complete quickly or timeout
-            conversation_result = execute_single_conversation(test_model, test_skill, {})  # empty cache
+            conversation_result = execute_single_conversation(
+                test_model, test_skill, {}
+            )  # empty cache
 
             elapsed = time.time() - start_time
             signal.alarm(0)  # Cancel timeout
@@ -104,7 +108,9 @@ def test_single_conversation_timeout():
                 print("❌ Conversation returned 0 steps")
                 return False
 
-            print(f"✅ Valid conversation with {len(conversation_result['steps'])} steps")
+            print(
+                f"✅ Valid conversation with {len(conversation_result['steps'])} steps"
+            )
             return True
 
         except TimeoutError:

@@ -39,11 +39,17 @@ if __name__ == "__main__":
         print(f"   Skills processed: {restart_status['tournament_skills']}")
         # Still need to call main function to generate output file if missing
         if not Path(output_file).exists():
-            main_with_cache_dir_data_driven(conversations_dir, models_file, judges_file, skills_file, output_file)
+            main_with_cache_dir_data_driven(
+                conversations_dir, models_file, judges_file, skills_file, output_file
+            )
     else:
-        print(f"⚠️  Tournament restart needed: {restart_status['total_unprocessed']} skills unprocessed")
+        print(
+            f"⚠️  Tournament restart needed: {restart_status['total_unprocessed']} skills unprocessed"
+        )
         print(f"   Unprocessed skills: {restart_status['unprocessed_skills']}")
-        print(f"   Processing tournaments for all skills with conversations...")
+        print("   Processing tournaments for all skills with conversations...")
 
         # Run data-driven tournament generation (processes all skills with conversations)
-        main_with_cache_dir_data_driven(conversations_dir, models_file, judges_file, skills_file, output_file)
+        main_with_cache_dir_data_driven(
+            conversations_dir, models_file, judges_file, skills_file, output_file
+        )

@@ -22,7 +22,9 @@ class TestSnakemakeRuleFailure:
         # If it doesn't exist, the rule failed
         if not tournaments_file.exists():
             print("   🚨 BUG CONFIRMED: run_tournaments rule failed silently")
-            print("   Snakemake 'run:' directive doesn't properly handle Python exceptions")
+            print(
+                "   Snakemake 'run:' directive doesn't properly handle Python exceptions"
+            )
 
             # Check if we can find evidence of the failure
             cache_markers = [
@@ -36,10 +38,16 @@ class TestSnakemakeRuleFailure:
             print(f"   All input dependencies exist: {all_markers_exist}")
 
             if all_markers_exist:
-                print("   🎯 SOLUTION: Replace 'run:' directive with 'script:' directive")
-                print("   This will properly handle Python exceptions and fail the rule")
+                print(
+                    "   🎯 SOLUTION: Replace 'run:' directive with 'script:' directive"
+                )
+                print(
+                    "   This will properly handle Python exceptions and fail the rule"
+                )
 
-                pytest.fail("run_tournaments rule has silent failure - use script: instead of run:")
+                pytest.fail(
+                    "run_tournaments rule has silent failure - use script: instead of run:"
+                )
         else:
             print("   ✅ Rule succeeded - tournaments.json exists")
 

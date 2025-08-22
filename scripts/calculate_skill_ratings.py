@@ -35,10 +35,13 @@ class SkillRatingCalculator:
         self.default_sigma = DEFAULT_SIGMA
         self.default_tau = DEFAULT_TAU
 
-    def _create_rating(self, mu: float | None = None, sigma: float | None = None) -> BradleyTerryFullRating:
+    def _create_rating(
+        self, mu: float | None = None, sigma: float | None = None
+    ) -> BradleyTerryFullRating:
         """Create an OpenSkill rating object."""
         return BradleyTerryFullRating(
-            mu=mu if mu is not None else self.default_mu, sigma=sigma if sigma is not None else self.default_sigma
+            mu=mu if mu is not None else self.default_mu,
+            sigma=sigma if sigma is not None else self.default_sigma,
         )
 
     def _generate_cache_key(
@@ -63,7 +66,9 @@ class SkillRatingCalculator:
             for match in matches:
                 # Validate required fields - throw halting error if missing
                 required_fields = ["match_id", "winner", "timestamp"]
-                missing_fields = [field for field in required_fields if field not in match]
+                missing_fields = [
+                    field for field in required_fields if field not in match
+                ]
                 if missing_fields:
                     raise ValueError(
                         f"Tournament data integrity error in skill '{skill_id}': Missing required fields {missing_fields} in match: {match}"
@@ -76,9 +81,16 @@ class SkillRatingCalculator:
                 match_signatures.append(match_sig)
             tournament_data[skill_id] = sorted(match_signatures)
 
-        cache_content = {"models": model_ids, "judges": judge_ids, "evals": eval_ids, "tournaments": tournament_data}
+        cache_content = {
+            "models": model_ids,
+            "judges": judge_ids,
+            "evals": eval_ids,
+            "tournaments": tournament_data,
+        }
 
-        return hashlib.sha256(json.dumps(cache_content, sort_keys=True).encode()).hexdigest()[:CACHE_KEY_LENGTH]
+        return hashlib.sha256(
+            json.dumps(cache_content, sort_keys=True).encode()
+        ).hexdigest()[:CACHE_KEY_LENGTH]
 
     def _sanitize_path_component(self, component: str) -> str:
         """Sanitize a path component to prevent directory traversal and other attacks."""
@@ -102,7 +114,9 @@ class SkillRatingCalculator:
         safe_skill_id = self._sanitize_path_component(skill_id)
         return self.cache_dir / f"{safe_skill_id}_{cache_key}.json"
 
-    def _load_cached_ratings(self, cache_path: Path) -> tuple[dict[str, Any] | None, bool]:
+    def _load_cached_ratings(
+        self, cache_path: Path
+    ) -> tuple[dict[str, Any] | None, bool]:
         """Load cached skill ratings.
 
         Returns:
@@ -117,29 +131,42 @@ class SkillRatingCalculator:
                 return None, True
         return None, False
 
-    def _save_cached_ratings(self, cache_path: Path, ratings_data: dict[str, Any]) -> None:
+    def _save_cached_ratings(
+        self, cache_path: Path, ratings_data: dict[str, Any]
+    ) -> None:
         """Save skill ratings to cache."""
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         with open(cache_path, "w") as f:
             json.dump(ratings_data, f, indent=2)
 
     def cleanup_invalid_rating_cache(
-        self, current_models: list[dict[str, Any]], current_judges: list[dict[str, Any]], current_evals: list[dict[str, Any]]
+        self,
+        current_models: list[dict[str, Any]],
+        current_judges: list[dict[str, Any]],
+        current_evals: list[dict[str, Any]],
     ) -> None:
         """Remove all cached ratings that are no longer valid."""
         # CRITICAL SAFETY: Prevent production data destruction during testing
         try:
-            from scripts.safety_guards import check_production_data_access, ensure_test_mode_for_cache_operations
+            from scripts.safety_guards import (
+                check_production_data_access,
+                ensure_test_mode_for_cache_operations,
+            )
         except ModuleNotFoundError:
             # When running through wrapper, try without the scripts prefix
-            from safety_guards import check_production_data_access, ensure_test_mode_for_cache_operations
+            from safety_guards import (
+                check_production_data_access,
+                ensure_test_mode_for_cache_operations,
+            )
 
         ensure_test_mode_for_cache_operations()
         check_production_data_access(self.cache_dir, "rating cache cleanup")
         current_model_ids = {model["id"] for model in current_models}
-        current_judge_ids = {judge["id"] for judge in current_judges}
-        current_eval_ids = {eval_data["id"] for eval_data in current_evals}
-        current_skill_ids = {eval_data["_metadata"]["skill"] for eval_data in current_evals}
+        {judge["id"] for judge in current_judges}
+        {eval_data["id"] for eval_data in current_evals}
+        current_skill_ids = {
+            eval_data["_metadata"]["skill"] for eval_data in current_evals
+        }
 
         cleaned_count = 0
 
@@ -175,7 +202,9 @@ class SkillRatingCalculator:
                         for model_id in model_ratings.keys():
                             if model_id not in current_model_ids:
                                 should_remove = True
-                                remove_reason = f"cached model '{model_id}' no longer exists"
+                                remove_reason = (
+                                    f"cached model '{model_id}' no longer exists"
+                                )
                                 break
 
                 except (OSError, json.JSONDecodeError, IndexError):
@@ -183,7 +212,9 @@ class SkillRatingCalculator:
                     remove_reason = "corrupted cache file"
 
                 if should_remove:
-                    print(f"   🗑️  Removing invalid rating cache: {cache_file.name} ({remove_reason})")
+                    print(
+                        f"   🗑️  Removing invalid rating cache: {cache_file.name} ({remove_reason})"
+                    )
                     cache_file.unlink()
                     cleaned_count += 1
 
@@ -192,7 +223,9 @@ class SkillRatingCalculator:
         else:
             print("   ✅ No invalid rating cache files found")
 
-    def calculate_skill_ratings(self, skill_id: str, tournament_data: dict[str, Any], cache_key: str) -> dict[str, Any]:
+    def calculate_skill_ratings(
+        self, skill_id: str, tournament_data: dict[str, Any], cache_key: str
+    ) -> dict[str, Any]:
         """Calculate ratings for a skill using all matches in chronological order."""
         cache_path = self._get_cache_path(skill_id, cache_key)
 
@@ -204,7 +237,9 @@ class SkillRatingCalculator:
 
         print(f"    🎯 Calculating skill ratings: {skill_id}")
         if was_corrupted:
-            print(f"    ⚠️  Corrupted cache detected for {skill_id}, recalculating without saving to cache")
+            print(
+                f"    ⚠️  Corrupted cache detected for {skill_id}, recalculating without saving to cache"
+            )
 
         # Get all matches in chronological order
         match_history = tournament_data.get("match_history", [])
@@ -232,7 +267,9 @@ class SkillRatingCalculator:
         for model_id in model_ids:
             model_ratings[model_id] = self._create_rating()
 
-        print(f"    📊 Processing {len(match_history)} matches for {len(model_ids)} models")
+        print(
+            f"    📊 Processing {len(match_history)} matches for {len(model_ids)} models"
+        )
 
         # Process matches in chronological order
         match_results = []
@@ -273,11 +310,17 @@ class SkillRatingCalculator:
                     "rating_changes": {
                         model_a: {
                             "before": {"mu": rating_a.mu, "sigma": rating_a.sigma},
-                            "after": {"mu": new_ratings[0][0].mu, "sigma": new_ratings[0][0].sigma},
+                            "after": {
+                                "mu": new_ratings[0][0].mu,
+                                "sigma": new_ratings[0][0].sigma,
+                            },
                         },
                         model_b: {
                             "before": {"mu": rating_b.mu, "sigma": rating_b.sigma},
-                            "after": {"mu": new_ratings[1][0].mu, "sigma": new_ratings[1][0].sigma},
+                            "after": {
+                                "mu": new_ratings[1][0].mu,
+                                "sigma": new_ratings[1][0].sigma,
+                            },
                         },
                     },
                 }
@@ -291,7 +334,9 @@ class SkillRatingCalculator:
                     "model_id": model_id,
                     "rating": round(rating.mu, 2),
                     "sigma": round(rating.sigma, 2),
-                    "conservative_rating": round(rating.mu - CONSERVATIVE_MULTIPLIER * rating.sigma, 2),
+                    "conservative_rating": round(
+                        rating.mu - CONSERVATIVE_MULTIPLIER * rating.sigma, 2
+                    ),
                     "rank": 0,  # Will be set after sorting
                 }
             )
@@ -325,7 +370,9 @@ class SkillRatingCalculator:
         # Save to cache only if corruption wasn't detected
         if not was_corrupted:
             self._save_cached_ratings(cache_path, ratings_data)
-            print(f"    ✅ Calculated ratings for {skill_id}: {len(model_ids)} models, {len(match_history)} matches")
+            print(
+                f"    ✅ Calculated ratings for {skill_id}: {len(model_ids)} models, {len(match_history)} matches"
+            )
         else:
             print(
                 f"    ✅ Calculated ratings for {skill_id}: {len(model_ids)} models, {len(match_history)} matches (not cached due to corruption)"
@@ -335,7 +382,12 @@ class SkillRatingCalculator:
 
 
 def main_with_data_dir(
-    data_dir: Path, summaries_file: Path, models_file: Path, judges_file: Path, skills_file: Path, output_file: Path
+    data_dir: Path,
+    summaries_file: Path,
+    models_file: Path,
+    judges_file: Path,
+    skills_file: Path,
+    output_file: Path,
 ) -> None:
     """Main function for skill rating calculation with custom data directory."""
     skill_ratings_cache_dir = data_dir / "skill_ratings"
@@ -388,7 +440,9 @@ def main_with_data_dir(
             calculator.cleanup_invalid_rating_cache(models, judges, evals)
 
             # Generate cache key based on current state
-            cache_key = calculator._generate_cache_key(models, judges, evals, tournaments)
+            cache_key = calculator._generate_cache_key(
+                models, judges, evals, tournaments
+            )
 
             print(f"🔑 Cache key: {cache_key}")
             print(f"🏟️  Processing ratings for {len(tournaments)} skills...")
@@ -396,13 +450,17 @@ def main_with_data_dir(
             skill_ratings = {}
 
             for skill_id, tournament_data in tournaments.items():
-                skill_rating = calculator.calculate_skill_ratings(skill_id, tournament_data, cache_key)
+                skill_rating = calculator.calculate_skill_ratings(
+                    skill_id, tournament_data, cache_key
+                )
                 skill_ratings[skill_id] = skill_rating
 
                 # Print top 3 models for this skill
                 print(f"   🏆 Top 3 models in {skill_id}:")
                 for model in skill_rating["model_rankings"][:3]:
-                    print(f"      {model['rank']}. {model['model_id']} - {model['rating']} (±{model['sigma']:.1f})")
+                    print(
+                        f"      {model['rank']}. {model['model_id']} - {model['rating']} (±{model['sigma']:.1f})"
+                    )
 
             result = {
                 "skill_ratings": skill_ratings,
@@ -438,7 +496,9 @@ def main() -> None:
     skills_file = data_dir / "loaded_skills.json"
     output_file = data_dir / "skill_ratings.json"
 
-    main_with_data_dir(data_dir, summaries_file, models_file, judges_file, skills_file, output_file)
+    main_with_data_dir(
+        data_dir, summaries_file, models_file, judges_file, skills_file, output_file
+    )
 
 
 if __name__ == "__main__":

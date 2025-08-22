@@ -30,7 +30,9 @@ class TestDetailedPerformanceFix:
     @patch("app.st.header")
     @patch("app.st.selectbox")
     @patch("app.st.subheader")
-    def test_fix_shows_real_ratings_for_all_skills(self, mock_subheader, mock_selectbox, mock_header, mock_dataframe):
+    def test_fix_shows_real_ratings_for_all_skills(
+        self, mock_subheader, mock_selectbox, mock_header, mock_dataframe
+    ):
         """
         Test that the fix shows real ratings for all skills that have ratings data,
         eliminating the 1500.0 defaults.
@@ -99,12 +101,18 @@ class TestDetailedPerformanceFix:
             if default_count == 0 and len(detailed_table) == len(skills_with_ratings):
                 print("\n🎉 FIX SUCCESSFUL!")
                 print("   ✅ No 1500.0 defaults found")
-                print(f"   ✅ All {len(skills_with_ratings)} skills with ratings are shown")
+                print(
+                    f"   ✅ All {len(skills_with_ratings)} skills with ratings are shown"
+                )
                 print("   ✅ All ratings are real values")
             elif default_count > 0:
-                print(f"\n❌ FIX INCOMPLETE: Still {default_count} skills showing 1500.0 defaults")
+                print(
+                    f"\n❌ FIX INCOMPLETE: Still {default_count} skills showing 1500.0 defaults"
+                )
             elif len(detailed_table) < len(skills_with_ratings):
-                print(f"\n❌ FIX INCOMPLETE: Missing {len(skills_with_ratings) - len(detailed_table)} skills")
+                print(
+                    f"\n❌ FIX INCOMPLETE: Missing {len(skills_with_ratings) - len(detailed_table)} skills"
+                )
             else:
                 print("\n⚠️ UNEXPECTED: More skills in table than expected")
         else:
@@ -160,10 +168,26 @@ class TestDetailedPerformanceFix:
                             {
                                 "Skill": skill,
                                 "Rating": f"{rating:.1f}",
-                                "Rank": tournament_stats.get("rank", "N/A") if tournament_stats else "N/A",
-                                "Wins": tournament_stats.get("wins", 0) if tournament_stats else 0,
-                                "Losses": tournament_stats.get("losses", 0) if tournament_stats else 0,
-                                "Ties": tournament_stats.get("ties", 0) if tournament_stats else 0,
+                                "Rank": (
+                                    tournament_stats.get("rank", "N/A")
+                                    if tournament_stats
+                                    else "N/A"
+                                ),
+                                "Wins": (
+                                    tournament_stats.get("wins", 0)
+                                    if tournament_stats
+                                    else 0
+                                ),
+                                "Losses": (
+                                    tournament_stats.get("losses", 0)
+                                    if tournament_stats
+                                    else 0
+                                ),
+                                "Ties": (
+                                    tournament_stats.get("ties", 0)
+                                    if tournament_stats
+                                    else 0
+                                ),
                             }
                         )
 

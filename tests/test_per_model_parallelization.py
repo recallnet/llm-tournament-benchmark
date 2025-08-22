@@ -27,9 +27,24 @@ class TestPerModelConversationExecution:
                 "timestamp": "2025-08-20T10:00:00",
             },
             "models": [
-                {"id": "thedrummer/unslopnemo-12b", "author": "TheDrummer", "slug": "unslopnemo-12b", "context_window": 32768},
-                {"id": "openai/gpt-oss-120b", "author": "OpenAI", "slug": "gpt-oss-120b", "context_window": 32768},
-                {"id": "inception/mercury", "author": "Inception", "slug": "mercury", "context_window": 32768},
+                {
+                    "id": "thedrummer/unslopnemo-12b",
+                    "author": "TheDrummer",
+                    "slug": "unslopnemo-12b",
+                    "context_window": 32768,
+                },
+                {
+                    "id": "openai/gpt-oss-120b",
+                    "author": "OpenAI",
+                    "slug": "gpt-oss-120b",
+                    "context_window": 32768,
+                },
+                {
+                    "id": "inception/mercury",
+                    "author": "Inception",
+                    "slug": "mercury",
+                    "context_window": 32768,
+                },
             ],
         }
 
@@ -67,13 +82,19 @@ class TestPerModelConversationExecution:
                         {"role": "user", "content": "Test prompt"},
                         {"role": "assistant", "content": "Test response"},
                     ],
-                    "execution_info": {"total_steps": 1, "completed_steps": 1, "status": "completed"},
+                    "execution_info": {
+                        "total_steps": 1,
+                        "completed_steps": 1,
+                        "status": "completed",
+                    },
                 }
             ],
             "intermediaries": [],
         }
 
-    def test_single_model_filter_produces_correct_structure(self, sample_models, sample_single_model_output):
+    def test_single_model_filter_produces_correct_structure(
+        self, sample_models, sample_single_model_output
+    ):
         """Test that filtering to single model produces expected JSON structure."""
         # Test that single model execution produces correct structure
         # We'll mock this since it requires API calls
@@ -81,17 +102,32 @@ class TestPerModelConversationExecution:
         target_model_id = "thedrummer/unslopnemo-12b"
 
         # Mock the expensive operations
-        with patch("scripts.execute_conversations_single_model.ConversationExecutor") as mock_executor_class:
-            with patch("scripts.execute_conversations_single_model.cleanup_stale_cache"):
+        with patch(
+            "scripts.execute_conversations_single_model.ConversationExecutor"
+        ) as mock_executor_class:
+            with patch(
+                "scripts.execute_conversations_single_model.cleanup_stale_cache"
+            ):
                 with patch("builtins.open", create=True) as mock_open:
 
                     # Mock file reads
                     mock_files = [
                         json.dumps(sample_models),  # models file
-                        json.dumps({"evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]}),  # skills
+                        json.dumps(
+                            {
+                                "evals": [
+                                    {
+                                        "id": "test_eval",
+                                        "_metadata": {"skill": "test_skill"},
+                                    }
+                                ]
+                            }
+                        ),  # skills
                         json.dumps({"judges": [{"id": "test_judge"}]}),  # judges
                     ]
-                    mock_open.return_value.__enter__.return_value.read.side_effect = mock_files
+                    mock_open.return_value.__enter__.return_value.read.side_effect = (
+                        mock_files
+                    )
 
                     # Mock executor
                     mock_executor = MagicMock()
@@ -99,12 +135,17 @@ class TestPerModelConversationExecution:
 
                     # Mock conversation result
                     mock_conversation = {
-                        "metadata": {"model_id": target_model_id, "timestamp": "2025-08-20T10:00:00"},
+                        "metadata": {
+                            "model_id": target_model_id,
+                            "timestamp": "2025-08-20T10:00:00",
+                        },
                         "messages": [{"role": "user", "content": "test"}],
                     }
                     mock_executor.execute_conversation.return_value = mock_conversation
 
-                    from scripts.execute_conversations_single_model import execute_conversations_for_model
+                    from scripts.execute_conversations_single_model import (
+                        execute_conversations_for_model,
+                    )
 
                     result = execute_conversations_for_model(
                         models_file="mock_models.json",
@@ -133,7 +174,11 @@ class TestPerModelConversationExecution:
         try:
             model_ids = get_model_ids(models_file)
 
-            expected_ids = ["thedrummer/unslopnemo-12b", "openai/gpt-oss-120b", "inception/mercury"]
+            expected_ids = [
+                "thedrummer/unslopnemo-12b",
+                "openai/gpt-oss-120b",
+                "inception/mercury",
+            ]
 
             assert model_ids == expected_ids
             assert len(model_ids) == 3
@@ -149,26 +194,37 @@ class TestPerModelConversationExecution:
         mock_skills = {"evals": []}
         mock_judges = {"judges": []}
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as models_f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as models_f:
             json.dump(empty_models, models_f)
             models_f.flush()
             models_file = models_f.name
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as skills_f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as skills_f:
             json.dump(mock_skills, skills_f)
             skills_f.flush()
             skills_file = skills_f.name
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as judges_f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False
+        ) as judges_f:
             json.dump(mock_judges, judges_f)
             judges_f.flush()
             judges_file = judges_f.name
 
         try:
-            from scripts.execute_conversations_single_model import execute_conversations_for_model
+            from scripts.execute_conversations_single_model import (
+                execute_conversations_for_model,
+            )
 
             result = execute_conversations_for_model(
-                models_file=models_file, skills_file=skills_file, judges_file=judges_file, target_model_id="nonexistent/model"
+                models_file=models_file,
+                skills_file=skills_file,
+                judges_file=judges_file,
+                target_model_id="nonexistent/model",
             )
 
             # Should return empty but valid structure
@@ -204,7 +260,11 @@ class TestConversationAggregation:
                 },
                 "conversations": [
                     {
-                        "metadata": {"model_id": "model_a", "eval_id": "eval_1", "skill_id": "skill_1"},
+                        "metadata": {
+                            "model_id": "model_a",
+                            "eval_id": "eval_1",
+                            "skill_id": "skill_1",
+                        },
                         "messages": [{"role": "user", "content": "test"}],
                     }
                 ],
@@ -225,7 +285,11 @@ class TestConversationAggregation:
                 },
                 "conversations": [
                     {
-                        "metadata": {"model_id": "model_b", "eval_id": "eval_1", "skill_id": "skill_1"},
+                        "metadata": {
+                            "model_id": "model_b",
+                            "eval_id": "eval_1",
+                            "skill_id": "skill_1",
+                        },
                         "messages": [{"role": "user", "content": "test"}],
                     }
                 ],
@@ -233,7 +297,9 @@ class TestConversationAggregation:
             },
         ]
 
-    def test_conversation_aggregation_produces_correct_totals(self, sample_per_model_outputs):
+    def test_conversation_aggregation_produces_correct_totals(
+        self, sample_per_model_outputs
+    ):
         """Test that aggregated execution_info contains correct totals."""
         from scripts.aggregate_conversations import aggregate_conversation_results
 
@@ -251,14 +317,18 @@ class TestConversationAggregation:
         assert len(result["conversations"]) == 2
         assert len(result["intermediaries"]) == 2
 
-    def test_aggregation_preserves_conversation_data_integrity(self, sample_per_model_outputs):
+    def test_aggregation_preserves_conversation_data_integrity(
+        self, sample_per_model_outputs
+    ):
         """Test that no conversation data is lost or corrupted during aggregation."""
         from scripts.aggregate_conversations import aggregate_conversation_results
 
         result = aggregate_conversation_results(sample_per_model_outputs)
 
         # All conversations should be present
-        conversation_model_ids = [c["metadata"]["model_id"] for c in result["conversations"]]
+        conversation_model_ids = [
+            c["metadata"]["model_id"] for c in result["conversations"]
+        ]
         assert "model_a" in conversation_model_ids
         assert "model_b" in conversation_model_ids
 
@@ -308,7 +378,9 @@ class TestParallelizationIntegration:
         # Load original conversations.json for comparison
         original_path = Path("data/testonly/conversations.json")
         if not original_path.exists():
-            pytest.skip("Original conversations.json not found - cannot test compatibility")
+            pytest.skip(
+                "Original conversations.json not found - cannot test compatibility"
+            )
 
         with open(original_path) as f:
             original_output = json.load(f)
@@ -331,8 +403,12 @@ class TestParallelizationIntegration:
                     "evals_count": 45,
                     "judges_count": 3,
                 },
-                "conversations": original_output["conversations"][:45],  # First 45 conversations
-                "intermediaries": original_output["intermediaries"][:5],  # First 5 intermediaries
+                "conversations": original_output["conversations"][
+                    :45
+                ],  # First 45 conversations
+                "intermediaries": original_output["intermediaries"][
+                    :5
+                ],  # First 5 intermediaries
             }
         ]
 
@@ -403,9 +479,14 @@ class TestPerformanceAndSafety:
             # Create minimal test data files
             test_models = {
                 "pool_info": {"name": "test", "model_count": 2},
-                "models": [{"id": "model_a", "slug": "model_a"}, {"id": "model_b", "slug": "model_b"}],
+                "models": [
+                    {"id": "model_a", "slug": "model_a"},
+                    {"id": "model_b", "slug": "model_b"},
+                ],
             }
-            test_skills = {"evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]}
+            test_skills = {
+                "evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]
+            }
             test_judges = {"judges": [{"id": "test_judge"}]}
 
             # Write test files
@@ -444,7 +525,9 @@ class TestPerformanceAndSafety:
                 output_text = result.stdout + result.stderr
                 # Should mention multiple models or parallel execution capability
                 assert (
-                    "model_a" in output_text or "model_b" in output_text or "execute_conversations_for_model" in output_text
+                    "model_a" in output_text
+                    or "model_b" in output_text
+                    or "execute_conversations_for_model" in output_text
                 ), f"Dry-run should show parallel model processing. Output: {output_text}"
 
     def test_cache_preservation_across_parallelization(self):
@@ -462,9 +545,18 @@ class TestPerformanceAndSafety:
 
             # Create mock cache files
             test_cache_files = {
-                "conversation_cache_model_a_eval1.json": {"cached": True, "data": "test_a"},
-                "conversation_cache_model_b_eval1.json": {"cached": True, "data": "test_b"},
-                "intermediary_cache_judge1_eval1.json": {"cached": True, "intermediary": "data"},
+                "conversation_cache_model_a_eval1.json": {
+                    "cached": True,
+                    "data": "test_a",
+                },
+                "conversation_cache_model_b_eval1.json": {
+                    "cached": True,
+                    "data": "test_b",
+                },
+                "intermediary_cache_judge1_eval1.json": {
+                    "cached": True,
+                    "intermediary": "data",
+                },
             }
 
             for filename, content in test_cache_files.items():
@@ -495,7 +587,9 @@ class TestPerformanceAndSafety:
             # Test concurrent cache access (simulating parallel model execution)
             threads = []
             for i, model_id in enumerate(["model_a", "model_b"]):
-                thread = threading.Thread(target=access_cache_file, args=(model_id, i * 0.1))
+                thread = threading.Thread(
+                    target=access_cache_file, args=(model_id, i * 0.1)
+                )
                 threads.append(thread)
                 thread.start()
 
@@ -505,7 +599,9 @@ class TestPerformanceAndSafety:
 
             # Verify cache files are intact and accessible
             assert len(access_errors) == 0, f"Cache access errors: {access_errors}"
-            assert len(cache_access_results) == 2, "Should successfully read both cache files"
+            assert (
+                len(cache_access_results) == 2
+            ), "Should successfully read both cache files"
             assert "model_a: test_a" in cache_access_results
             assert "model_b: test_b" in cache_access_results
 
@@ -516,7 +612,9 @@ class TestPerformanceAndSafety:
 
                 with open(cache_file) as f:
                     actual_content = json.load(f)
-                assert actual_content == expected_content, f"Cache file {filename} content corrupted"
+                assert (
+                    actual_content == expected_content
+                ), f"Cache file {filename} content corrupted"
 
     def test_graceful_failure_handling(self):
         """Test that individual model failures don't crash the entire pipeline."""
@@ -537,7 +635,9 @@ class TestPerformanceAndSafety:
                     {"id": "another_working_model", "slug": "working2"},
                 ],
             }
-            test_skills = {"evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]}
+            test_skills = {
+                "evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]
+            }
             test_judges = {"judges": [{"id": "test_judge"}]}
 
             models_file = temp_path / "models.json"
@@ -552,40 +652,69 @@ class TestPerformanceAndSafety:
                 json.dump(test_judges, f)
 
             # Mock ConversationExecutor to simulate failures
-            from scripts.execute_conversations_single_model import execute_conversations_for_model
+            from scripts.execute_conversations_single_model import (
+                execute_conversations_for_model,
+            )
 
             def mock_execute_conversation(model, skill_id, eval_data):
                 if model["id"] == "failing_model":
                     raise Exception("Simulated API failure")
                 return {
-                    "metadata": {"model_id": model["id"], "timestamp": "2025-08-20T10:00:00"},
+                    "metadata": {
+                        "model_id": model["id"],
+                        "timestamp": "2025-08-20T10:00:00",
+                    },
                     "messages": [{"role": "assistant", "content": "success"}],
                 }
 
-            with patch("scripts.execute_conversations_single_model.ConversationExecutor") as mock_executor_class:
-                with patch("scripts.execute_conversations_single_model.cleanup_stale_cache"):
+            with patch(
+                "scripts.execute_conversations_single_model.ConversationExecutor"
+            ) as mock_executor_class:
+                with patch(
+                    "scripts.execute_conversations_single_model.cleanup_stale_cache"
+                ):
                     mock_executor = MagicMock()
-                    mock_executor.execute_conversation.side_effect = mock_execute_conversation
-                    mock_executor.execute_intermediary.return_value = {"id": "test_inter"}
+                    mock_executor.execute_conversation.side_effect = (
+                        mock_execute_conversation
+                    )
+                    mock_executor.execute_intermediary.return_value = {
+                        "id": "test_inter"
+                    }
                     mock_executor_class.return_value = mock_executor
 
                     # Test each model separately - working models should succeed
                     working_result = execute_conversations_for_model(
-                        str(models_file), str(skills_file), str(judges_file), "working_model"
+                        str(models_file),
+                        str(skills_file),
+                        str(judges_file),
+                        "working_model",
                     )
-                    assert working_result["execution_info"]["successful_conversations"] == 1
+                    assert (
+                        working_result["execution_info"]["successful_conversations"]
+                        == 1
+                    )
                     assert working_result["execution_info"]["failed_conversations"] == 0
 
                     # Failing model should handle the failure gracefully
                     failing_result = execute_conversations_for_model(
-                        str(models_file), str(skills_file), str(judges_file), "failing_model"
+                        str(models_file),
+                        str(skills_file),
+                        str(judges_file),
+                        "failing_model",
                     )
-                    assert failing_result["execution_info"]["successful_conversations"] == 0
+                    assert (
+                        failing_result["execution_info"]["successful_conversations"]
+                        == 0
+                    )
                     assert failing_result["execution_info"]["failed_conversations"] == 1
-                    assert len(failing_result["conversations"]) == 0  # No successful conversations
+                    assert (
+                        len(failing_result["conversations"]) == 0
+                    )  # No successful conversations
 
                     # Test aggregation with mixed results
-                    from scripts.aggregate_conversations import aggregate_conversation_results
+                    from scripts.aggregate_conversations import (
+                        aggregate_conversation_results,
+                    )
 
                     mixed_results = [working_result, failing_result]
                     aggregated = aggregate_conversation_results(mixed_results)
@@ -594,7 +723,9 @@ class TestPerformanceAndSafety:
                     assert aggregated["execution_info"]["total_conversations"] == 2
                     assert aggregated["execution_info"]["successful_conversations"] == 1
                     assert aggregated["execution_info"]["failed_conversations"] == 1
-                    assert len(aggregated["conversations"]) == 1  # Only successful conversation
+                    assert (
+                        len(aggregated["conversations"]) == 1
+                    )  # Only successful conversation
 
     def test_rollback_scenario_preserves_data(self):
         """Test that rolling back to original implementation works seamlessly."""
@@ -609,9 +740,14 @@ class TestPerformanceAndSafety:
             # Create test data
             test_models = {
                 "pool_info": {"name": "test", "model_count": 2},
-                "models": [{"id": "model_a", "slug": "model_a"}, {"id": "model_b", "slug": "model_b"}],
+                "models": [
+                    {"id": "model_a", "slug": "model_a"},
+                    {"id": "model_b", "slug": "model_b"},
+                ],
             }
-            test_skills = {"evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]}
+            test_skills = {
+                "evals": [{"id": "test_eval", "_metadata": {"skill": "test_skill"}}]
+            }
             test_judges = {"judges": [{"id": "test_judge"}]}
 
             models_file = temp_path / "models.json"
@@ -630,7 +766,9 @@ class TestPerformanceAndSafety:
 
             # Simulate parallel execution results
             from scripts.aggregate_conversations import aggregate_conversation_results
-            from scripts.execute_conversations_single_model import execute_conversations_for_model
+            from scripts.execute_conversations_single_model import (
+                execute_conversations_for_model,
+            )
 
             # Mock executor for consistent results
             mock_conversation = {
@@ -638,22 +776,33 @@ class TestPerformanceAndSafety:
                 "messages": [{"role": "assistant", "content": "test"}],
             }
 
-            with patch("scripts.execute_conversations_single_model.ConversationExecutor") as mock_executor_class:
-                with patch("scripts.execute_conversations_single_model.cleanup_stale_cache"):
+            with patch(
+                "scripts.execute_conversations_single_model.ConversationExecutor"
+            ) as mock_executor_class:
+                with patch(
+                    "scripts.execute_conversations_single_model.cleanup_stale_cache"
+                ):
                     mock_executor = MagicMock()
                     mock_executor.execute_conversation.return_value = mock_conversation
-                    mock_executor.execute_intermediary.return_value = {"id": "test_inter"}
+                    mock_executor.execute_intermediary.return_value = {
+                        "id": "test_inter"
+                    }
                     mock_executor_class.return_value = mock_executor
 
                     # Get parallel results
                     parallel_results = []
                     for model in test_models["models"]:
                         result = execute_conversations_for_model(
-                            str(models_file), str(skills_file), str(judges_file), model["id"]
+                            str(models_file),
+                            str(skills_file),
+                            str(judges_file),
+                            model["id"],
                         )
                         parallel_results.append(result)
 
-                    aggregated_parallel = aggregate_conversation_results(parallel_results)
+                    aggregated_parallel = aggregate_conversation_results(
+                        parallel_results
+                    )
 
             # Verify structure matches expected legacy format
             expected_keys = {"execution_info", "conversations", "intermediaries"}
@@ -671,7 +820,10 @@ class TestPerformanceAndSafety:
                 "evals_count",
                 "judges_count",
             }
-            assert set(aggregated_parallel["execution_info"].keys()) == expected_execution_info_keys
+            assert (
+                set(aggregated_parallel["execution_info"].keys())
+                == expected_execution_info_keys
+            )
 
             # Verify data integrity
             assert isinstance(aggregated_parallel["conversations"], list)

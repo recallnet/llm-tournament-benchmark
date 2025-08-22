@@ -7,10 +7,10 @@
     },
     {
       "role": "assistant",
-      "content": "To compare the two responses for adherence to the specific formatting request of no em dashes, let's examine each one:\n\n**Solution A:**\n- Uses em dashes in several places, such as \"Rarity\u2014Black swan events are rare and unpredictable\" and \"Extreme impact\u2014Despite their rarity, black swan events have an oversized impact.\"\n\n**Solution B:**\n- Does not use any em dashes. It uses commas and periods to separate clauses and ideas.\n\nGiven the requirement to avoid em dashes, **Solution B** adheres strictly to the formatting request.\n\n- MY VOTE IS FOR: B"
+      "content": "To compare the two responses for adherence to the specific formatting request of no em dashes, let's examine each:\n\n**Solution A:**\n- Uses em dashes in several places, such as \"Rarity \u2014 Black swan events are rare and unpredictable\" and \"Extreme impact \u2014 Despite their rarity, black swan events have an oversized impact.\"\n\n**Solution B:**\n- Does not use any em dashes. It uses commas and other punctuation to separate ideas and list items.\n\nGiven the requirement to avoid em dashes, **Solution B** adheres to the formatting request more closely.\n\n- MY VOTE IS FOR: B"
     }
   ],
-  "explanation": "To compare the two responses for adherence to the specific formatting request of no em dashes, let's examine each one:\n\n**Solution A:**\n- Uses em dashes in several places, such as \"Rarity\u2014Black swan events are rare and unpredictable\" and \"Extreme impact\u2014Despite their rarity, black swan events have an oversized impact.\"\n\n**Solution B:**\n- Does not use any em dashes. It uses commas and periods to separate clauses and ideas.\n\nGiven the requirement to avoid em dashes, **Solution B** adheres strictly to the formatting request.\n\n- MY VOTE IS FOR: B",
+  "explanation": "To compare the two responses for adherence to the specific formatting request of no em dashes, let's examine each:\n\n**Solution A:**\n- Uses em dashes in several places, such as \"Rarity \u2014 Black swan events are rare and unpredictable\" and \"Extreme impact \u2014 Despite their rarity, black swan events have an oversized impact.\"\n\n**Solution B:**\n- Does not use any em dashes. It uses commas and other punctuation to separate ideas and list items.\n\nGiven the requirement to avoid em dashes, **Solution B** adheres to the formatting request more closely.\n\n- MY VOTE IS FOR: B",
   "metadata": {
     "match_id": "7ed5712d0acf8123",
     "judge_id": "inception/mercury",
@@ -18,7 +18,7 @@
     "model_b_id": "openai/gpt-oss-120b",
     "eval_id": "black-swan-event",
     "skill_id": "respect_no_em_dash_requests",
-    "timestamp": "2025-08-21T01:22:43.675174",
+    "timestamp": "2025-08-21T23:43:49.025970",
     "cache_key": "6364be5696ccfdb9"
   }
 }

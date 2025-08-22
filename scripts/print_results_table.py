@@ -34,8 +34,8 @@ def format_results_table(ratings_data: dict[str, Any]) -> None:
         model_ratings = skill_data.get("model_ratings", {})
         all_models.update(model_ratings.keys())
 
-    all_models = sorted(list(all_models))
-    skills = sorted(list(skill_ratings.keys()))
+    all_models = sorted(all_models)
+    skills = sorted(skill_ratings.keys())
 
     if not all_models or not skills:
         print("❌ No model ratings found.")

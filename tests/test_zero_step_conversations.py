@@ -17,12 +17,18 @@ def test_zero_step_conversations():
     # Check individual conversation cache files instead of obsolete conversations.json
     conversations_dir = Path("data/testonly/conversations")
     if not conversations_dir.exists():
-        return True, {"zero_step_issue": False, "reason": "No conversations directory found"}
+        return True, {
+            "zero_step_issue": False,
+            "reason": "No conversations directory found",
+        }
 
     # Find all individual conversation cache files
     cache_files = list(conversations_dir.rglob("*.json"))
     if not cache_files:
-        return True, {"zero_step_issue": False, "reason": "No conversation cache files found"}
+        return True, {
+            "zero_step_issue": False,
+            "reason": "No conversation cache files found",
+        }
 
     # Find all conversations with 0 steps
     zero_step_conversations = []
@@ -36,7 +42,11 @@ def test_zero_step_conversations():
             # Handle different conversation formats
             conv = conv_data if isinstance(conv_data, dict) else {}
 
-            for conv in [conv_data] if isinstance(conv_data, dict) else conv_data.get("conversations", []):
+            for conv in (
+                [conv_data]
+                if isinstance(conv_data, dict)
+                else conv_data.get("conversations", [])
+            ):
                 steps = conv.get("steps", [])
                 if len(steps) == 0:
                     zero_step_conversations.append(conv)
@@ -50,13 +60,15 @@ def test_zero_step_conversations():
             continue
 
     has_zero_steps = len(zero_step_conversations) > 0
-    has_ethical_zero_steps = len(ethical_zero_step) > 0
+    len(ethical_zero_step) > 0
 
     if has_zero_steps:
         print(f"Found {len(zero_step_conversations)} zero-step conversations")
         print(f"Found {len(ethical_zero_step)} ethical zero-step conversations")
         for conv in ethical_zero_step:
-            print(f"  - {conv['metadata'].get('model_id')}: {conv['metadata'].get('eval_id')}")
+            print(
+                f"  - {conv['metadata'].get('model_id')}: {conv['metadata'].get('eval_id')}"
+            )
 
     # Return for compatibility with other functions that check this
     return has_zero_steps, {
@@ -92,7 +104,11 @@ def test_judge_view_building_with_zero_steps():
             models = json.load(f)["models"]
 
         # Get an ethical eval
-        ethical_evals = [e for e in skills_data["evals"] if e.get("_metadata", {}).get("skill") == "ethical_loopholes"]
+        ethical_evals = [
+            e
+            for e in skills_data["evals"]
+            if e.get("_metadata", {}).get("skill") == "ethical_loopholes"
+        ]
         if not ethical_evals:
             raise AssertionError("No ethical evals found")
 
@@ -112,7 +128,12 @@ def test_judge_view_building_with_zero_steps():
 
             try:
                 view_content = judge_executor._build_view_content(
-                    view_spec_a, conversations_data, conversations_data, model_id, skill_id, eval_id
+                    view_spec_a,
+                    conversations_data,
+                    conversations_data,
+                    model_id,
+                    skill_id,
+                    eval_id,
                 )
 
                 # Check for error markers or problematic content
@@ -125,7 +146,13 @@ def test_judge_view_building_with_zero_steps():
                     issues.append(f"short_content_{len(view_content)}")
 
                 if issues:
-                    view_failures.append({"model_id": model_id, "issues": issues, "content_length": len(view_content)})
+                    view_failures.append(
+                        {
+                            "model_id": model_id,
+                            "issues": issues,
+                            "content_length": len(view_content),
+                        }
+                    )
 
             except Exception as e:
                 view_failures.append({"model_id": model_id, "error": str(e)})
@@ -184,7 +211,9 @@ def test_conversation_structure_issues():
             issues.append("empty_final")
 
         if issues:
-            structure_issues.append({"model_id": model_id, "eval_id": eval_id, "issues": issues})
+            structure_issues.append(
+                {"model_id": model_id, "eval_id": eval_id, "issues": issues}
+            )
 
     has_issues = len(structure_issues) > 0
     if has_issues:
@@ -192,7 +221,10 @@ def test_conversation_structure_issues():
         for issue in structure_issues:
             print(f"  - {issue}")
 
-    return has_issues, {"structure_issues": structure_issues, "total_ethical": len(ethical_conversations)}
+    return has_issues, {
+        "structure_issues": structure_issues,
+        "total_ethical": len(ethical_conversations),
+    }
 
 
 def test_conversations_need_regeneration():
@@ -234,8 +266,12 @@ if __name__ == "__main__":
 
         # Show specific issues
         if test_data["zero_step_issue"]:
-            print(f"\n📊 Zero-step conversations: {test_data['zero_step_data']['total_zero_step']}")
-            print(f"📊 Ethical zero-step: {test_data['zero_step_data']['ethical_zero_step']}")
+            print(
+                f"\n📊 Zero-step conversations: {test_data['zero_step_data']['total_zero_step']}"
+            )
+            print(
+                f"📊 Ethical zero-step: {test_data['zero_step_data']['ethical_zero_step']}"
+            )
 
         if test_data["view_issue"]:
             failures = test_data["view_data"]["view_failures"]

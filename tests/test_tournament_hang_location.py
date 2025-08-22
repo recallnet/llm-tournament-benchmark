@@ -18,7 +18,9 @@ class TimeoutError(Exception):
 
 
 def timeout_handler(signum, frame):
-    raise TimeoutError(f"Tournament execution timed out at line: {frame.f_lineno} in {frame.f_code.co_filename}")
+    raise TimeoutError(
+        f"Tournament execution timed out at line: {frame.f_lineno} in {frame.f_code.co_filename}"
+    )
 
 
 def test_tournament_execution_with_instrumentation():

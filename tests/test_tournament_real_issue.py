@@ -63,21 +63,33 @@ def test_actual_tournament_bottleneck():
 
     # Check if we're missing the ethical_loopholes skill
     ethical_loopholes_dir = judge_cache_dir / "ethical_loopholes"
-    ethical_files = list(ethical_loopholes_dir.glob("*.json")) if ethical_loopholes_dir.exists() else []
+    ethical_files = (
+        list(ethical_loopholes_dir.glob("*.json"))
+        if ethical_loopholes_dir.exists()
+        else []
+    )
     print(f"📊 Found {len(ethical_files)} ethical_loopholes tournament files")
 
     if len(ethical_files) == 0:
-        print("⚠️ No ethical_loopholes tournaments found - this may be where it's hanging!")
+        print(
+            "⚠️ No ethical_loopholes tournaments found - this may be where it's hanging!"
+        )
 
         # Check if the conversations exist for ethical_loopholes
-        ethical_convs = [c for c in conversations.get("conversations", []) if c.get("skill_id") == "ethical_loopholes"]
+        ethical_convs = [
+            c
+            for c in conversations.get("conversations", [])
+            if c.get("skill_id") == "ethical_loopholes"
+        ]
         print(f"📊 Found {len(ethical_convs)} ethical_loopholes conversations")
 
         if len(ethical_convs) > 0:
             print("✅ Conversations exist, tournament should be runnable")
             return True
         else:
-            print("❌ No conversations for ethical_loopholes - issue in conversation step")
+            print(
+                "❌ No conversations for ethical_loopholes - issue in conversation step"
+            )
             return False
 
     return True

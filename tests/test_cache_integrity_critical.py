@@ -45,7 +45,10 @@ class TestCacheIntegrityViolations:
             from openskill.models import BradleyTerryFullRating
 
             mock_rating = BradleyTerryFullRating(mu=1600, sigma=90)
-            mock_rate.return_value = [[mock_rating], [BradleyTerryFullRating(mu=1400, sigma=90)]]
+            mock_rate.return_value = [
+                [mock_rating],
+                [BradleyTerryFullRating(mu=1400, sigma=90)],
+            ]
 
             original_cache_key = calculator._generate_cache_key(
                 [{"id": "model_a"}, {"id": "model_b"}],
@@ -54,7 +57,9 @@ class TestCacheIntegrityViolations:
                 {"test_skill": original_data},
             )
 
-            result1 = calculator.calculate_skill_ratings(skill_id, original_data, original_cache_key)
+            result1 = calculator.calculate_skill_ratings(
+                skill_id, original_data, original_cache_key
+            )
             assert mock_rate.call_count >= 1  # Should calculate first time
 
         # Modified tournament data - different winner
@@ -74,7 +79,10 @@ class TestCacheIntegrityViolations:
         with patch("openskill.models.BradleyTerryFull.rate") as mock_rate2:
             # Mock different rating for modified data
             mock_rating2 = BradleyTerryFullRating(mu=1400, sigma=90)
-            mock_rate2.return_value = [[mock_rating2], [BradleyTerryFullRating(mu=1600, sigma=90)]]
+            mock_rate2.return_value = [
+                [mock_rating2],
+                [BradleyTerryFullRating(mu=1600, sigma=90)],
+            ]
 
             modified_cache_key = calculator._generate_cache_key(
                 [{"id": "model_a"}, {"id": "model_b"}],
@@ -88,11 +96,15 @@ class TestCacheIntegrityViolations:
                 original_cache_key != modified_cache_key
             ), "INTEGRITY VIOLATION: Different input data produced same cache key!"
 
-            result2 = calculator.calculate_skill_ratings(skill_id, modified_data, modified_cache_key)
+            result2 = calculator.calculate_skill_ratings(
+                skill_id, modified_data, modified_cache_key
+            )
             assert mock_rate2.call_count >= 1  # Should calculate again, not use cache
 
             # Results should be different because data is different
-            assert result1 != result2, "INTEGRITY VIOLATION: Different input data produced same results!"
+            assert (
+                result1 != result2
+            ), "INTEGRITY VIOLATION: Different input data produced same results!"
 
     def test_corrupted_cache_file_handling(self, calculator):
         """Test that corrupted cache files don't crash the system or return bad data."""
@@ -124,9 +136,14 @@ class TestCacheIntegrityViolations:
             from openskill.models import BradleyTerryFullRating
 
             mock_rating = BradleyTerryFullRating(mu=1600, sigma=90)
-            mock_rate.return_value = [[mock_rating], [BradleyTerryFullRating(mu=1400, sigma=90)]]
+            mock_rate.return_value = [
+                [mock_rating],
+                [BradleyTerryFullRating(mu=1400, sigma=90)],
+            ]
 
-            result = calculator.calculate_skill_ratings(skill_id, tournament_data, cache_key)
+            result = calculator.calculate_skill_ratings(
+                skill_id, tournament_data, cache_key
+            )
 
             # Should recalculate due to corrupted cache
             assert mock_rate.call_count >= 1
@@ -217,22 +234,35 @@ class TestCacheConsistencyViolations:
             )
 
             # CRITICAL: Should not use stale cache when cache key is different
-            assert new_cache_key != "old_cache_key", "Cache key generation failed - same key for different data!"
+            assert (
+                new_cache_key != "old_cache_key"
+            ), "Cache key generation failed - same key for different data!"
 
             with patch("openskill.models.BradleyTerryFull.rate") as mock_rate:
                 from openskill.models import BradleyTerryFullRating
 
                 mock_rating = BradleyTerryFullRating(mu=1600, sigma=90)
-                mock_rate.return_value = [[mock_rating], [BradleyTerryFullRating(mu=1400, sigma=90)]]
+                mock_rate.return_value = [
+                    [mock_rating],
+                    [BradleyTerryFullRating(mu=1400, sigma=90)],
+                ]
 
-                result = calc.calculate_skill_ratings("test_skill", new_tournament_data, new_cache_key)
+                result = calc.calculate_skill_ratings(
+                    "test_skill", new_tournament_data, new_cache_key
+                )
 
                 # Should recalculate because cache key is different
-                assert mock_rate.call_count >= 1, "INTEGRITY VIOLATION: Used stale cache with different cache key!"
+                assert (
+                    mock_rate.call_count >= 1
+                ), "INTEGRITY VIOLATION: Used stale cache with different cache key!"
 
                 # Result should reflect new data
-                assert "new_model_a" in result["model_ratings"], "Results don't match new tournament data!"
-                assert "old_model" not in result["model_ratings"], "Results contain stale model data!"
+                assert (
+                    "new_model_a" in result["model_ratings"]
+                ), "Results don't match new tournament data!"
+                assert (
+                    "old_model" not in result["model_ratings"]
+                ), "Results contain stale model data!"
 
 
 class TestCacheSecurityViolations:
@@ -333,5 +363,9 @@ class TestCacheSecurityViolations:
 
             key3 = calc._generate_cache_key(models, judges, evals, data3)
 
-            assert key1 != key3, "INTEGRITY VIOLATION: Swapped model order produced same cache key!"
-            assert key2 != key3, "INTEGRITY VIOLATION: Different model arrangements produced same cache key!"
+            assert (
+                key1 != key3
+            ), "INTEGRITY VIOLATION: Swapped model order produced same cache key!"
+            assert (
+                key2 != key3
+            ), "INTEGRITY VIOLATION: Different model arrangements produced same cache key!"

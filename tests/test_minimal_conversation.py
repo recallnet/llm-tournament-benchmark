@@ -55,7 +55,9 @@ def test_minimal_conversation_generation():
 
         try:
             skill_id = test_eval["_metadata"]["skill"]
-            conversation_result = executor.execute_conversation(test_model, skill_id, test_eval)
+            conversation_result = executor.execute_conversation(
+                test_model, skill_id, test_eval
+            )
 
             elapsed = time.time() - start_time
             signal.alarm(0)  # Cancel timeout
@@ -118,10 +120,17 @@ def test_api_connectivity():
             return False
 
         # Test minimal API call with timeout
-        headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
 
         # Simple test payload
-        payload = {"model": "openai/gpt-3.5-turbo", "messages": [{"role": "user", "content": "Hi"}], "max_tokens": 5}
+        payload = {
+            "model": "openai/gpt-3.5-turbo",
+            "messages": [{"role": "user", "content": "Hi"}],
+            "max_tokens": 5,
+        }
 
         print("🌐 Testing OpenRouter API connectivity...")
 
@@ -133,7 +142,10 @@ def test_api_connectivity():
 
         try:
             response = requests.post(
-                "https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=30
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json=payload,
+                timeout=30,
             )
 
             elapsed = time.time() - start_time
@@ -180,4 +192,6 @@ if __name__ == "__main__":
         sys.exit(1)
     else:
         print("\n✅ Minimal conversation generation works")
-        print("💡 Issue may be with bulk processing or specific eval/model combinations")
+        print(
+            "💡 Issue may be with bulk processing or specific eval/model combinations"
+        )

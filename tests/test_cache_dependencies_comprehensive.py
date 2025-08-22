@@ -82,7 +82,9 @@ def test_conversation_cache_dependencies():
 
                 if cached_model:
                     # Remove the model that has cached conversations
-                    models_data["models"] = [m for m in models_data["models"] if m["id"] != cached_model]
+                    models_data["models"] = [
+                        m for m in models_data["models"] if m["id"] != cached_model
+                    ]
                     removed_model = {"id": cached_model}
                 else:
                     # Fallback: remove any model
@@ -103,12 +105,18 @@ def test_conversation_cache_dependencies():
 
                     # Check that conversations for removed model were deleted
                     remaining_conversations = scenario.get_cache_files("conversations")
-                    removed_count = len(initial_conversations) - len(remaining_conversations)
+                    removed_count = len(initial_conversations) - len(
+                        remaining_conversations
+                    )
 
-                    print(f"   ✅ Model removed: {removed_count} conversations cleaned up")
+                    print(
+                        f"   ✅ Model removed: {removed_count} conversations cleaned up"
+                    )
 
                     if removed_count == 0:
-                        print(f"   ⚠️ Expected some conversations to be removed for model {removed_model['id']}")
+                        print(
+                            f"   ⚠️ Expected some conversations to be removed for model {removed_model['id']}"
+                        )
                         return False
 
                 except ImportError as e:
@@ -119,7 +127,9 @@ def test_conversation_cache_dependencies():
         if models_file.exists():
             with open(models_file) as f:
                 models_data = json.load(f)
-            models_data["models"].append({"id": "test/new-model", "provider": "test", "name": "New Test Model"})
+            models_data["models"].append(
+                {"id": "test/new-model", "provider": "test", "name": "New Test Model"}
+            )
 
             with open(models_file, "w") as f:
                 json.dump(models_data, f, indent=2)
@@ -131,7 +141,9 @@ def test_conversation_cache_dependencies():
                 skills_data = json.load(f)
 
             expected_new_conversations = len(skills_data["evals"])
-            print(f"   📊 New model should need {expected_new_conversations} conversations")
+            print(
+                f"   📊 New model should need {expected_new_conversations} conversations"
+            )
 
         print("   ✅ Conversation cache dependency tests passed")
         return True
@@ -168,7 +180,7 @@ def test_tournament_cache_dependencies():
             original_judges = judges_data["judges"].copy()
             if len(original_judges) > 1:
                 # Remove one judge
-                removed_judge = judges_data["judges"].pop()
+                judges_data["judges"].pop()
                 with open(judges_file, "w") as f:
                     json.dump(judges_data, f, indent=2)
 
@@ -176,15 +188,23 @@ def test_tournament_cache_dependencies():
                 try:
                     from run_tournaments import JudgeExecutor
 
-                    judge_executor = JudgeExecutor(scenario.test_data_dir / "tournaments")
+                    judge_executor = JudgeExecutor(
+                        scenario.test_data_dir / "tournaments"
+                    )
                     judge_executor.cleanup_invalid_match_cache(
-                        models_data["models"], judges_data["judges"], skills_data["evals"]
+                        models_data["models"],
+                        judges_data["judges"],
+                        skills_data["evals"],
                     )
 
                     remaining_judge_cache = scenario.get_cache_files("judge_cache")
-                    removed_count = len(initial_judge_cache) - len(remaining_judge_cache)
+                    removed_count = len(initial_judge_cache) - len(
+                        remaining_judge_cache
+                    )
 
-                    print(f"   ✅ Judge removed: {removed_count} cached decisions cleaned up")
+                    print(
+                        f"   ✅ Judge removed: {removed_count} cached decisions cleaned up"
+                    )
 
                 except ImportError as e:
                     print(f"   ❌ Cannot test tournament cleanup: {e}")
@@ -244,14 +264,20 @@ def test_cross_stage_dependencies():
 
         if conversations_file.exists():
             # Get current modification times
-            conv_mtime = conversations_file.stat().st_mtime if conversations_file.exists() else 0
-            tourn_mtime = tournaments_file.stat().st_mtime if tournaments_file.exists() else 0
+            conv_mtime = (
+                conversations_file.stat().st_mtime if conversations_file.exists() else 0
+            )
+            tourn_mtime = (
+                tournaments_file.stat().st_mtime if tournaments_file.exists() else 0
+            )
 
             print(f"   📊 conversations.json mtime: {conv_mtime}")
             print(f"   📊 tournaments.json mtime: {tourn_mtime}")
 
             if conv_mtime > tourn_mtime:
-                print("   ✅ Conversations newer than tournaments - tournaments should regenerate")
+                print(
+                    "   ✅ Conversations newer than tournaments - tournaments should regenerate"
+                )
             elif tourn_mtime > conv_mtime and tournaments_file.exists():
                 print("   ✅ Tournaments up to date with conversations")
             else:
@@ -268,7 +294,9 @@ def test_cross_stage_dependencies():
             print(f"   📊 skill_ratings.json mtime: {ratings_mtime}")
 
             if tourn_mtime > ratings_mtime:
-                print("   ✅ Tournaments newer than ratings - ratings should regenerate")
+                print(
+                    "   ✅ Tournaments newer than ratings - ratings should regenerate"
+                )
             elif ratings_mtime > tourn_mtime:
                 print("   ✅ Ratings up to date with tournaments")
 
@@ -295,12 +323,12 @@ def test_cache_key_consistency():
 
                 if cache_key:
                     # Verify cache key represents the content appropriately
-                    key_content = (
-                        f"{metadata.get('skill_id', '')}:{metadata.get('eval_id', '')}:{metadata.get('model_id', '')}"
-                    )
-                    expected_key = hashlib.sha256(key_content.encode()).hexdigest()[:16]
+                    key_content = f"{metadata.get('skill_id', '')}:{metadata.get('eval_id', '')}:{metadata.get('model_id', '')}"
+                    hashlib.sha256(key_content.encode()).hexdigest()[:16]
 
-                    print(f"   📋 {conv_file.name}: cache_key={'✅ present' if cache_key else '❌ missing'}")
+                    print(
+                        f"   📋 {conv_file.name}: cache_key={'✅ present' if cache_key else '❌ missing'}"
+                    )
 
                 else:
                     print(f"   ⚠️ {conv_file.name}: Missing cache key")
@@ -344,7 +372,7 @@ def test_current_cache_state_analysis():
 
                 metadata = conv_data.get("metadata", {})
                 model_id = metadata.get("model_id", "")
-                skill_id = metadata.get("skill_id", "")
+                metadata.get("skill_id", "")
                 eval_id = metadata.get("eval_id", "")
 
                 # Check if this conversation is still valid
@@ -364,7 +392,9 @@ def test_current_cache_state_analysis():
         print(f"   ❌ Invalid conversations: {invalid_conversations}")
 
         if invalid_conversations > 0:
-            print(f"   💡 {invalid_conversations} conversations need cleanup/regeneration")
+            print(
+                f"   💡 {invalid_conversations} conversations need cleanup/regeneration"
+            )
             return False
         else:
             print("   ✅ All cached conversations are valid")
@@ -381,9 +411,15 @@ if __name__ == "__main__":
     test_results = []
 
     # Run all tests
-    test_results.append(("Conversation dependencies", test_conversation_cache_dependencies()))
-    test_results.append(("Tournament dependencies", test_tournament_cache_dependencies()))
-    test_results.append(("Eval config dependencies", test_eval_config_change_dependencies()))
+    test_results.append(
+        ("Conversation dependencies", test_conversation_cache_dependencies())
+    )
+    test_results.append(
+        ("Tournament dependencies", test_tournament_cache_dependencies())
+    )
+    test_results.append(
+        ("Eval config dependencies", test_eval_config_change_dependencies())
+    )
     test_results.append(("Cross-stage dependencies", test_cross_stage_dependencies()))
     test_results.append(("Cache key consistency", test_cache_key_consistency()))
     test_results.append(("Current cache state", test_current_cache_state_analysis()))

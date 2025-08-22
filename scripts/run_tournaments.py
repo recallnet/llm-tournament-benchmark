@@ -9,6 +9,7 @@ import json
 import math
 import os
 import random
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -32,7 +33,9 @@ class TournamentMatch:
         self.match_id = self._generate_match_id()
         self.timestamp: str | None = None
         self.judge_votes: dict[str, str] = {}  # judge_id -> "A" | "B" | "TIE"
-        self.judge_conversations: dict[str, list[dict[str, str]]] = {}  # judge_id -> full messages array
+        self.judge_conversations: dict[str, list[dict[str, str]]] = (
+            {}
+        )  # judge_id -> full messages array
         self.judge_explanations: dict[str, str] = {}  # judge_id -> reasoning text
         self.result: str | None = None  # "A" | "B" | "TIE"
         self.conversation_a_key: str | None = None
@@ -45,7 +48,13 @@ class TournamentMatch:
         content = f"{models[0]}:{models[1]}:{self.eval_id}:{self.skill_id}"
         return hashlib.sha256(content.encode()).hexdigest()[:16]
 
-    def add_judge_result(self, judge_id: str, vote: str, conversation: list[dict[str, str]], explanation: str) -> None:
+    def add_judge_result(
+        self,
+        judge_id: str,
+        vote: str,
+        conversation: list[dict[str, str]],
+        explanation: str,
+    ) -> None:
         """Add a judge's complete result for this match."""
         if vote not in ["A", "B", "TIE"]:
             raise ValueError(f"Invalid vote: {vote}. Must be 'A', 'B', or 'TIE'")
@@ -113,7 +122,9 @@ class SwissTournament:
         # Tournament state
         self.rounds: list[list[TournamentMatch]] = []
         self.scores: dict[str, float] = {model_id: 0.0 for model_id in self.model_ids}
-        self.head_to_head: dict[tuple[str, str], str] = {}  # (model_a, model_b) -> winner
+        self.head_to_head: dict[tuple[str, str], str] = (
+            {}
+        )  # (model_a, model_b) -> winner
         self.completed = False
         self.winner: str | None = None
 
@@ -137,10 +148,21 @@ class SwissTournament:
             # First round: random pairings
             shuffled = self.model_ids.copy()
             random.shuffle(shuffled)
-            return [(shuffled[i], shuffled[i + 1]) for i in range(0, len(shuffled) - 1, 2)]
+            return [
+                (shuffled[i], shuffled[i + 1]) for i in range(0, len(shuffled) - 1, 2)
+            ]
 
         # Subsequent rounds: pair by score, avoid rematches
-        sorted_by_score = sorted(self.model_ids, key=lambda x: (self.scores[x], x), reverse=True)
+        sorted_by_score = sorted(
+            self.model_ids, key=lambda x: (self.scores[x], x), reverse=True
+        )
+
+        # Build set of all previous pairings for efficient lookup
+        previous_pairings = set()
+        for round_matches in self.rounds:
+            for match in round_matches:
+                pair_key = tuple(sorted([match.model_a_id, match.model_b_id]))
+                previous_pairings.add(pair_key)
 
         pairings = []
         used = set()
@@ -152,6 +174,7 @@ class SwissTournament:
                 continue
 
             # Find best pairing for current model
+            paired = False
             for j in range(i + 1, len(sorted_by_score)):
                 if sorted_by_score[j] in used:
                     continue
@@ -159,14 +182,27 @@ class SwissTournament:
                 model_a, model_b = sorted_by_score[i], sorted_by_score[j]
                 pair_key = tuple(sorted([model_a, model_b]))
 
-                # Avoid rematches
-                if pair_key not in [
-                    (tuple(sorted([m.model_a_id, m.model_b_id]))) for round_matches in self.rounds for m in round_matches
-                ]:
+                # Check if this pairing already occurred
+                if pair_key not in previous_pairings:
                     pairings.append((model_a, model_b))
                     used.add(model_a)
                     used.add(model_b)
+                    paired = True
                     break
+
+            # If no valid pairing found, we must allow a rematch (Swiss constraint)
+            if not paired:
+                # Pair with closest available opponent even if it's a rematch
+                for j in range(i + 1, len(sorted_by_score)):
+                    if sorted_by_score[j] not in used:
+                        model_a, model_b = sorted_by_score[i], sorted_by_score[j]
+                        pairings.append((model_a, model_b))
+                        used.add(model_a)
+                        used.add(model_b)
+                        print(
+                            f"      ⚠️  Forced rematch: {model_a} vs {model_b} (no other pairings available)"
+                        )
+                        break
 
             i += 1
 
@@ -176,6 +212,7 @@ class SwissTournament:
             # Award bye (1 point) to lowest-scoring unused model
             bye_model = min(unused, key=lambda x: self.scores[x])
             self.scores[bye_model] += 1.0
+            print(f"      👋 Bye awarded to: {bye_model}")
 
         return pairings
 
@@ -220,7 +257,10 @@ class SwissTournament:
             "skill_id": self.skill_id,
             "eval_id": self.eval_id,
             "model_ids": self.model_ids,
-            "rounds": [[match.to_dict() for match in round_matches] for round_matches in self.rounds],
+            "rounds": [
+                [match.to_dict() for match in round_matches]
+                for round_matches in self.rounds
+            ],
             "scores": self.scores,
             "head_to_head": {f"{k[0]}:{k[1]}": v for k, v in self.head_to_head.items()},
             "completed": self.completed,
@@ -235,8 +275,19 @@ class JudgeExecutor:
     def __init__(self, cache_dir: Path):
         # SAFETY: Cache directory must always be provided by caller to prevent path confusion
         self.api_key = os.getenv("OPENROUTER_API_KEY")
-        if not self.api_key:
+
+        # Allow mock execution for testing environments
+        is_testing = (
+            os.getenv("AFBENCH_TESTING") == "true"
+            or "test" in str(cache_dir).lower()
+            or "pytest" in sys.modules
+        )
+
+        if not self.api_key and not is_testing:
             raise ValueError("OPENROUTER_API_KEY not found in environment")
+        elif is_testing and not self.api_key:
+            print("⚠️  Running in testing mode without OPENROUTER_API_KEY")
+            self.api_key = "mock-api-key-for-testing"
 
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
         self.cache_dir = cache_dir
@@ -247,20 +298,31 @@ class JudgeExecutor:
         self.min_interval = 0.1  # 100ms between requests
 
     def cleanup_invalid_match_cache(
-        self, current_models: list[dict[str, Any]], current_judges: list[dict[str, Any]], current_evals: list[dict[str, Any]]
+        self,
+        current_models: list[dict[str, Any]],
+        current_judges: list[dict[str, Any]],
+        current_evals: list[dict[str, Any]],
     ) -> None:
         """Remove ALL cached judge decisions that are no longer valid due to model/judge/eval changes."""
         # CRITICAL SAFETY: Prevent production data destruction during testing
         try:
-            from scripts.safety_guards import check_production_data_access, ensure_test_mode_for_cache_operations
+            from scripts.safety_guards import (
+                check_production_data_access,
+                ensure_test_mode_for_cache_operations,
+            )
         except ImportError:
-            from safety_guards import check_production_data_access, ensure_test_mode_for_cache_operations
+            from safety_guards import (
+                check_production_data_access,
+                ensure_test_mode_for_cache_operations,
+            )
         ensure_test_mode_for_cache_operations()
         check_production_data_access(self.cache_dir, "cache cleanup")
         current_model_ids = {model["id"] for model in current_models}
         current_judge_ids = {judge["id"] for judge in current_judges}
         current_eval_ids = {eval_data["id"] for eval_data in current_evals}
-        current_skill_ids = {eval_data["_metadata"]["skill"] for eval_data in current_evals}
+        current_skill_ids = {
+            eval_data["_metadata"]["skill"] for eval_data in current_evals
+        }
 
         cleaned_count = 0
 
@@ -325,17 +387,25 @@ class JudgeExecutor:
                             remove_reason = "corrupted cache file"
 
                         if should_remove:
-                            print(f"   🗑️  Removing invalid match cache: {cache_file.name} ({remove_reason})")
+                            print(
+                                f"   🗑️  Removing invalid match cache: {cache_file.name} ({remove_reason})"
+                            )
                             cache_file.unlink()
                             cleaned_count += 1
 
         if cleaned_count > 0:
-            print(f"   ✅ Cleaned {cleaned_count} invalid match cache files/directories")
+            print(
+                f"   ✅ Cleaned {cleaned_count} invalid match cache files/directories"
+            )
         else:
             print("   ✅ No invalid match cache files found")
 
     def _generate_judge_cache_key_with_prompt(
-        self, match: TournamentMatch, judge_id: str, final_prompt: str, eval_config: dict[str, Any]
+        self,
+        match: TournamentMatch,
+        judge_id: str,
+        final_prompt: str,
+        eval_config: dict[str, Any],
     ) -> str:
         """Generate cache key for judge decision including the actual final prompt."""
         # Include match details + judge + FINAL prompt for cache key
@@ -347,9 +417,13 @@ class JudgeExecutor:
             "model_b": match.model_b_id,
             "eval_judge_system": eval_config.get("judge", {}).get("system", ""),
         }
-        return hashlib.sha256(json.dumps(cache_content, sort_keys=True).encode()).hexdigest()[:16]
+        return hashlib.sha256(
+            json.dumps(cache_content, sort_keys=True).encode()
+        ).hexdigest()[:16]
 
-    def _get_judge_cache_path(self, match: TournamentMatch, judge_id: str, cache_key: str) -> Path:
+    def _get_judge_cache_path(
+        self, match: TournamentMatch, judge_id: str, cache_key: str
+    ) -> Path:
         """Get cache file path for judge decision."""
         safe_judge_id = judge_id.replace("/", "_").replace(":", "_")
         filename = f"{match.match_id}_{safe_judge_id}_{cache_key}.json"
@@ -379,16 +453,65 @@ class JudgeExecutor:
             time.sleep(self.min_interval - elapsed)
         self.last_request_time = time.time()
 
-    def _make_api_request(self, model_id: str, messages: list[dict[str, str]]) -> dict[str, Any]:
-        """Make a request to OpenRouter API."""
+    def _make_api_request(
+        self,
+        model_id: str,
+        messages: list[dict[str, str]],
+        endpoint: str = "openrouter",
+    ) -> dict[str, Any]:
+        """Make a request to API or return mock response for testing."""
+        # Handle mock endpoints for testing
+        if endpoint == "mock":
+            return self._generate_mock_response(model_id, messages)
+
         self._rate_limit()
 
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
         payload = {"model": model_id, "messages": messages}
 
         response = requests.post(self.base_url, headers=headers, json=payload)
         response.raise_for_status()
         return response.json()
+
+    def _generate_mock_response(
+        self, model_id: str, messages: list[dict[str, str]]
+    ) -> dict[str, Any]:
+        """Generate deterministic mock response for testing."""
+        # Extract judge behavior from model_id (e.g., "test/judge-agree_A" -> "agree_A")
+        judge_behavior = "agree_A"  # Default
+        if "agree_A" in model_id:
+            judge_behavior = "agree_A"
+        elif "agree_B" in model_id:
+            judge_behavior = "agree_B"
+        elif "agree_TIE" in model_id:
+            judge_behavior = "agree_TIE"
+        elif "disagree_A" in model_id:
+            judge_behavior = "disagree_A"
+        elif "disagree_B" in model_id:
+            judge_behavior = "disagree_B"
+
+        # Generate response based on behavior
+        if judge_behavior == "agree_A":
+            content = "After careful analysis, I believe Option A provides a better response. MY VOTE IS FOR: A"
+        elif judge_behavior == "agree_B":
+            content = "After careful analysis, I believe Option B provides a better response. MY VOTE IS FOR: B"
+        elif judge_behavior == "agree_TIE":
+            content = "Both responses have equal merit and quality. MY VOTE IS FOR: TIE"
+        elif judge_behavior == "disagree_A":
+            content = "I disagree with the previous assessment. Option A is clearly better. MY VOTE IS FOR: A"
+        elif judge_behavior == "disagree_B":
+            content = "I disagree with the previous assessment. Option B is clearly better. MY VOTE IS FOR: B"
+        else:
+            content = "Both responses are comparable in quality. MY VOTE IS FOR: TIE"
+
+        return {
+            "choices": [{"message": {"content": content, "role": "assistant"}}],
+            "_mock": True,
+            "_behavior": judge_behavior,
+        }
 
     def _build_view_content(
         self,
@@ -409,7 +532,9 @@ class JudgeExecutor:
 
             if kind == "step":
                 # Find conversation directly from cache
-                conversation = find_conversation_in_cache(conversations_cache_dir, skill_id, eval_id, model_id)
+                conversation = find_conversation_in_cache(
+                    conversations_cache_dir, skill_id, eval_id, model_id
+                )
 
                 if not conversation:
                     content_parts.append(f"[STEP_NOT_FOUND: {item_id}]")
@@ -427,7 +552,9 @@ class JudgeExecutor:
                 elif part == "history":
                     # Get the full conversation history for this step
                     messages = conversation.get("messages", [])
-                    history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
+                    history_text = "\n".join(
+                        [f"{msg['role']}: {msg['content']}" for msg in messages]
+                    )
                     content_parts.append(history_text)
 
             elif kind == "intermediary":
@@ -460,7 +587,9 @@ class JudgeExecutor:
                 elif part == "history":
                     # Get the full intermediary conversation
                     messages = intermediary.get("messages", [])
-                    history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
+                    history_text = "\n".join(
+                        [f"{msg['role']}: {msg['content']}" for msg in messages]
+                    )
                     content_parts.append(history_text)
 
         return "\n\n".join(content_parts)
@@ -503,13 +632,19 @@ class JudgeExecutor:
         judge_prompt += "\n\nPlease end your response with exactly one of these formats:\n- MY VOTE IS FOR: A\n- MY VOTE IS FOR: B\n- MY VOTE IS FOR: TIE"
 
         # Generate cache key based on the FINAL prompt (not the template)
-        cache_key = self._generate_judge_cache_key_with_prompt(match, judge_id, judge_prompt, eval_config)
+        cache_key = self._generate_judge_cache_key_with_prompt(
+            match, judge_id, judge_prompt, eval_config
+        )
         cache_path = self._get_judge_cache_path(match, judge_id, cache_key)
 
         cached_result = self._load_judge_cache(cache_path)
         if cached_result:
             print(f"    📋 Using cached judge decision: {judge_id}")
-            return cached_result["vote"], cached_result["conversation"], cached_result["explanation"]
+            return (
+                cached_result["vote"],
+                cached_result["conversation"],
+                cached_result["explanation"],
+            )
 
         # Create messages for judge
         messages = []
@@ -521,7 +656,8 @@ class JudgeExecutor:
 
         try:
             # Execute judge decision
-            response = self._make_api_request(judge_id, messages)
+            judge_endpoint = judge.get("endpoint", "openrouter")
+            response = self._make_api_request(judge_id, messages, judge_endpoint)
 
             if "choices" not in response or not response["choices"]:
                 raise Exception(f"Invalid API response: {response}")
@@ -594,11 +730,23 @@ class JudgeExecutor:
         response_lower = judge_response.lower()
 
         # Look for explicit choice statements
-        if "choose a" in response_lower or "option a" in response_lower or judge_response.strip().upper().startswith("A"):
+        if (
+            "choose a" in response_lower
+            or "option a" in response_lower
+            or judge_response.strip().upper().startswith("A")
+        ):
             return "A"
-        elif "choose b" in response_lower or "option b" in response_lower or judge_response.strip().upper().startswith("B"):
+        elif (
+            "choose b" in response_lower
+            or "option b" in response_lower
+            or judge_response.strip().upper().startswith("B")
+        ):
             return "B"
-        elif "tie" in response_lower or "equal" in response_lower or "draw" in response_lower:
+        elif (
+            "tie" in response_lower
+            or "equal" in response_lower
+            or "draw" in response_lower
+        ):
             return "TIE"
 
         # Fallback: look for A or B near the start of response
@@ -612,7 +760,9 @@ class JudgeExecutor:
         return "TIE"
 
 
-def find_conversation_in_cache(cache_dir: str, skill_id: str, eval_id: str, model_id: str) -> dict | None:
+def find_conversation_in_cache(
+    cache_dir: str, skill_id: str, eval_id: str, model_id: str
+) -> dict | None:
     """
     Find a conversation directly from cache files instead of mega conversations.json.
 
@@ -625,14 +775,14 @@ def find_conversation_in_cache(cache_dir: str, skill_id: str, eval_id: str, mode
     Returns:
         Conversation dict or None if not found
     """
-    import glob
 
     # Sanitize model ID for filename pattern
     safe_model_id = model_id.replace("/", "_").replace(":", "_")
 
     # Look for cache files matching this model/eval combination
-    cache_pattern = f"{cache_dir}/{skill_id}/{eval_id}_{safe_model_id}_*.json"
-    matching_files = list(Path(cache_dir).glob(f"{skill_id}/{eval_id}_{safe_model_id}_*.json"))
+    matching_files = list(
+        Path(cache_dir).glob(f"{skill_id}/{eval_id}_{safe_model_id}_*.json")
+    )
 
     if not matching_files:
         return None
@@ -648,7 +798,9 @@ def find_conversation_in_cache(cache_dir: str, skill_id: str, eval_id: str, mode
         return None
 
 
-def build_judge_prompt_from_cache(cache_dir: str, skill_id: str, eval_id: str, model_a_id: str, model_b_id: str) -> str:
+def build_judge_prompt_from_cache(
+    cache_dir: str, skill_id: str, eval_id: str, model_a_id: str, model_b_id: str
+) -> str:
     """
     Build judge prompt by reading conversations directly from cache.
 
@@ -696,7 +848,13 @@ Which response is better? Choose A, B, or TIE."""
     return prompt
 
 
-def main_with_cache_dir(conversations_cache_dir: str, models_file: str, judges_file: str, skills_file: str, output_file: str):
+def main_with_cache_dir(
+    conversations_cache_dir: str,
+    models_file: str,
+    judges_file: str,
+    skills_file: str,
+    output_file: str,
+):
     """
     Main function that reads directly from conversation cache directory.
 
@@ -724,7 +882,7 @@ def main_with_cache_dir(conversations_cache_dir: str, models_file: str, judges_f
 
     models = models_data["models"]
     judges = judges_data["judges"]
-    skills = skills_data["skills"]
+    skills_data["skills"]
     evals = skills_data["evals"]
 
     print(f"📊 Loaded {len(models)} models, {len(judges)} judges, {len(evals)} evals")
@@ -732,7 +890,9 @@ def main_with_cache_dir(conversations_cache_dir: str, models_file: str, judges_f
 
     # Define judge cache directory from conversation cache directory structure
     conversations_path = Path(conversations_cache_dir)
-    data_dir = conversations_path.parent  # Go up one level from conversations to data/profile
+    data_dir = (
+        conversations_path.parent
+    )  # Go up one level from conversations to data/profile
     cache_dir = data_dir / "judge_cache"
     print(f"📁 Using judge cache: {cache_dir}")
 
@@ -794,14 +954,18 @@ def main_with_cache_dir(conversations_cache_dir: str, models_file: str, judges_f
                     # Execute judges for this match
                     for i, judge in enumerate(judges):
                         try:
-                            vote, conversation, explanation = judge_executor.execute_judge_decision(
-                                match,
-                                judge,
-                                eval_data,
-                                conversations_cache_dir,
-                                intermediaries_data,
+                            vote, conversation, explanation = (
+                                judge_executor.execute_judge_decision(
+                                    match,
+                                    judge,
+                                    eval_data,
+                                    conversations_cache_dir,
+                                    intermediaries_data,
+                                )
                             )
-                            match.add_judge_result(judge["id"], vote, conversation, explanation)
+                            match.add_judge_result(
+                                judge["id"], vote, conversation, explanation
+                            )
 
                             # Check for early consensus after 2nd judge
                             if i == 1 and match.check_early_consensus():
@@ -815,7 +979,9 @@ def main_with_cache_dir(conversations_cache_dir: str, models_file: str, judges_f
                                 {"role": "user", "content": "[JUDGE_EXECUTION_ERROR]"},
                                 {"role": "assistant", "content": f"Error: {e}"},
                             ]
-                            match.add_judge_result(judge["id"], "TIE", error_conversation, f"Error: {e}")
+                            match.add_judge_result(
+                                judge["id"], "TIE", error_conversation, f"Error: {e}"
+                            )
 
                     # Calculate match result
                     match.calculate_result()
@@ -856,7 +1022,11 @@ def main_with_cache_dir(conversations_cache_dir: str, models_file: str, judges_f
 
 
 def main_with_cache_dir_data_driven(
-    conversations_cache_dir: str, models_file: str, judges_file: str, skills_file: str, output_file: str
+    conversations_cache_dir: str,
+    models_file: str,
+    judges_file: str,
+    skills_file: str,
+    output_file: str,
 ):
     """
     Data-driven tournament generation that fixes the restart loop bug.
@@ -900,24 +1070,28 @@ def main_with_cache_dir_data_driven(
     skills_with_conversations = detector.get_skills_with_conversations()
 
     # Define judge cache directory
-    data_dir = conversations_dir.parent  # Go up one level from conversations to data/profile
+    data_dir = (
+        conversations_dir.parent
+    )  # Go up one level from conversations to data/profile
     cache_dir = data_dir / "judge_cache"
 
     print(f"📊 Loaded {len(models)} models, {len(judges)} judges")
     print(f"📁 Using conversation cache: {conversations_cache_dir}")
     print(f"📁 Using judge cache: {cache_dir}")
-    print(f"🔍 Found conversations for skills: {sorted(list(skills_with_conversations))}")
+    print(f"🔍 Found conversations for skills: {sorted(skills_with_conversations)}")
 
     # Filter evals to only include those for skills with conversations
     available_evals = []
-    skills_lookup = dict(skills_data["skills"].items())
+    dict(skills_data["skills"].items())
 
     for eval_data in skills_data["evals"]:
         skill_id = eval_data["_metadata"]["skill"]
         if skill_id in skills_with_conversations:
             available_evals.append(eval_data)
 
-    print(f"🚀 Running tournaments for {len(available_evals)} evals across {len(skills_with_conversations)} skills...")
+    print(
+        f"🚀 Running tournaments for {len(available_evals)} evals across {len(skills_with_conversations)} skills..."
+    )
 
     if len(models) < 2:
         print("⚠️  Need at least 2 models for tournaments - skipping")
@@ -939,7 +1113,9 @@ def main_with_cache_dir_data_driven(
 
         # Process tournaments for all skills with conversations
         for skill_id in sorted(skills_with_conversations):
-            skill_evals = [e for e in available_evals if e["_metadata"]["skill"] == skill_id]
+            skill_evals = [
+                e for e in available_evals if e["_metadata"]["skill"] == skill_id
+            ]
 
             if not skill_evals:
                 continue
@@ -969,33 +1145,49 @@ def main_with_cache_dir_data_driven(
                         print(f"      🥊 {model_a_id} vs {model_b_id}")
 
                         # Create match
-                        match = TournamentMatch(model_a_id, model_b_id, eval_id, skill_id_from_eval)
+                        match = TournamentMatch(
+                            model_a_id, model_b_id, eval_id, skill_id_from_eval
+                        )
                         match.timestamp = datetime.utcnow().isoformat()
 
                         # Execute judges for this match
                         for i, judge in enumerate(judges):
                             try:
-                                vote, conversation, explanation = judge_executor.execute_judge_decision(
-                                    match,
-                                    judge,
-                                    eval_data,
-                                    conversations_cache_dir,
-                                    {},  # Empty intermediaries for now
+                                vote, conversation, explanation = (
+                                    judge_executor.execute_judge_decision(
+                                        match,
+                                        judge,
+                                        eval_data,
+                                        conversations_cache_dir,
+                                        {},  # Empty intermediaries for now
+                                    )
                                 )
-                                match.add_judge_result(judge["id"], vote, conversation, explanation)
+                                match.add_judge_result(
+                                    judge["id"], vote, conversation, explanation
+                                )
 
                                 # Check for early consensus after 2nd judge
                                 if i == 1 and match.check_early_consensus():
-                                    print(f"         🎯 Early consensus reached: {vote}")
+                                    print(
+                                        f"         🎯 Early consensus reached: {vote}"
+                                    )
                                     break
 
                             except Exception as e:
                                 print(f"         ❌ Judge {judge['id']} failed: {e}")
                                 error_conversation = [
-                                    {"role": "user", "content": "[JUDGE_EXECUTION_ERROR]"},
+                                    {
+                                        "role": "user",
+                                        "content": "[JUDGE_EXECUTION_ERROR]",
+                                    },
                                     {"role": "assistant", "content": f"Error: {e}"},
                                 ]
-                                match.add_judge_result(judge["id"], "TIE", error_conversation, f"Error: {e}")
+                                match.add_judge_result(
+                                    judge["id"],
+                                    "TIE",
+                                    error_conversation,
+                                    f"Error: {e}",
+                                )
 
                         # Calculate match result
                         match.calculate_result()
@@ -1086,7 +1278,7 @@ def main():
 
     # Load all input data
     with open(conversations_file) as f:
-        conversations_data = json.load(f)
+        json.load(f)
 
     with open(models_file) as f:
         models_data = json.load(f)
@@ -1158,14 +1350,18 @@ def main():
                     # Execute judges for this match
                     for i, judge in enumerate(judges):
                         try:
-                            vote, conversation, explanation = judge_executor.execute_judge_decision(
-                                match,
-                                judge,
-                                eval_data,
-                                conversations_cache_dir,
-                                intermediaries_data,
+                            vote, conversation, explanation = (
+                                judge_executor.execute_judge_decision(
+                                    match,
+                                    judge,
+                                    eval_data,
+                                    conversations_cache_dir,
+                                    intermediaries_data,
+                                )
                             )
-                            match.add_judge_result(judge["id"], vote, conversation, explanation)
+                            match.add_judge_result(
+                                judge["id"], vote, conversation, explanation
+                            )
 
                             # Check for early consensus after 2nd judge
                             if i == 1 and match.check_early_consensus():
@@ -1179,7 +1375,9 @@ def main():
                                 {"role": "user", "content": "[JUDGE_EXECUTION_ERROR]"},
                                 {"role": "assistant", "content": f"Error: {e}"},
                             ]
-                            match.add_judge_result(judge["id"], "TIE", error_conversation, f"Error: {e}")
+                            match.add_judge_result(
+                                judge["id"], "TIE", error_conversation, f"Error: {e}"
+                            )
 
                     # Calculate match result
                     match.calculate_result()

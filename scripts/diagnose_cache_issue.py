@@ -85,7 +85,11 @@ def analyze_cache_state():
 
     # Check output files
     print("\n📤 OUTPUT FILES:")
-    output_files = ["tournaments.json", "tournament_summaries.json", "skill_ratings.json"]
+    output_files = [
+        "tournaments.json",
+        "tournament_summaries.json",
+        "skill_ratings.json",
+    ]
 
     for output_file in output_files:
         path = data_dir / output_file
@@ -146,7 +150,11 @@ def check_pipeline_health():
     issues = []
 
     # Check required files
-    required_files = ["data/loaded_models.json", "data/loaded_judges.json", "data/loaded_skills.json"]
+    required_files = [
+        "data/loaded_models.json",
+        "data/loaded_judges.json",
+        "data/loaded_skills.json",
+    ]
 
     for req_file in required_files:
         if not Path(req_file).exists():
@@ -158,7 +166,9 @@ def check_pipeline_health():
         # Extract model IDs from cache markers
         cached_models = set()
         for marker in cache_markers:
-            model_id = marker.name.replace("conversations_cache_", "").replace(".done", "")
+            model_id = marker.name.replace("conversations_cache_", "").replace(
+                ".done", ""
+            )
             cached_models.add(model_id)
 
         # Check against loaded models
@@ -171,7 +181,9 @@ def check_pipeline_health():
                     loaded_model_ids.add(model_id)
 
                 if cached_models != loaded_model_ids:
-                    issues.append(f"Cache/models mismatch: cached={cached_models}, loaded={loaded_model_ids}")
+                    issues.append(
+                        f"Cache/models mismatch: cached={cached_models}, loaded={loaded_model_ids}"
+                    )
 
             except Exception as e:
                 issues.append(f"Error checking model consistency: {e}")

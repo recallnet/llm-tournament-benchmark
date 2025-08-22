@@ -17,8 +17,13 @@ class TestLoadSkillRatings:
     def test_load_skill_ratings_success(self):
         """Test successful loading of skill ratings data."""
         test_data = {
-            "skill_ratings": {"skill1": {"model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}}},
-            "execution_info": {"timestamp": "2024-01-01T00:00:00", "cache_key": "test_key"},
+            "skill_ratings": {
+                "skill1": {"model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}}
+            },
+            "execution_info": {
+                "timestamp": "2024-01-01T00:00:00",
+                "cache_key": "test_key",
+            },
         }
 
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -53,7 +58,9 @@ class TestLoadSkillRatings:
                     load_skill_ratings()
 
                 assert exc_info.value.code == 1
-                mock_print.assert_called_with("❌ No skill ratings found. Run the pipeline first.")
+                mock_print.assert_called_with(
+                    "❌ No skill ratings found. Run the pipeline first."
+                )
 
     def test_load_skill_ratings_json_error(self):
         """Test load_skill_ratings with invalid JSON."""
@@ -84,13 +91,22 @@ class TestFormatResultsTable:
         ratings_data = {
             "skill_ratings": {
                 "skill_alpha": {
-                    "model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}, "model_b": {"mu": 1550.0, "sigma": 95.0}}
+                    "model_ratings": {
+                        "model_a": {"mu": 1600.0, "sigma": 90.0},
+                        "model_b": {"mu": 1550.0, "sigma": 95.0},
+                    }
                 },
                 "skill_beta": {
-                    "model_ratings": {"model_a": {"mu": 1580.0, "sigma": 85.0}, "model_b": {"mu": 1620.0, "sigma": 88.0}}
+                    "model_ratings": {
+                        "model_a": {"mu": 1580.0, "sigma": 85.0},
+                        "model_b": {"mu": 1620.0, "sigma": 88.0},
+                    }
                 },
             },
-            "execution_info": {"timestamp": "2024-01-01T12:00:00", "cache_key": "test_cache_123"},
+            "execution_info": {
+                "timestamp": "2024-01-01T12:00:00",
+                "cache_key": "test_cache_123",
+            },
         }
 
         # Capture stdout
@@ -123,7 +139,10 @@ class TestFormatResultsTable:
 
     def test_format_results_table_empty_skill_ratings(self):
         """Test formatting with empty skill_ratings."""
-        ratings_data = {"skill_ratings": {}, "execution_info": {"timestamp": "2024-01-01T12:00:00"}}
+        ratings_data = {
+            "skill_ratings": {},
+            "execution_info": {"timestamp": "2024-01-01T12:00:00"},
+        }
 
         with patch("sys.stdout", new=StringIO()) as fake_out:
             format_results_table(ratings_data)
@@ -133,7 +152,12 @@ class TestFormatResultsTable:
 
     def test_format_results_table_no_model_ratings(self):
         """Test formatting with skills but no model ratings."""
-        ratings_data = {"skill_ratings": {"skill_alpha": {"model_ratings": {}}, "skill_beta": {"model_ratings": {}}}}
+        ratings_data = {
+            "skill_ratings": {
+                "skill_alpha": {"model_ratings": {}},
+                "skill_beta": {"model_ratings": {}},
+            }
+        }
 
         with patch("sys.stdout", new=StringIO()) as fake_out:
             format_results_table(ratings_data)
@@ -143,7 +167,9 @@ class TestFormatResultsTable:
 
     def test_format_results_table_missing_model_ratings_key(self):
         """Test formatting with skills missing model_ratings key."""
-        ratings_data = {"skill_ratings": {"skill_alpha": {}, "skill_beta": {}}}  # No model_ratings key
+        ratings_data = {
+            "skill_ratings": {"skill_alpha": {}, "skill_beta": {}}
+        }  # No model_ratings key
 
         with patch("sys.stdout", new=StringIO()) as fake_out:
             format_results_table(ratings_data)
@@ -154,8 +180,15 @@ class TestFormatResultsTable:
     def test_format_results_table_single_model_single_skill(self):
         """Test formatting with single model and skill."""
         ratings_data = {
-            "skill_ratings": {"single_skill": {"model_ratings": {"single_model": {"mu": 1500.0, "sigma": 100.0}}}},
-            "execution_info": {"timestamp": "2024-01-01T12:00:00", "cache_key": "single_test"},
+            "skill_ratings": {
+                "single_skill": {
+                    "model_ratings": {"single_model": {"mu": 1500.0, "sigma": 100.0}}
+                }
+            },
+            "execution_info": {
+                "timestamp": "2024-01-01T12:00:00",
+                "cache_key": "single_test",
+            },
         }
 
         with patch("sys.stdout", new=StringIO()) as fake_out:
@@ -172,7 +205,10 @@ class TestFormatResultsTable:
         ratings_data = {
             "skill_ratings": {
                 "skill_alpha": {
-                    "model_ratings": {"model_a": {"sigma": 90.0}, "model_b": {"mu": 1550.0, "sigma": 95.0}}  # Missing mu
+                    "model_ratings": {
+                        "model_a": {"sigma": 90.0},
+                        "model_b": {"mu": 1550.0, "sigma": 95.0},
+                    }  # Missing mu
                 }
             }
         }
@@ -190,7 +226,10 @@ class TestFormatResultsTable:
         ratings_data = {
             "skill_ratings": {
                 "skill_alpha": {
-                    "model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}, "model_b": {"mu": 1550.0, "sigma": 95.0}}
+                    "model_ratings": {
+                        "model_a": {"mu": 1600.0, "sigma": 90.0},
+                        "model_b": {"mu": 1550.0, "sigma": 95.0},
+                    }
                 },
                 "skill_beta": {
                     "model_ratings": {
@@ -213,7 +252,9 @@ class TestFormatResultsTable:
         """Test formatting with long skill names that need truncation."""
         ratings_data = {
             "skill_ratings": {
-                "very_long_skill_name_that_exceeds_column_width": {"model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}}
+                "very_long_skill_name_that_exceeds_column_width": {
+                    "model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}
+                }
             }
         }
 
@@ -229,7 +270,10 @@ class TestFormatResultsTable:
             "skill_ratings": {
                 "skill_alpha": {
                     "model_ratings": {
-                        "very_very_long_model_name_that_affects_column_width": {"mu": 1600.0, "sigma": 90.0},
+                        "very_very_long_model_name_that_affects_column_width": {
+                            "mu": 1600.0,
+                            "sigma": 90.0,
+                        },
                         "short": {"mu": 1550.0, "sigma": 95.0},
                     }
                 }
@@ -262,12 +306,20 @@ class TestFormatResultsTable:
 
         # Check for 0.0 in rating column for model with no mu (default value is 0)
         lines = output.split("\n")
-        model_line = next((line for line in lines if "model_with_no_ratings" in line), "")
+        model_line = next(
+            (line for line in lines if "model_with_no_ratings" in line), ""
+        )
         assert "0.0" in model_line
 
     def test_format_results_table_missing_execution_info(self):
         """Test formatting with missing execution_info."""
-        ratings_data = {"skill_ratings": {"skill_alpha": {"model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}}}}
+        ratings_data = {
+            "skill_ratings": {
+                "skill_alpha": {
+                    "model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}
+                }
+            }
+        }
 
         with patch("sys.stdout", new=StringIO()) as fake_out:
             format_results_table(ratings_data)
@@ -279,7 +331,11 @@ class TestFormatResultsTable:
     def test_format_results_table_partial_execution_info(self):
         """Test formatting with partial execution_info."""
         ratings_data = {
-            "skill_ratings": {"skill_alpha": {"model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}}},
+            "skill_ratings": {
+                "skill_alpha": {
+                    "model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}
+                }
+            },
             "execution_info": {
                 "timestamp": "2024-01-01T12:00:00"
                 # Missing cache_key
@@ -297,8 +353,12 @@ class TestFormatResultsTable:
         """Test that skill names are properly formatted (title case, underscores replaced)."""
         ratings_data = {
             "skill_ratings": {
-                "skill_with_underscores": {"model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}},
-                "anotherskill": {"model_ratings": {"model_a": {"mu": 1550.0, "sigma": 95.0}}},
+                "skill_with_underscores": {
+                    "model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}
+                },
+                "anotherskill": {
+                    "model_ratings": {"model_a": {"mu": 1550.0, "sigma": 95.0}}
+                },
             }
         }
 
@@ -349,14 +409,23 @@ class TestMainFunction:
     def test_main_success(self):
         """Test successful main function execution."""
         test_data = {
-            "skill_ratings": {"skill_alpha": {"model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}}},
-            "execution_info": {"timestamp": "2024-01-01T12:00:00", "cache_key": "test_key"},
+            "skill_ratings": {
+                "skill_alpha": {
+                    "model_ratings": {"model_a": {"mu": 1600.0, "sigma": 90.0}}
+                }
+            },
+            "execution_info": {
+                "timestamp": "2024-01-01T12:00:00",
+                "cache_key": "test_key",
+            },
         }
 
         with patch("scripts.print_results_table.load_skill_ratings") as mock_load:
             mock_load.return_value = test_data
 
-            with patch("scripts.print_results_table.format_results_table") as mock_format:
+            with patch(
+                "scripts.print_results_table.format_results_table"
+            ) as mock_format:
                 main()
 
                 mock_load.assert_called_once()
@@ -372,7 +441,9 @@ class TestMainFunction:
                     main()
 
                 assert exc_info.value.code == 1
-                mock_print.assert_called_with("❌ Error printing results table: Load error")
+                mock_print.assert_called_with(
+                    "❌ Error printing results table: Load error"
+                )
 
     def test_main_format_error(self):
         """Test main function handles formatting errors."""
@@ -381,7 +452,9 @@ class TestMainFunction:
         with patch("scripts.print_results_table.load_skill_ratings") as mock_load:
             mock_load.return_value = test_data
 
-            with patch("scripts.print_results_table.format_results_table") as mock_format:
+            with patch(
+                "scripts.print_results_table.format_results_table"
+            ) as mock_format:
                 mock_format.side_effect = Exception("Format error")
 
                 with patch("builtins.print") as mock_print:
@@ -389,7 +462,9 @@ class TestMainFunction:
                         main()
 
                     assert exc_info.value.code == 1
-                    mock_print.assert_called_with("❌ Error printing results table: Format error")
+                    mock_print.assert_called_with(
+                        "❌ Error printing results table: Format error"
+                    )
 
     def test_main_module_execution(self):
         """Test module-level execution."""
@@ -410,7 +485,12 @@ class TestEdgeCases:
         """Test with model that has empty ratings dictionary."""
         ratings_data = {
             "skill_ratings": {
-                "skill_alpha": {"model_ratings": {"empty_model": {}, "normal_model": {"mu": 1600.0, "sigma": 90.0}}}
+                "skill_alpha": {
+                    "model_ratings": {
+                        "empty_model": {},
+                        "normal_model": {"mu": 1600.0, "sigma": 90.0},
+                    }
+                }
             }
         }
 
@@ -426,7 +506,12 @@ class TestEdgeCases:
         """Test with model rating data that is None."""
         ratings_data = {
             "skill_ratings": {
-                "skill_alpha": {"model_ratings": {"model_a": None, "model_b": {"mu": 1600.0, "sigma": 90.0}}}  # Explicit None
+                "skill_alpha": {
+                    "model_ratings": {
+                        "model_a": None,
+                        "model_b": {"mu": 1600.0, "sigma": 90.0},
+                    }
+                }  # Explicit None
             }
         }
 
@@ -442,7 +527,9 @@ class TestEdgeCases:
         ratings_data = {
             "skill_ratings": {
                 "a": {  # Single character skill name
-                    "model_ratings": {"x": {"mu": 1600.0, "sigma": 90.0}}  # Single character model
+                    "model_ratings": {
+                        "x": {"mu": 1600.0, "sigma": 90.0}
+                    }  # Single character model
                 }
             }
         }
@@ -458,7 +545,9 @@ class TestEdgeCases:
         """Test column width calculation with various name lengths."""
         # Test with model name shorter than "Model"
         ratings_data = {
-            "skill_ratings": {"skill": {"model_ratings": {"a": {"mu": 1600.0, "sigma": 90.0}}}}  # Shorter than "Model"
+            "skill_ratings": {
+                "skill": {"model_ratings": {"a": {"mu": 1600.0, "sigma": 90.0}}}
+            }  # Shorter than "Model"
         }
 
         with patch("sys.stdout", new=StringIO()) as fake_out:
@@ -472,7 +561,11 @@ class TestEdgeCases:
         """Test skill name truncation at exact boundary conditions."""
         # Create skill name that's exactly at truncation boundary
         skill_name = "x" * 9  # skill_width - 3 = 12 - 3 = 9
-        ratings_data = {"skill_ratings": {skill_name: {"model_ratings": {"model": {"mu": 1600.0, "sigma": 90.0}}}}}
+        ratings_data = {
+            "skill_ratings": {
+                skill_name: {"model_ratings": {"model": {"mu": 1600.0, "sigma": 90.0}}}
+            }
+        }
 
         with patch("sys.stdout", new=StringIO()) as fake_out:
             format_results_table(ratings_data)
@@ -487,7 +580,11 @@ class TestEdgeCases:
         """Test skill name truncation when over boundary."""
         # Create skill name longer than truncation boundary
         skill_name = "x" * 12  # Longer than skill_width - 2
-        ratings_data = {"skill_ratings": {skill_name: {"model_ratings": {"model": {"mu": 1600.0, "sigma": 90.0}}}}}
+        ratings_data = {
+            "skill_ratings": {
+                skill_name: {"model_ratings": {"model": {"mu": 1600.0, "sigma": 90.0}}}
+            }
+        }
 
         with patch("sys.stdout", new=StringIO()) as fake_out:
             format_results_table(ratings_data)

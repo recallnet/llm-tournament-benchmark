@@ -21,7 +21,9 @@ if __name__ == "__main__":
         # Data directory is parent of input files
         data_dir = summaries_file.parent
 
-        main_with_data_dir(data_dir, summaries_file, models_file, judges_file, skills_file, output_file)
+        main_with_data_dir(
+            data_dir, summaries_file, models_file, judges_file, skills_file, output_file
+        )
     elif "snakemake" in globals():
         # Fallback to snakemake context
         summaries_file = Path(snakemake.input.summaries)
@@ -32,7 +34,9 @@ if __name__ == "__main__":
 
         data_dir = summaries_file.parent
 
-        main_with_data_dir(data_dir, summaries_file, models_file, judges_file, skills_file, output_file)
+        main_with_data_dir(
+            data_dir, summaries_file, models_file, judges_file, skills_file, output_file
+        )
     else:
         # Fallback for direct execution
         main()

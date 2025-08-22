@@ -37,14 +37,22 @@ class TestJudgeExecutionSmokingGun:
             print("   🚨 SMOKING GUN CONFIRMED!")
             print("   Judge cache directory IS the tournaments directory!")
             print("   This means:")
-            print("   - Judge decisions cache to: data/tournaments/harm_avoidance/*.json")
+            print(
+                "   - Judge decisions cache to: data/tournaments/harm_avoidance/*.json"
+            )
             print("   - tournaments.json should be at: data/tournaments.json")
-            print("   - But judge cleanup targets: data/tournaments/ (same as tournaments.json parent!)")
+            print(
+                "   - But judge cleanup targets: data/tournaments/ (same as tournaments.json parent!)"
+            )
 
             # Check what's actually in the judge cache directory
             if actual_judge_cache_location.exists():
-                subdirs = [d for d in actual_judge_cache_location.iterdir() if d.is_dir()]
-                files = [f for f in actual_judge_cache_location.iterdir() if f.is_file()]
+                subdirs = [
+                    d for d in actual_judge_cache_location.iterdir() if d.is_dir()
+                ]
+                files = [
+                    f for f in actual_judge_cache_location.iterdir() if f.is_file()
+                ]
 
                 print("   Judge cache contents:")
                 print(f"   - Subdirectories: {[d.name for d in subdirs]}")
@@ -63,9 +71,13 @@ class TestJudgeExecutionSmokingGun:
                         "tournaments.json written to wrong location: data/tournaments/tournaments.json instead of data/tournaments.json"
                     )
                 else:
-                    print("   ❌ tournaments.json not found in judge cache directory either")
+                    print(
+                        "   ❌ tournaments.json not found in judge cache directory either"
+                    )
 
-            pytest.fail("Judge cache directory conflicts with tournaments.json location")
+            pytest.fail(
+                "Judge cache directory conflicts with tournaments.json location"
+            )
 
     def test_judge_decision_execution_flow(self):
         """Test the judge decision execution flow for bottlenecks."""
@@ -90,7 +102,9 @@ class TestJudgeExecutionSmokingGun:
                 print(f"   - Evals: {len(evals)}")
 
                 # Calculate tournament workload
-                model_pairs_per_eval = (len(models) * (len(models) - 1)) // 2  # Combinations of 2 models
+                model_pairs_per_eval = (
+                    len(models) * (len(models) - 1)
+                ) // 2  # Combinations of 2 models
                 total_matches = model_pairs_per_eval * len(evals)
 
                 print(f"   - Model pairs per eval: {model_pairs_per_eval}")
@@ -114,24 +128,36 @@ class TestJudgeExecutionSmokingGun:
                         print(f"   - Cached judge decisions: {len(cached_decisions)}")
 
                         coverage_percent = (
-                            (len(cached_decisions) / total_judge_decisions) * 100 if total_judge_decisions > 0 else 0
+                            (len(cached_decisions) / total_judge_decisions) * 100
+                            if total_judge_decisions > 0
+                            else 0
                         )
                         print(f"   - Cache coverage: {coverage_percent:.1f}%")
 
                         # Check which skills have judge cache
                         skills_with_cache = set()
                         for cache_file in cached_decisions:
-                            if cache_file.parent != judge_cache_dir:  # Skip root level files
+                            if (
+                                cache_file.parent != judge_cache_dir
+                            ):  # Skip root level files
                                 skills_with_cache.add(cache_file.parent.name)
 
-                        print(f"   - Skills with judge cache: {sorted(skills_with_cache)}")
+                        print(
+                            f"   - Skills with judge cache: {sorted(skills_with_cache)}"
+                        )
 
-                        expected_skills = {eval_data["_metadata"]["skill"] for eval_data in evals}
+                        expected_skills = {
+                            eval_data["_metadata"]["skill"] for eval_data in evals
+                        }
                         missing_skills = expected_skills - skills_with_cache
 
                         if missing_skills:
-                            print(f"   🚨 Skills missing judge cache: {sorted(missing_skills)}")
-                            print("   This confirms tournament generation stops after processing some skills")
+                            print(
+                                f"   🚨 Skills missing judge cache: {sorted(missing_skills)}"
+                            )
+                            print(
+                                "   This confirms tournament generation stops after processing some skills"
+                            )
                         else:
                             print("   ✅ All skills have judge cache")
 
@@ -157,7 +183,9 @@ class TestJudgeExecutionSmokingGun:
             # If only harm_avoidance has cache, that's the smoking gun
             if len(skill_cache_counts) == 1 and "harm_avoidance" in skill_cache_counts:
                 print("   🚨 SMOKING GUN: Only harm_avoidance has judge cache!")
-                print("   This means tournament generation processes harm_avoidance then fails/stops")
+                print(
+                    "   This means tournament generation processes harm_avoidance then fails/stops"
+                )
 
                 # Check what specific error might cause this
                 print("   Possible causes:")
@@ -166,11 +194,15 @@ class TestJudgeExecutionSmokingGun:
                 print("   3. API rate limiting after processing harm_avoidance")
                 print("   4. Cache directory conflict causing write failures")
 
-                pytest.fail("Tournament generation fails after processing only harm_avoidance skill")
+                pytest.fail(
+                    "Tournament generation fails after processing only harm_avoidance skill"
+                )
             elif len(skill_cache_counts) == 0:
                 print("   ❌ No judge cache found at all")
             else:
-                print(f"   ✅ Multiple skills have judge cache: {sorted(skill_cache_counts.keys())}")
+                print(
+                    f"   ✅ Multiple skills have judge cache: {sorted(skill_cache_counts.keys())}"
+                )
 
     def test_judge_cache_vs_tournaments_json_relationship(self):
         """Test the relationship between judge cache and tournaments.json generation."""
@@ -196,16 +228,24 @@ class TestJudgeExecutionSmokingGun:
                 if len(judge_files) > 0:
                     print("   🚨 CRITICAL FINDING:")
                     print(f"   - Judges have made {len(judge_files)} decisions")
-                    print("   - But tournaments.json was never created from these decisions")
-                    print("   - This means main_with_cache_dir() failed after judge execution")
+                    print(
+                        "   - But tournaments.json was never created from these decisions"
+                    )
+                    print(
+                        "   - This means main_with_cache_dir() failed after judge execution"
+                    )
 
                     # This is the key insight - judge execution works but tournament compilation fails
                     print("   💡 ROOT CAUSE:")
                     print("   Judge execution succeeds (we have cached decisions)")
                     print("   But tournament results compilation/writing fails")
-                    print("   The failure is in creating tournaments.json from judge decisions")
+                    print(
+                        "   The failure is in creating tournaments.json from judge decisions"
+                    )
 
-                    pytest.fail("Judge decisions exist but tournaments.json compilation failed")
+                    pytest.fail(
+                        "Judge decisions exist but tournaments.json compilation failed"
+                    )
 
         elif not judge_cache_exists and not tournaments_exists:
             print("   ❌ Both judge cache and tournaments.json missing")

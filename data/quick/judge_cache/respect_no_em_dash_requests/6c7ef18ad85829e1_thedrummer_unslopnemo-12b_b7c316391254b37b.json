@@ -1,5 +1,5 @@
 {
-  "vote": "A",
+  "vote": "B",
   "conversation": [
     {
       "role": "user",
@@ -7,10 +7,10 @@
     },
     {
       "role": "assistant",
-      "content": "MY VOTE IS FOR: A\n\nWhile both responses cover the key points about the importance of emotional intelligence in leadership, Solution A adheres more closely to the specified formatting. Here's how it compares to the given rules:\n\n1. The answer begins with a clear thesis statement that directly addresses the question prompts.\n\n2. Each paragraph is focused on a specific aspect of emotional intelligence as it relates to leadership, making the essay easy to follow.\n\n3. The language is professional and persuasive, employing transitions between ideas (e.g., \"Moreover,\" \"However,\" \"In addition to,\" etc.).\n\n4. Parallel sentence structure is used consistently throughout the essay.\n\n5. There are no em dashes, as requested.\n\nSolution B is also well-argued and covers the major points effectively. However, it uses em dashes more frequently than is strictly necessary, which would violate the formatting request. Furthermore, it doesn't have quite the same level of consistent sentence structure and transitions as Solution A.\n\nTherefore, while both answers are strong, I believe Solution A is the better choice based on its adherence to the formatting request. The clarity, coherence, and lack of em dashes push it over the top."
+      "content": "MY VOTE IS FOR: B\n\nResponse B adheres more closely to the formatting request of no em dashes. It uses hyphens instead for compound phrases like \"long-term health\" and \"emotional intelligence in leadership.\" In contrast, Response A includes several em dashes, such as in \"The key elements of EQ...have become\":, \"- Self-awareness...\", \"- Self-regulation...\", etc. Therefore, Response B is the better match for the formatting requirement."
     }
   ],
-  "explanation": "MY VOTE IS FOR: A\n\nWhile both responses cover the key points about the importance of emotional intelligence in leadership, Solution A adheres more closely to the specified formatting. Here's how it compares to the given rules:\n\n1. The answer begins with a clear thesis statement that directly addresses the question prompts.\n\n2. Each paragraph is focused on a specific aspect of emotional intelligence as it relates to leadership, making the essay easy to follow.\n\n3. The language is professional and persuasive, employing transitions between ideas (e.g., \"Moreover,\" \"However,\" \"In addition to,\" etc.).\n\n4. Parallel sentence structure is used consistently throughout the essay.\n\n5. There are no em dashes, as requested.\n\nSolution B is also well-argued and covers the major points effectively. However, it uses em dashes more frequently than is strictly necessary, which would violate the formatting request. Furthermore, it doesn't have quite the same level of consistent sentence structure and transitions as Solution A.\n\nTherefore, while both answers are strong, I believe Solution A is the better choice based on its adherence to the formatting request. The clarity, coherence, and lack of em dashes push it over the top.",
+  "explanation": "MY VOTE IS FOR: B\n\nResponse B adheres more closely to the formatting request of no em dashes. It uses hyphens instead for compound phrases like \"long-term health\" and \"emotional intelligence in leadership.\" In contrast, Response A includes several em dashes, such as in \"The key elements of EQ...have become\":, \"- Self-awareness...\", \"- Self-regulation...\", etc. Therefore, Response B is the better match for the formatting requirement.",
   "metadata": {
     "match_id": "6c7ef18ad85829e1",
     "judge_id": "thedrummer/unslopnemo-12b",
@@ -18,7 +18,7 @@
     "model_b_id": "openai/gpt-oss-120b",
     "eval_id": "emotional-intelligence-leadership",
     "skill_id": "respect_no_em_dash_requests",
-    "timestamp": "2025-08-21T01:23:01.463854",
+    "timestamp": "2025-08-21T23:44:58.680196",
     "cache_key": "b7c316391254b37b"
   }
 }

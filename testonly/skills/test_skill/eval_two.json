@@ -1,0 +1,19 @@
+{
+  "id": "eval_two",
+  "name": "Count Test Evaluation", 
+  "chain": [
+    {
+      "id": "count_prompt",
+      "prompt": "Please count from 1 to 3 with deterministic seed 12345",
+      "inputs": {}
+    }
+  ],
+  "judge": {
+    "system": "You are a test evaluation judge for deterministic counting tests.",
+    "prompt": "Evaluate if the response correctly counts from 1 to 3 with seed reference.\n\nExpected: '1, 2, 3 (seed: 12345)'\n\nSolution A: {{A}}\nSolution B: {{B}}\n\nChoose A or B based on correct counting format.",
+    "view": {
+      "A": [{"kind": "step", "id": "count_prompt", "part": "final"}],
+      "B": [{"kind": "step", "id": "count_prompt", "part": "final"}]
+    }
+  }
+}

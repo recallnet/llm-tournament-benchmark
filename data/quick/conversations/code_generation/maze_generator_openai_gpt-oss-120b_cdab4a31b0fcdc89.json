@@ -1,0 +1,29 @@
+{
+  "metadata": {
+    "skill_id": "code_generation",
+    "eval_id": "maze_generator",
+    "eval_name": "Maze Generator with A* Solver",
+    "model_id": "openai/gpt-oss-120b",
+    "model_slug": "gpt-oss-120b",
+    "model_author": "OpenAI",
+    "timestamp": "2025-08-21T22:30:38.917983",
+    "cache_key": "cdab4a31b0fcdc89",
+    "step_count": 1,
+    "message_count": 2
+  },
+  "messages": [
+    {
+      "role": "user",
+      "content": "You are an expert JavaScript programmer. Write a single JavaScript function that generates and solves mazes with step-by-step visualization.\n\nREQUIREMENTS:\n- Function takes a canvas ID parameter (canvas will be 500x500px)\n- Generates maze using recursive division algorithm\n- Solves maze using A* search algorithm\n- Step-by-step visualization of both generation and solving process\n- Visual indicators for different states (walls, paths, current search, solution)\n- No external libraries, works in most browsers\n- Clean, efficient code with proper error handling\n\nOUTPUT: Valid JavaScript code only. No explanatory text, comments outside code, or markdown formatting."
+    },
+    {
+      "role": "assistant",
+      "content": "function generateAndSolveMaze(canvasId){try{const canvas=document.getElementById(canvasId);if(!canvas||!canvas.getContext)throw new Error('Canvas not found');const ctx=canvas.getContext('2d');const size=500;canvas.width=size;canvas.height=size;const cols=25;const rows=25;const cellSize=size/cols;const wallsColor='#000';const pathColor='#fff';const visitedColor='rgba(173,216,230,0.6)';const currentColor='rgba(255,0,0,0.6)';const solutionColor='rgba(0,255,0,0.6)';const cells=[];for(let y=0;y<rows;y++){cells[y]=[];for(let x=0;x<cols;x++){cells[y][x]={walls:{N:false,E:false,S:false,W:false}}}}function setBorder(){for(let x=0;x<cols;x++){cells[0][x].walls.N=true;cells[rows-1][x].walls.S=true;generationSteps.push({type:'wall',x, y:0, dir:'H'});generationSteps.push({type:'wall',x, y:rows-1, dir:'H'});}for(let y=0;y<rows;y++){cells[y][0].walls.W=true;cells[y][cols-1].walls.E=true;generationSteps.push({type:'wall',x:0, y, dir:'V'});generationSteps.push({type:'wall',x:cols-1, y, dir:'V'});}}function drawCellBackground(){ctx.fillStyle=pathColor;ctx.fillRect(0,0,size,size);}function drawWall(step){ctx.strokeStyle=wallsColor;ctx.lineWidth=2;ctx.beginPath();if(step.dir==='H'){ctx.moveTo(step.x*cellSize, (step.y+1)*cellSize);ctx.lineTo((step.x+1)*cellSize, (step.y+1)*cellSize);}else{ctx.moveTo((step.x+1)*cellSize, step.y*cellSize);ctx.lineTo((step.x+1)*cellSize, (step.y+1)*cellSize);}ctx.stroke();}function fillCell(x,y,color){ctx.fillStyle=color;ctx.fillRect(x*cellSize+2, y*cellSize+2, cellSize-4, cellSize-4);}function chooseOrientation(w,h){if(w<h)return'V';if(h<w)return'H';return Math.random()<0.5?'V':'H';}const generationSteps=[];setBorder();function divide(x,y,w,h,orientation){if(w<2||h<2)return;const horiz=orientation==='H';let wx=x+(horiz?0:Math.floor(Math.random()*(w-2)));let wy=y+(horiz?Math.floor(Math.random()*(h-2)):0);let length=horiz?w:h;let passage=horiz?x+Math.floor(Math.random()*w):y+Math.floor(Math.random()*h);for(let i=0;i<length;i++){if(horiz){let cx=x+i;if(cx===passage)continue;cells[wy][cx].walls.S=true;cells[wy+1][cx].walls.N=true;generationSteps.push({type:'wall',x:cx,y:wy,dir:'H'});}else{let cy=y+i;if(cy===passage)continue;cells[cy][wx].walls.E=true;cells[cy][wx+1].walls.W=true;generationSteps.push({type:'wall',x:wx,y:cy,dir:'V'});}}if(horiz){divide(x,y,w,wy-y+1,chooseOrientation(w,wy-y+1));divide(x,wy+1,w,y+h-wy-1,chooseOrientation(w,y+h-wy-1));}else{divide(x,y,wx-x+1,h,chooseOrientation(wx-x+1,h));divide(wx+1,y,x+w-wx-1,h,chooseOrientation(x+w-wx-1,h));}}divide(0,0,cols,rows,chooseOrientation(cols,rows));async function runGeneration(){drawCellBackground();for(const step of generationSteps){drawWall(step);await new Promise(r=>requestAnimationFrame(r));}}function heuristic(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y);}async function solve(){const start={x:0,y:0};const goal={x:cols-1,y:rows-1};const open=[{node:start,g:0,f:heuristic(start,goal),parent:null}];const closed=new Set();while(open.length){open.sort((a,b)=>a.f-b.f);const current=open.shift();const key=current.node.x+','+current.node.y;if(closed.has(key))continue;closed.add(key);fillCell(current.node.x,current.node.y,currentColor);await new Promise(r=>requestAnimationFrame(r));if(current.node.x===goal.x&&current.node.y===goal.y){let pathNode=current;while(pathNode){fillCell(pathNode.node.x,pathNode.node.y,solutionColor);await new Promise(r=>requestAnimationFrame(r));pathNode=pathNode.parent;}break;}const dirs=[{dx:0,dy:-1,wall:'N'},{dx:1,dy:0,wall:'E'},{dx:0,dy:1,wall:'S'},{dx:-1,dy:0,wall:'W'}];for(const d of dirs){const nx=current.node.x+d.dx, ny=current.node.y+d.dy;if(nx<0||ny<0||nx>=cols||ny>=rows)continue;if(cells[current.node.y][current.node.x].walls[d.wall])continue;const nKey=nx+','+ny;if(closed.has(nKey))continue;const g=current.g+1;const h=heuristic({x:nx,y:ny},goal);open.push({node:{x:nx,y:ny},g,f:g+h,parent:current});fillCell(nx,ny,visitedColor);}await new Promise(r=>requestAnimationFrame(r));}}await runGeneration();await solve();}catch(e){console.error(e);}}"
+    }
+  ],
+  "execution_info": {
+    "total_steps": 1,
+    "completed_steps": 1,
+    "status": "completed"
+  }
+}

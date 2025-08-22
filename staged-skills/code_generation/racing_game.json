@@ -9,8 +9,8 @@
     }
   ],
   "judge": {
-    "system": "You are a JavaScript code quality expert with expertise in game development and Web Audio API. Evaluate code based on functionality, performance, best practices, and requirements fulfillment.",
-    "prompt": "Evaluate the JavaScript voice-controlled racing game implementation on a scale of 0-10 points:\n\n**Voice Control Integration (4 points)**: Does it properly implement Web Audio API for microphone access with volume-based speed control? Is the voice control responsive and intuitive?\n\n**Game Mechanics (3 points)**: Does it feature a complete racing experience with lap timing, crash detection, realistic physics, and personal best tracking?\n\n**User Interface (2 points)**: Does it include a visual volume meter, start button, completion celebration, and mute toggle? Are controls clear and functional?\n\n**Performance & Compatibility (1 point)**: Does it run smoothly at 60 FPS with proper microphone permission handling across browsers?\n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B and provide your scoring breakdown.",
+    "system": "Judge functionality, correctness, and feature completeness. Do not penalize minified or differently formatted code if it works correctly.",
+    "prompt": "Evaluate the JavaScript voice-controlled racing game implementation. \n\nSolution A: {{A}}\n\nSolution B: {{B}}\n\nChoose A or B as the winner.",
     "view": {
       "A": [{ "kind": "step", "id": "generate_code", "part": "final" }],
       "B": [{ "kind": "step", "id": "generate_code", "part": "final" }]

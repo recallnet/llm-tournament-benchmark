@@ -1,45 +1,48 @@
-# AFBench Test-Only Configuration
-# Only for automated tests - minimal models/judges for speed
+# AFBench Testonly Configuration
+# Minimal, deterministic, fast configuration for testing pipeline behavior
 
-# Data directory - isolated test-only data
+# Data directory - isolated testonly data
 data_dir: "data/testonly"
 
-# Model pool configuration - use minimal test pool
+# Model pool configuration - use minimal testonly pool
 model_pool:
   default_pool: "testonly"
   pools_dir: "model_pools"
 
-# Judge pool configuration - use minimal test pool
+# Judge pool configuration - use minimal testonly pool  
 judge_pool:
   default_pool: "testonly"
   pools_dir: "judge_pools"
 
-# Skills configuration
+# Skills configuration - use minimal testonly skills
 skills:
-  skills_dir: "skills"
-  selected_skills: []
+  skills_dir: "testonly/skills"
+  selected_skills: []  # Load all skills in testonly directory
 
-# Minimal data generation for tests
+# Minimal data generation for fast testing
 n_samples: 10
-random_seed: 42
+random_seed: 12345  # Fixed seed for deterministic results
 
-# Fast processing for tests
+# Fast processing parameters
 processing:
   remove_outliers: false
-  normalize: false
+  outlier_threshold: 3.0
+  normalize: true
 
 # Analysis parameters
 analysis:
   statistical_tests: false
   correlation_analysis: false
+  significance_level: 0.05
 
-# Minimal plotting for tests
+# Minimal plotting parameters
 plotting:
-  figure_size: [4, 3]
-  dpi: 72
+  figure_size: [6, 4]
+  dpi: 100
+  style: "default"
 
 # Report parameters
 report:
   include_plots: false
   format: "json"
-  timestamp: false
+  timestamp: true

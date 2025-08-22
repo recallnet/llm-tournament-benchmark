@@ -31,16 +31,22 @@ def main():
         print(f"   Output file: {output_file}")
 
         # Run tournament generation
-        main_with_cache_dir(conversations_cache_dir, models_file, judges_file, skills_file, output_file)
+        main_with_cache_dir(
+            conversations_cache_dir, models_file, judges_file, skills_file, output_file
+        )
 
         # Verify output was created
         output_path = Path(output_file)
         if not output_path.exists():
-            raise RuntimeError(f"Tournament generation failed - output file not created: {output_file}")
+            raise RuntimeError(
+                f"Tournament generation failed - output file not created: {output_file}"
+            )
 
         # Verify output has content
         if output_path.stat().st_size == 0:
-            raise RuntimeError(f"Tournament generation failed - output file is empty: {output_file}")
+            raise RuntimeError(
+                f"Tournament generation failed - output file is empty: {output_file}"
+            )
 
         print(f"✅ Tournament generation completed successfully: {output_file}")
 

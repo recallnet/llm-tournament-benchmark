@@ -18,7 +18,7 @@
     "model_b_id": "openai/gpt-oss-120b",
     "eval_id": "smartwatch-summary",
     "skill_id": "respect_no_em_dash_requests",
-    "timestamp": "2025-08-21T01:21:45.346504",
+    "timestamp": "2025-08-21T23:42:49.180794",
     "cache_key": "66e7cd2581e23cab"
   }
 }

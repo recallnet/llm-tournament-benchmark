@@ -24,7 +24,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "site"))
 class TestDetailedPerformanceBug:
     """Test the specific bug in detailed performance section showing 1500.0."""
 
-    def test_detailed_performance_shows_1500_when_model_not_in_tournament_rankings(self):
+    def test_detailed_performance_shows_1500_when_model_not_in_tournament_rankings(
+        self,
+    ):
         """
         Test the exact scenario where a model has ratings but isn't in tournament rankings,
         causing the detailed performance to show 1500.0 defaults.
@@ -35,9 +37,22 @@ class TestDetailedPerformanceBug:
 
         # Create test data where model has ratings but missing from some tournament rankings
         test_data = {
-            "models": {"models": [{"id": "test_model", "author": "Test", "context_window": 32000, "endpoint": "test"}]},
+            "models": {
+                "models": [
+                    {
+                        "id": "test_model",
+                        "author": "Test",
+                        "context_window": 32000,
+                        "endpoint": "test",
+                    }
+                ]
+            },
             "tournaments": {
-                "skill_a": {"model_rankings": [{"model_id": "test_model", "wins": 5, "losses": 2, "rank": 1}]},
+                "skill_a": {
+                    "model_rankings": [
+                        {"model_id": "test_model", "wins": 5, "losses": 2, "rank": 1}
+                    ]
+                },
                 "skill_b": {
                     "model_rankings": [
                         # MODEL IS MISSING FROM skill_b tournament rankings!
@@ -46,8 +61,12 @@ class TestDetailedPerformanceBug:
                 },
             },
             "ratings": {
-                "skill_a": {"model_ratings": {"test_model": {"mu": 1600.0, "sigma": 50.0}}},
-                "skill_b": {"model_ratings": {"test_model": {"mu": 1550.0, "sigma": 55.0}}},  # Rating exists!
+                "skill_a": {
+                    "model_ratings": {"test_model": {"mu": 1600.0, "sigma": 50.0}}
+                },
+                "skill_b": {
+                    "model_ratings": {"test_model": {"mu": 1550.0, "sigma": 55.0}}
+                },  # Rating exists!
             },
         }
 
@@ -69,8 +88,12 @@ class TestDetailedPerformanceBug:
         print(f"\nTournament participation for {selected_model}:")
         for skill, tournament_data in tournaments.items():
             model_rankings = tournament_data.get("model_rankings", [])
-            model_in_rankings = any(r.get("model_id") == selected_model for r in model_rankings)
-            print(f"  {skill}: {'✅ IN RANKINGS' if model_in_rankings else '❌ NOT IN RANKINGS'}")
+            model_in_rankings = any(
+                r.get("model_id") == selected_model for r in model_rankings
+            )
+            print(
+                f"  {skill}: {'✅ IN RANKINGS' if model_in_rankings else '❌ NOT IN RANKINGS'}"
+            )
 
         # Simulate the exact code from lines 197-201
         print("\nSimulating app code (lines 197-201):")
@@ -79,18 +102,32 @@ class TestDetailedPerformanceBug:
             for ranking in tournament_data.get("model_rankings", []):
                 if ranking["model_id"] == selected_model:
                     skill_ratings = ratings.get(skill, {})
-                    rating = skill_ratings.get("model_ratings", {}).get(selected_model, {}).get("mu", 1500)
+                    rating = (
+                        skill_ratings.get("model_ratings", {})
+                        .get(selected_model, {})
+                        .get("mu", 1500)
+                    )
 
                     print(f"  {skill}: {rating} (from tournament ranking loop)")
-                    skill_performance.append({"Skill": skill, "Rating": f"{rating:.1f}"})
+                    skill_performance.append(
+                        {"Skill": skill, "Rating": f"{rating:.1f}"}
+                    )
 
-        print(f"\nRESULT: Only {len(skill_performance)} skills shown in detailed performance")
+        print(
+            f"\nRESULT: Only {len(skill_performance)} skills shown in detailed performance"
+        )
         for item in skill_performance:
             print(f"  {item['Skill']}: {item['Rating']}")
 
         # The BUG: skill_b won't appear because test_model isn't in skill_b's model_rankings,
         # even though test_model HAS a rating for skill_b!
-        skills_with_ratings = len([s for s, data in ratings.items() if selected_model in data.get("model_ratings", {})])
+        skills_with_ratings = len(
+            [
+                s
+                for s, data in ratings.items()
+                if selected_model in data.get("model_ratings", {})
+            ]
+        )
         skills_in_performance = len(skill_performance)
 
         print("\n📊 ANALYSIS:")
@@ -99,8 +136,12 @@ class TestDetailedPerformanceBug:
         print(f"  Missing skills: {skills_with_ratings - skills_in_performance}")
 
         if skills_in_performance < skills_with_ratings:
-            print("\n🐛 BUG CONFIRMED: Detailed performance missing skills with ratings!")
-            print("   This is why some skills might show 1500.0 - they're not being included at all!")
+            print(
+                "\n🐛 BUG CONFIRMED: Detailed performance missing skills with ratings!"
+            )
+            print(
+                "   This is why some skills might show 1500.0 - they're not being included at all!"
+            )
         else:
             print("\n✅ No missing skills detected")
 
@@ -115,14 +156,35 @@ class TestDetailedPerformanceBug:
 
         # Same test data as above
         test_data = {
-            "models": {"models": [{"id": "test_model", "author": "Test", "context_window": 32000, "endpoint": "test"}]},
+            "models": {
+                "models": [
+                    {
+                        "id": "test_model",
+                        "author": "Test",
+                        "context_window": 32000,
+                        "endpoint": "test",
+                    }
+                ]
+            },
             "tournaments": {
-                "skill_a": {"model_rankings": [{"model_id": "test_model", "wins": 5, "losses": 2, "rank": 1}]},
-                "skill_b": {"model_rankings": [{"model_id": "other_model", "wins": 3, "losses": 4, "rank": 1}]},
+                "skill_a": {
+                    "model_rankings": [
+                        {"model_id": "test_model", "wins": 5, "losses": 2, "rank": 1}
+                    ]
+                },
+                "skill_b": {
+                    "model_rankings": [
+                        {"model_id": "other_model", "wins": 3, "losses": 4, "rank": 1}
+                    ]
+                },
             },
             "ratings": {
-                "skill_a": {"model_ratings": {"test_model": {"mu": 1600.0, "sigma": 50.0}}},
-                "skill_b": {"model_ratings": {"test_model": {"mu": 1550.0, "sigma": 55.0}}},
+                "skill_a": {
+                    "model_ratings": {"test_model": {"mu": 1600.0, "sigma": 50.0}}
+                },
+                "skill_b": {
+                    "model_ratings": {"test_model": {"mu": 1550.0, "sigma": 55.0}}
+                },
             },
         }
 
@@ -152,10 +214,20 @@ class TestDetailedPerformanceBug:
                     {
                         "Skill": skill,
                         "Rating": f"{rating:.1f}",
-                        "Rank": tournament_stats.get("rank", "N/A") if tournament_stats else "N/A",
-                        "Wins": tournament_stats.get("wins", 0) if tournament_stats else 0,
-                        "Losses": tournament_stats.get("losses", 0) if tournament_stats else 0,
-                        "Ties": tournament_stats.get("ties", 0) if tournament_stats else 0,
+                        "Rank": (
+                            tournament_stats.get("rank", "N/A")
+                            if tournament_stats
+                            else "N/A"
+                        ),
+                        "Wins": (
+                            tournament_stats.get("wins", 0) if tournament_stats else 0
+                        ),
+                        "Losses": (
+                            tournament_stats.get("losses", 0) if tournament_stats else 0
+                        ),
+                        "Ties": (
+                            tournament_stats.get("ties", 0) if tournament_stats else 0
+                        ),
                     }
                 )
 
@@ -164,13 +236,21 @@ class TestDetailedPerformanceBug:
             print(f"  {item['Skill']}: {item['Rating']}")
 
         # Verify the fix works
-        skills_with_ratings = len([s for s, data in ratings.items() if selected_model in data.get("model_ratings", {})])
+        skills_with_ratings = len(
+            [
+                s
+                for s, data in ratings.items()
+                if selected_model in data.get("model_ratings", {})
+            ]
+        )
         fixed_skills_count = len(skill_performance_fixed)
 
         print("\n📊 FIX VERIFICATION:")
         print(f"  Skills with ratings: {skills_with_ratings}")
         print(f"  Skills in fixed performance: {fixed_skills_count}")
-        print(f"  All skills included: {'✅' if fixed_skills_count == skills_with_ratings else '❌'}")
+        print(
+            f"  All skills included: {'✅' if fixed_skills_count == skills_with_ratings else '❌'}"
+        )
 
         if fixed_skills_count == skills_with_ratings:
             print("\n✅ FIX SUCCESSFUL: All skills with ratings are now included!")

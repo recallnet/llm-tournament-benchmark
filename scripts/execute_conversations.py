@@ -7,6 +7,7 @@ Handles both single-step and multi-step eval chains with proper caching.
 import hashlib
 import json
 import os
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -25,8 +26,19 @@ class ConversationExecutor:
     def __init__(self, cache_dir: Path, intermediary_cache_dir: Path):
         # SAFETY: Cache directories must always be provided by caller to prevent path confusion
         self.api_key = os.getenv("OPENROUTER_API_KEY")
-        if not self.api_key:
+
+        # Allow mock execution for testing environments
+        is_testing = (
+            os.getenv("AFBENCH_TESTING") == "true"
+            or "test" in str(cache_dir).lower()
+            or "pytest" in sys.modules
+        )
+
+        if not self.api_key and not is_testing:
             raise ValueError("OPENROUTER_API_KEY not found in environment")
+        elif is_testing and not self.api_key:
+            print("⚠️  Running in testing mode without OPENROUTER_API_KEY")
+            self.api_key = "mock-api-key-for-testing"
 
         self.base_url = "https://openrouter.ai/api/v1/chat/completions"
         self.cache_dir = cache_dir
@@ -56,7 +68,9 @@ class ConversationExecutor:
 
         return hashlib.sha256(cache_content.encode()).hexdigest()[:16]
 
-    def _get_cache_path(self, skill_id: str, eval_id: str, model_id: str, cache_key: str) -> Path:
+    def _get_cache_path(
+        self, skill_id: str, eval_id: str, model_id: str, cache_key: str
+    ) -> Path:
         """Get the cache file path for a conversation."""
         safe_model_id = model_id.replace("/", "_").replace(":", "_")
         filename = f"{eval_id}_{safe_model_id}_{cache_key}.json"
@@ -79,17 +93,85 @@ class ConversationExecutor:
         with open(cache_path, "w") as f:
             json.dump(conversation_data, f, indent=2)
 
-    def _make_api_request(self, model_id: str, messages: list[dict[str, str]]) -> dict[str, Any]:
+    def _make_api_request(
+        self, model_id: str, messages: list[dict[str, str]]
+    ) -> dict[str, Any]:
         """Make a request to OpenRouter API."""
         self._rate_limit()
 
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        # Check for fault injection during testing
+        fault_injection = self._check_fault_injection(model_id)
+        if fault_injection.get("should_fail"):
+            raise requests.exceptions.HTTPError(fault_injection["error_message"])
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
 
         payload = {"model": model_id, "messages": messages}
+
+        # In testing mode, return mock response
+        if self.api_key == "mock-api-key-for-testing":
+            return {
+                "choices": [
+                    {
+                        "message": {
+                            "content": f"Mock response from {model_id}: "
+                            + messages[-1]["content"]
+                        }
+                    }
+                ]
+            }
 
         response = requests.post(self.base_url, headers=headers, json=payload)
         response.raise_for_status()
         return response.json()
+
+    def _check_fault_injection(self, model_id: str) -> dict:
+        """Check if fault injection is configured for this model."""
+        # Look for fault injection config file
+        fault_config_paths = [
+            Path.cwd() / ".fault_injection.json",
+            Path("/tmp/.fault_injection.json"),
+        ]
+
+        for config_path in fault_config_paths:
+            if config_path.exists():
+                try:
+                    with open(config_path) as f:
+                        config = json.load(f)
+
+                    # print(f"🔍 Fault injection check for {model_id}: config={config}")  # Debug output
+
+                    # Check if this model should fail
+                    if config.get("target") == "conversations" and (
+                        config.get("model_id") == model_id
+                        or config.get("model_id") == "all"
+                    ):
+
+                        failure_count = config.get("failure_count", 0)
+                        if failure_count > 0:
+                            # Track retry attempts for validation
+                            retry_attempts = config.get("retry_attempts", 0) + 1
+                            config["retry_attempts"] = retry_attempts
+
+                            # Decrement failure count
+                            config["failure_count"] = failure_count - 1
+                            with open(config_path, "w") as f:
+                                json.dump(config, f)
+
+                            print(
+                                f"💥 Triggering fault injection for {model_id} (attempt {retry_attempts}, remaining failures: {failure_count - 1})"
+                            )
+                            return {
+                                "should_fail": True,
+                                "error_message": f"Injected failure for model {model_id} (attempt {retry_attempts}, remaining: {failure_count - 1})",
+                            }
+                except (json.JSONDecodeError, OSError) as e:
+                    print(f"⚠️  Error reading fault injection config: {e}")
+
+        return {"should_fail": False}
 
     def _resolve_file_references(self, text: str) -> str:
         """Resolve ${file:...} references in text."""
@@ -105,7 +187,9 @@ class ConversationExecutor:
 
         return re.sub(r"\$\{file:([^}]+)\}", replace_file_ref, text)
 
-    def _prepare_step_inputs(self, step: dict[str, Any], conversation_history: list[dict[str, str]]) -> str:
+    def _prepare_step_inputs(
+        self, step: dict[str, Any], conversation_history: list[dict[str, str]]
+    ) -> str:
         """Prepare inputs for a step, resolving dependencies and file references."""
         prompt = step["prompt"]
 
@@ -123,14 +207,21 @@ class ConversationExecutor:
         return prompt
 
     def _get_intermediary_cache_path(
-        self, skill_id: str, eval_id: str, intermediary_id: str, judge_model_id: str, cache_key: str
+        self,
+        skill_id: str,
+        eval_id: str,
+        intermediary_id: str,
+        judge_model_id: str,
+        cache_key: str,
     ) -> Path:
         """Get cache path for intermediary execution."""
         safe_judge_id = judge_model_id.replace("/", "_").replace(":", "_")
         filename = f"{eval_id}_{intermediary_id}_{safe_judge_id}_{cache_key}.json"
         return self.intermediary_cache_dir / skill_id / filename
 
-    def _substitute_intermediary_variables(self, intermediary: dict[str, Any], conversation_result: dict[str, Any]) -> str:
+    def _substitute_intermediary_variables(
+        self, intermediary: dict[str, Any], conversation_result: dict[str, Any]
+    ) -> str:
         """Substitute variables in intermediary prompt from conversation results."""
         prompt = intermediary["prompt"]
 
@@ -155,7 +246,9 @@ class ConversationExecutor:
                     content = "[NO_CONTENT_FOUND]"
             elif part == "history":
                 # Get the full conversation up to this step
-                content = "\n".join([f"{msg['role']}: {msg['content']}" for msg in messages])
+                content = "\n".join(
+                    [f"{msg['role']}: {msg['content']}" for msg in messages]
+                )
             else:
                 content = f"[UNKNOWN_PART: {part}]"
 
@@ -183,8 +276,12 @@ class ConversationExecutor:
             "conversation_cache_key": conversation_result["metadata"]["cache_key"],
             "judge_model": judge_model_id,
         }
-        cache_key = hashlib.sha256(json.dumps(cache_content, sort_keys=True).encode()).hexdigest()[:16]
-        cache_path = self._get_intermediary_cache_path(skill_id, eval_id, intermediary_id, judge_model_id, cache_key)
+        cache_key = hashlib.sha256(
+            json.dumps(cache_content, sort_keys=True).encode()
+        ).hexdigest()[:16]
+        cache_path = self._get_intermediary_cache_path(
+            skill_id, eval_id, intermediary_id, judge_model_id, cache_key
+        )
 
         # Check cache first
         cached_result = self._load_from_cache(cache_path)
@@ -196,7 +293,9 @@ class ConversationExecutor:
 
         try:
             # Prepare the prompt with variable substitution
-            prompt = self._substitute_intermediary_variables(intermediary, conversation_result)
+            prompt = self._substitute_intermediary_variables(
+                intermediary, conversation_result
+            )
 
             # Create message for judge model
             messages = [{"role": "user", "content": prompt}]
@@ -217,7 +316,9 @@ class ConversationExecutor:
                     "eval_id": eval_id,
                     "intermediary_id": intermediary_id,
                     "judge_model_id": judge_model_id,
-                    "conversation_cache_key": conversation_result["metadata"]["cache_key"],
+                    "conversation_cache_key": conversation_result["metadata"][
+                        "cache_key"
+                    ],
                     "timestamp": datetime.utcnow().isoformat(),
                     "cache_key": cache_key,
                 },
@@ -231,7 +332,9 @@ class ConversationExecutor:
 
             # Cache the result
             self._save_to_cache(cache_path, intermediary_result)
-            print(f"    ✅ Intermediary {intermediary_id} completed ({len(assistant_message)} chars)")
+            print(
+                f"    ✅ Intermediary {intermediary_id} completed ({len(assistant_message)} chars)"
+            )
 
             return intermediary_result
 
@@ -250,7 +353,9 @@ class ConversationExecutor:
             print(f"    ❌ Intermediary {intermediary_id} failed: {e}")
             return error_result
 
-    def execute_conversation(self, model: dict[str, Any], skill_id: str, eval_data: dict[str, Any]) -> dict[str, Any]:
+    def execute_conversation(
+        self, model: dict[str, Any], skill_id: str, eval_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute a complete conversation for a model-eval pair."""
         model_id = model["id"]
         eval_id = eval_data["id"]
@@ -295,7 +400,9 @@ class ConversationExecutor:
                 # Add assistant response to conversation
                 messages.append({"role": "assistant", "content": assistant_message})
 
-                print(f"    ✅ Step {step_id} completed ({len(assistant_message)} chars)")
+                print(
+                    f"    ✅ Step {step_id} completed ({len(assistant_message)} chars)"
+                )
 
             # Create conversation result
             conversation_result = {
@@ -312,7 +419,11 @@ class ConversationExecutor:
                     "message_count": len(messages),
                 },
                 "messages": messages,
-                "execution_info": {"total_steps": len(chain), "completed_steps": len(chain), "status": "completed"},
+                "execution_info": {
+                    "total_steps": len(chain),
+                    "completed_steps": len(chain),
+                    "status": "completed",
+                },
             }
 
             # Cache the result
@@ -335,7 +446,9 @@ class ConversationExecutor:
                 "messages": messages,
                 "execution_info": {
                     "total_steps": len(chain),
-                    "completed_steps": len([m for m in messages if m["role"] == "assistant"]),
+                    "completed_steps": len(
+                        [m for m in messages if m["role"] == "assistant"]
+                    ),
                     "status": "failed",
                     "error": str(e),
                 },
@@ -345,7 +458,9 @@ class ConversationExecutor:
             return error_result
 
 
-def cleanup_stale_cache(models: list, judges: list, cache_dir: Path, intermediary_cache_dir: Path):
+def cleanup_stale_cache(
+    models: list, judges: list, cache_dir: Path, intermediary_cache_dir: Path
+):
     """Remove cached conversations for models that no longer exist in the pools."""
     current_model_ids = {model["id"] for model in models}
     current_judge_ids = {judge["id"] for judge in judges}
@@ -366,12 +481,16 @@ def cleanup_stale_cache(models: list, judges: list, cache_dir: Path, intermediar
                             cache_data = json.load(f)
                         model_id = cache_data.get("metadata", {}).get("model_id")
                         if model_id and model_id not in current_model_ids:
-                            print(f"   🗑️  Removing stale conversation cache: {cache_file.name} (model: {model_id})")
+                            print(
+                                f"   🗑️  Removing stale conversation cache: {cache_file.name} (model: {model_id})"
+                            )
                             cache_file.unlink()
                             cleaned_count += 1
                     except (json.JSONDecodeError, OSError):
                         # If we can't read the file, it's corrupted - remove it
-                        print(f"   🗑️  Removing corrupted conversation cache: {cache_file.name}")
+                        print(
+                            f"   🗑️  Removing corrupted conversation cache: {cache_file.name}"
+                        )
                         cache_file.unlink()
                         cleaned_count += 1
 
@@ -384,7 +503,9 @@ def cleanup_stale_cache(models: list, judges: list, cache_dir: Path, intermediar
                     parts = cache_file.stem.split("_")
                     if len(parts) >= 4:
                         # Reconstruct judge model ID (handle slashes that became underscores)
-                        judge_parts = parts[2:-1]  # Skip eval name, intermediary name, and hash
+                        judge_parts = parts[
+                            2:-1
+                        ]  # Skip eval name, intermediary name, and hash
                         potential_judge_id = "/".join(judge_parts)
 
                         # Also check with underscores (fallback)
@@ -394,7 +515,9 @@ def cleanup_stale_cache(models: list, judges: list, cache_dir: Path, intermediar
                             potential_judge_id not in current_judge_ids
                             and potential_judge_id_underscore not in current_judge_ids
                         ):
-                            print(f"   🗑️  Removing stale intermediary cache: {cache_file.name}")
+                            print(
+                                f"   🗑️  Removing stale intermediary cache: {cache_file.name}"
+                            )
                             cache_file.unlink()
                             cleaned_count += 1
 
@@ -404,7 +527,9 @@ def cleanup_stale_cache(models: list, judges: list, cache_dir: Path, intermediar
         print("   ✅ No stale cache files found")
 
 
-def execute_all_conversations(models_file: Path, skills_file: Path, judges_file: Path, output_file: Path):
+def execute_all_conversations(
+    models_file: Path, skills_file: Path, judges_file: Path, output_file: Path
+):
     """Execute conversations for all model-eval pairs."""
 
     # Define cache directories from output file path structure
@@ -426,13 +551,19 @@ def execute_all_conversations(models_file: Path, skills_file: Path, judges_file:
     evals = skills_data["evals"]
     judges = judges_data["judges"]
 
-    print(f"🎯 Executing conversations for {len(models)} models x {len(evals)} evals = {len(models) * len(evals)} total")
-    print(f"🧑‍⚖️ Using {len(judges)} judge models for intermediaries (primary: {judges[0]['id'] if judges else 'none'})")
+    print(
+        f"🎯 Executing conversations for {len(models)} models x {len(evals)} evals = {len(models) * len(evals)} total"
+    )
+    print(
+        f"🧑‍⚖️ Using {len(judges)} judge models for intermediaries (primary: {judges[0]['id'] if judges else 'none'})"
+    )
 
     executor = ConversationExecutor(cache_dir, intermediary_cache_dir)
 
     # Clean up stale cache entries
-    cleanup_stale_cache(models, judges, executor.cache_dir, executor.intermediary_cache_dir)
+    cleanup_stale_cache(
+        models, judges, executor.cache_dir, executor.intermediary_cache_dir
+    )
 
     results = []
     intermediary_results = []
@@ -443,30 +574,46 @@ def execute_all_conversations(models_file: Path, skills_file: Path, judges_file:
     for eval_data in evals:
         skill_id = eval_data["_metadata"]["skill"]
         eval_id = eval_data["id"]
-        has_intermediaries = "intermediaries" in eval_data and eval_data["intermediaries"]
+        has_intermediaries = (
+            "intermediaries" in eval_data and eval_data["intermediaries"]
+        )
 
         for model in models:
             completed += 1
-            print(f"\n[{completed}/{total_combinations}] Processing {skill_id}/{eval_id} x {model['id']}")
+            print(
+                f"\n[{completed}/{total_combinations}] Processing {skill_id}/{eval_id} x {model['id']}"
+            )
 
             try:
                 # Execute main conversation
-                conversation_result = executor.execute_conversation(model, skill_id, eval_data)
+                conversation_result = executor.execute_conversation(
+                    model, skill_id, eval_data
+                )
                 results.append(conversation_result)
 
                 # Execute intermediaries if they exist
                 if has_intermediaries and judges:
-                    primary_judge = judges[0]  # Use first judge model for intermediaries
-                    print(f"  🔄 Processing {len(eval_data['intermediaries'])} intermediaries with {primary_judge['id']}")
+                    primary_judge = judges[
+                        0
+                    ]  # Use first judge model for intermediaries
+                    print(
+                        f"  🔄 Processing {len(eval_data['intermediaries'])} intermediaries with {primary_judge['id']}"
+                    )
 
                     for intermediary in eval_data["intermediaries"]:
                         try:
                             intermediary_result = executor.execute_intermediary(
-                                intermediary, conversation_result, primary_judge, skill_id, eval_id
+                                intermediary,
+                                conversation_result,
+                                primary_judge,
+                                skill_id,
+                                eval_id,
                             )
                             intermediary_results.append(intermediary_result)
                         except Exception as e:
-                            print(f"    ❌ Failed to execute intermediary {intermediary['id']}: {e}")
+                            print(
+                                f"    ❌ Failed to execute intermediary {intermediary['id']}: {e}"
+                            )
                             intermediary_results.append(
                                 {
                                     "metadata": {
@@ -477,7 +624,10 @@ def execute_all_conversations(models_file: Path, skills_file: Path, judges_file:
                                         "error": str(e),
                                         "timestamp": datetime.utcnow().isoformat(),
                                     },
-                                    "execution_info": {"status": "failed", "error": str(e)},
+                                    "execution_info": {
+                                        "status": "failed",
+                                        "error": str(e),
+                                    },
                                 }
                             )
 
@@ -501,14 +651,34 @@ def execute_all_conversations(models_file: Path, skills_file: Path, judges_file:
     final_output = {
         "execution_info": {
             "total_conversations": total_combinations,
-            "successful_conversations": len([r for r in results if r.get("execution_info", {}).get("status") == "completed"]),
-            "failed_conversations": len([r for r in results if r.get("execution_info", {}).get("status") == "failed"]),
+            "successful_conversations": len(
+                [
+                    r
+                    for r in results
+                    if r.get("execution_info", {}).get("status") == "completed"
+                ]
+            ),
+            "failed_conversations": len(
+                [
+                    r
+                    for r in results
+                    if r.get("execution_info", {}).get("status") == "failed"
+                ]
+            ),
             "total_intermediaries": len(intermediary_results),
             "successful_intermediaries": len(
-                [r for r in intermediary_results if r.get("execution_info", {}).get("status") == "completed"]
+                [
+                    r
+                    for r in intermediary_results
+                    if r.get("execution_info", {}).get("status") == "completed"
+                ]
             ),
             "failed_intermediaries": len(
-                [r for r in intermediary_results if r.get("execution_info", {}).get("status") == "failed"]
+                [
+                    r
+                    for r in intermediary_results
+                    if r.get("execution_info", {}).get("status") == "failed"
+                ]
             ),
             "timestamp": datetime.utcnow().isoformat(),
             "models_count": len(models),

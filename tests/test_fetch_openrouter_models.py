@@ -68,7 +68,11 @@ class TestOpenRouterModelsFetcher:
         return {
             "models": [
                 {"id": "openai/gpt-4-turbo", "author": "OpenAI", "slug": "gpt-4-turbo"},
-                {"id": "thedrummer/unslopnemo-12b", "author": "TheDrummer", "slug": "unslopnemo-12b"},
+                {
+                    "id": "thedrummer/unslopnemo-12b",
+                    "author": "TheDrummer",
+                    "slug": "unslopnemo-12b",
+                },
             ]
         }
 
@@ -77,7 +81,11 @@ class TestOpenRouterModelsFetcher:
         """Mock loaded judges data."""
         return {
             "models": [
-                {"id": "anthropic/claude-3-5-sonnet-20241022", "author": "Anthropic", "slug": "claude-3-5-sonnet"},
+                {
+                    "id": "anthropic/claude-3-5-sonnet-20241022",
+                    "author": "Anthropic",
+                    "slug": "claude-3-5-sonnet",
+                },
             ]
         }
 
@@ -116,7 +124,9 @@ class TestOpenRouterModelsFetcher:
 
         with patch("requests.get") as mock_get:
             mock_response = Mock()
-            mock_response.raise_for_status.side_effect = requests.HTTPError("404 Not Found")
+            mock_response.raise_for_status.side_effect = requests.HTTPError(
+                "404 Not Found"
+            )
             mock_get.return_value = mock_response
 
             with pytest.raises(requests.HTTPError, match="404 Not Found"):
@@ -128,7 +138,11 @@ class TestOpenRouterModelsFetcher:
 
         model_ids = fetcher.get_model_ids_from_pools(mock_models_data, mock_judges_data)
 
-        expected_ids = {"openai/gpt-4-turbo", "thedrummer/unslopnemo-12b", "anthropic/claude-3-5-sonnet-20241022"}
+        expected_ids = {
+            "openai/gpt-4-turbo",
+            "thedrummer/unslopnemo-12b",
+            "anthropic/claude-3-5-sonnet-20241022",
+        }
         assert model_ids == expected_ids
 
     def test_get_model_ids_empty_pools(self):
@@ -148,7 +162,9 @@ class TestOpenRouterModelsFetcher:
 
         pool_model_ids = {"openai/gpt-4-turbo", "anthropic/claude-3-5-sonnet-20241022"}
 
-        filtered = fetcher.filter_openrouter_models(mock_openrouter_response, pool_model_ids)
+        filtered = fetcher.filter_openrouter_models(
+            mock_openrouter_response, pool_model_ids
+        )
 
         # Should maintain same structure but only include matching models
         assert "data" in filtered
@@ -163,23 +179,35 @@ class TestOpenRouterModelsFetcher:
 
         pool_model_ids = {"non/existent-model"}
 
-        filtered = fetcher.filter_openrouter_models(mock_openrouter_response, pool_model_ids)
+        filtered = fetcher.filter_openrouter_models(
+            mock_openrouter_response, pool_model_ids
+        )
 
         assert "data" in filtered
         assert len(filtered["data"]) == 0
 
-    def test_process_models_integration(self, mock_openrouter_response, mock_models_data, mock_judges_data):
+    def test_process_models_integration(
+        self, mock_openrouter_response, mock_models_data, mock_judges_data
+    ):
         """Test the full processing pipeline."""
         fetcher = OpenRouterModelsFetcher()
 
-        with patch.object(fetcher, "fetch_openrouter_models", return_value=mock_openrouter_response):
-            full_data, filtered_data = fetcher.process_models(mock_models_data, mock_judges_data)
+        with patch.object(
+            fetcher, "fetch_openrouter_models", return_value=mock_openrouter_response
+        ):
+            full_data, filtered_data = fetcher.process_models(
+                mock_models_data, mock_judges_data
+            )
 
             # Full data should be unchanged
             assert full_data == mock_openrouter_response
 
             # Filtered data should only contain models in our pools
-            expected_model_ids = {"openai/gpt-4-turbo", "thedrummer/unslopnemo-12b", "anthropic/claude-3-5-sonnet-20241022"}
+            expected_model_ids = {
+                "openai/gpt-4-turbo",
+                "thedrummer/unslopnemo-12b",
+                "anthropic/claude-3-5-sonnet-20241022",
+            }
             filtered_ids = {model["id"] for model in filtered_data["data"]}
             assert filtered_ids == expected_model_ids
 
@@ -224,9 +252,14 @@ class TestMain:
             mock_snakemake.input.judges = str(temp_judges)
             mock_snakemake.output = [str(temp_full), str(temp_filtered)]
 
-            with patch("scripts.fetch_openrouter_models.OpenRouterModelsFetcher") as mock_fetcher_class:
+            with patch(
+                "scripts.fetch_openrouter_models.OpenRouterModelsFetcher"
+            ) as mock_fetcher_class:
                 mock_fetcher = Mock()
-                mock_fetcher.process_models.return_value = (mock_openrouter_data, mock_filtered_data)
+                mock_fetcher.process_models.return_value = (
+                    mock_openrouter_data,
+                    mock_filtered_data,
+                )
                 mock_fetcher_class.return_value = mock_fetcher
 
                 # Inject snakemake object into the module's globals
@@ -243,7 +276,9 @@ class TestMain:
                         delattr(fetch_module, "snakemake")
 
                 # Verify fetcher was called correctly
-                mock_fetcher.process_models.assert_called_once_with(mock_models_data, mock_judges_data)
+                mock_fetcher.process_models.assert_called_once_with(
+                    mock_models_data, mock_judges_data
+                )
 
                 # Verify output files were created
                 assert temp_full.exists()
@@ -261,14 +296,19 @@ class TestMain:
                 # Verify console output
                 mock_print.assert_any_call("Fetching OpenRouter models...")
                 mock_print.assert_any_call(f"Saved full OpenRouter data to {temp_full}")
-                mock_print.assert_any_call(f"Saved filtered OpenRouter data to {temp_filtered}")
+                mock_print.assert_any_call(
+                    f"Saved filtered OpenRouter data to {temp_filtered}"
+                )
 
     def test_main_file_not_found_error(self):
         """Test main function handling of missing input files."""
         mock_snakemake = Mock()
         mock_snakemake.input.models = "/nonexistent/models.json"
         mock_snakemake.input.judges = "/nonexistent/judges.json"
-        mock_snakemake.output = ["/path/to/openrouter_models_full.json", "/path/to/openrouter_models_filtered.json"]
+        mock_snakemake.output = [
+            "/path/to/openrouter_models_full.json",
+            "/path/to/openrouter_models_filtered.json",
+        ]
 
         # Inject snakemake object into the module's globals
         import scripts.fetch_openrouter_models as fetch_module

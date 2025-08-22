@@ -88,7 +88,9 @@ class TestTournamentGenerationCoverage:
         if extra_skills:
             print(f"   ⚠️  Extra skills: {sorted(extra_skills)}")
 
-        assert not missing_skills, f"Missing tournaments for skills: {sorted(missing_skills)}"
+        assert (
+            not missing_skills
+        ), f"Missing tournaments for skills: {sorted(missing_skills)}"
         assert len(found_skills) == len(
             self.expected_skills
         ), f"Expected {len(self.expected_skills)} skills, got {len(found_skills)}"
@@ -155,13 +157,25 @@ class TestTournamentGenerationCoverage:
             pytest.fail("No tournaments found in tournaments.json")
 
         # Test structure of each tournament
-        required_fields = ["tournament_id", "skill_id", "eval_id", "model_ids", "rounds", "scores", "completed"]
+        required_fields = [
+            "tournament_id",
+            "skill_id",
+            "eval_id",
+            "model_ids",
+            "rounds",
+            "scores",
+            "completed",
+        ]
 
         for i, tournament in enumerate(tournaments):
-            print(f"   🔍 Tournament {i+1}: {tournament.get('skill_id', 'UNKNOWN')}/{tournament.get('eval_id', 'UNKNOWN')}")
+            print(
+                f"   🔍 Tournament {i+1}: {tournament.get('skill_id', 'UNKNOWN')}/{tournament.get('eval_id', 'UNKNOWN')}"
+            )
 
             for field in required_fields:
-                assert field in tournament, f"Tournament {i} missing required field: {field}"
+                assert (
+                    field in tournament
+                ), f"Tournament {i} missing required field: {field}"
 
             # Check that tournament has actual match data
             rounds = tournament.get("rounds", [])
@@ -169,7 +183,9 @@ class TestTournamentGenerationCoverage:
 
             # Check that each round has matches
             for round_num, round_matches in enumerate(rounds):
-                assert len(round_matches) > 0, f"Tournament {i} round {round_num} has no matches"
+                assert (
+                    len(round_matches) > 0
+                ), f"Tournament {i} round {round_num} has no matches"
 
         print("   ✅ All tournaments have consistent structure")
 
@@ -197,12 +213,16 @@ class TestTournamentGenerationCoverage:
                     evals_by_skill[skill_id] = []
                 evals_by_skill[skill_id].append(eval_data)
 
-        print(f"   📋 Skills found in loaded_skills.json: {sorted(evals_by_skill.keys())}")
+        print(
+            f"   📋 Skills found in loaded_skills.json: {sorted(evals_by_skill.keys())}"
+        )
 
         # Compare with expected skills
         missing_from_loaded = set(self.expected_skills) - set(evals_by_skill.keys())
         if missing_from_loaded:
-            print(f"   ⚠️  Skills missing from loaded_skills.json: {sorted(missing_from_loaded)}")
+            print(
+                f"   ⚠️  Skills missing from loaded_skills.json: {sorted(missing_from_loaded)}"
+            )
 
         # Now check if tournaments exist for loaded skills
         tournaments_file = Path("data/testonly/tournaments.json")
@@ -211,15 +231,23 @@ class TestTournamentGenerationCoverage:
                 tournaments_data = json.load(f)
 
             tournaments = tournaments_data.get("tournaments", [])
-            tournament_skills = {t.get("skill_id") for t in tournaments if isinstance(tournaments, list)}
+            tournament_skills = {
+                t.get("skill_id") for t in tournaments if isinstance(tournaments, list)
+            }
 
             loaded_but_no_tournaments = set(evals_by_skill.keys()) - tournament_skills
             if loaded_but_no_tournaments:
-                print(f"   🚨 Skills loaded but NO tournaments generated: {sorted(loaded_but_no_tournaments)}")
-                print("      This indicates a problem in the tournament generation logic!")
+                print(
+                    f"   🚨 Skills loaded but NO tournaments generated: {sorted(loaded_but_no_tournaments)}"
+                )
+                print(
+                    "      This indicates a problem in the tournament generation logic!"
+                )
 
                 # This is likely the root cause - skills are loaded but tournaments aren't generated
-                pytest.fail(f"Tournament generation failed for loaded skills: {sorted(loaded_but_no_tournaments)}")
+                pytest.fail(
+                    f"Tournament generation failed for loaded skills: {sorted(loaded_but_no_tournaments)}"
+                )
 
         print("   ✅ Root cause analysis complete")
 
@@ -240,7 +268,9 @@ class TestTournamentGenerationCoverage:
                 conversation_files = list(skill_dir.glob("*.json"))
                 if conversation_files:
                     cached_skills.append(skill_dir.name)
-                    print(f"   📁 {skill_dir.name}: {len(conversation_files)} cached conversations")
+                    print(
+                        f"   📁 {skill_dir.name}: {len(conversation_files)} cached conversations"
+                    )
 
         missing_cache = set(self.expected_skills) - set(cached_skills)
         if missing_cache:
@@ -256,11 +286,15 @@ class TestTournamentGenerationCoverage:
                 tournaments_data = json.load(f)
 
             tournaments = tournaments_data.get("tournaments", [])
-            tournament_skills = {t.get("skill_id") for t in tournaments if isinstance(tournaments, list)}
+            tournament_skills = {
+                t.get("skill_id") for t in tournaments if isinstance(tournaments, list)
+            }
 
             cached_but_no_tournaments = set(cached_skills) - tournament_skills
             if cached_but_no_tournaments:
-                print(f"   🚨 CRITICAL: Skills with cache but NO tournaments: {sorted(cached_but_no_tournaments)}")
+                print(
+                    f"   🚨 CRITICAL: Skills with cache but NO tournaments: {sorted(cached_but_no_tournaments)}"
+                )
                 print("      This confirms the tournament generation is broken!")
 
         print("   ✅ Cache availability check complete")

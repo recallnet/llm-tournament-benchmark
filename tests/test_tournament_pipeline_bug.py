@@ -76,8 +76,12 @@ class TestTournamentPipelineBug:
 
         if not output_exists and not missing_deps:
             print("   🚨 BUG: All dependencies exist but output is missing")
-            print("   This means the run_tournaments rule FAILED but Snakemake didn't detect it")
-            pytest.fail("Snakemake dependency bug: dependencies exist but output missing")
+            print(
+                "   This means the run_tournaments rule FAILED but Snakemake didn't detect it"
+            )
+            pytest.fail(
+                "Snakemake dependency bug: dependencies exist but output missing"
+            )
 
     def test_tournament_rule_execution_tracking(self):
         """Test if we can track what happens when tournament rule runs."""
@@ -100,8 +104,12 @@ class TestTournamentPipelineBug:
                     if "Error" in log_content or "Exception" in log_content:
                         print("   🚨 Found errors in log:")
                         lines = log_content.split("\n")
-                        for i, line in enumerate(lines):
-                            if "run_tournaments" in line or "Error" in line or "Exception" in line:
+                        for _i, line in enumerate(lines):
+                            if (
+                                "run_tournaments" in line
+                                or "Error" in line
+                                or "Exception" in line
+                            ):
                                 print(f"      {line}")
                 else:
                     print("   ❌ No run_tournaments found in log")
@@ -132,7 +140,9 @@ class TestTournamentPipelineBug:
                     latest_file = max(judge_files, key=lambda f: f.stat().st_mtime)
                     import datetime
 
-                    timestamp = datetime.datetime.fromtimestamp(latest_file.stat().st_mtime)
+                    timestamp = datetime.datetime.fromtimestamp(
+                        latest_file.stat().st_mtime
+                    )
                     print(f"      Latest judge cache: {timestamp}")
 
         print(f"   Skills with judge cache: {sorted(skill_dirs)}")
@@ -208,12 +218,18 @@ class TestTournamentPipelineBug:
             path = Path(file_path)
             exists = path.exists()
             size = path.stat().st_size if exists else 0
-            file_states[file_path] = {"exists": exists, "size": size, "desc": description}
+            file_states[file_path] = {
+                "exists": exists,
+                "size": size,
+                "desc": description,
+            }
             print(f"   {description}: {'✅' if exists else '❌'} ({size} bytes)")
 
         # Check the logical dependency chain
         tournaments_exist = file_states["data/testonly/tournaments.json"]["exists"]
-        summaries_exist = file_states["data/testonly/tournament_summaries.json"]["exists"]
+        summaries_exist = file_states["data/testonly/tournament_summaries.json"][
+            "exists"
+        ]
         ratings_exist = file_states["data/testonly/skill_ratings.json"]["exists"]
 
         print("\n   Dependency chain:")
@@ -221,15 +237,21 @@ class TestTournamentPipelineBug:
         print(f"   {tournaments_exist} → {summaries_exist} → {ratings_exist}")
 
         if not tournaments_exist and (summaries_exist or ratings_exist):
-            print("   🚨 INCONSISTENT STATE: Downstream files exist without tournaments.json")
-            print("   This indicates tournaments.json was created but then disappeared or failed")
+            print(
+                "   🚨 INCONSISTENT STATE: Downstream files exist without tournaments.json"
+            )
+            print(
+                "   This indicates tournaments.json was created but then disappeared or failed"
+            )
 
         if ratings_exist:
             # Check the content of ratings to see what skills are included
             with open("data/testonly/skill_ratings.json") as f:
                 ratings_data = json.load(f)
 
-            skill_keys = list(ratings_data.keys()) if isinstance(ratings_data, dict) else []
+            skill_keys = (
+                list(ratings_data.keys()) if isinstance(ratings_data, dict) else []
+            )
             print(f"   Skills in skill_ratings.json: {skill_keys}")
 
 

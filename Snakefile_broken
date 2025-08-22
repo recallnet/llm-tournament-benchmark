@@ -1,0 +1,260 @@
+"""
+AFBench Snakemake workflow
+
+A modular data processing pipeline with rigorous QA standards.
+"""
+
+import sys
+import pandas as pd
+from pathlib import Path
+
+# Configuration
+configfile: "config/config.yaml"
+
+# Define output directories  
+OUTPUT_DIR = Path("output")
+DATA_DIR = Path(config.get("data_dir", "tests/data"))  # Default to tests/data for safety
+RESULTS_DIR = OUTPUT_DIR / "results"
+PLOTS_DIR = OUTPUT_DIR / "plots"
+
+# Ensure directories exist
+Path.mkdir(OUTPUT_DIR, exist_ok=True)
+Path.mkdir(DATA_DIR, exist_ok=True)
+Path.mkdir(RESULTS_DIR, exist_ok=True)
+Path.mkdir(PLOTS_DIR, exist_ok=True)
+
+# Define final outputs
+rule all:
+    input:
+        DATA_DIR / "skill_ratings.json"
+
+# AFBench tournament pipeline
+rule afbench:
+    input:
+        DATA_DIR / "skill_ratings.json"
+    shell:
+        "python scripts/print_results_table.py {DATA_DIR}"
+
+# Load model pool (first stage)
+rule load_models:
+    output:
+        DATA_DIR / "loaded_models.json"
+    params:
+        pool_name=config.get("model_pool", {}).get("default_pool", "test"),
+        pools_dir=config.get("model_pool", {}).get("pools_dir", "model_pools")
+    script:
+        "scripts/load_models.py"
+
+# Load judge pool
+rule load_judges:
+    output:
+        DATA_DIR / "loaded_judges.json"
+    params:
+        pool_name=config.get("judge_pool", {}).get("default_pool", "test"),
+        pools_dir=config.get("judge_pool", {}).get("pools_dir", "judge_pools")
+    script:
+        "scripts/load_judges.py"
+
+# Load skills and evals
+def get_all_skill_files():
+    """Dynamically find all skill JSON files."""
+    import glob
+    return glob.glob("skills/*/*.json")
+
+rule load_skills:
+    input:
+        # Dynamically find all skill JSON files to trigger reload when they change
+        get_all_skill_files()
+    output:
+        DATA_DIR / "loaded_skills.json"
+    params:
+        skills_dir=config.get("skills", {}).get("skills_dir", "skills"),
+        selected_skills=config.get("skills", {}).get("selected_skills", None)
+    script:
+        "scripts/load_skills.py"
+
+# Helper functions for conversation file checking
+def get_conversation_files_for_model(model_id_sanitized):
+    """Get all conversation files that should exist for a model."""
+    models_file = DATA_DIR / "loaded_models.json"
+    skills_file = DATA_DIR / "loaded_skills.json"
+    
+    if not models_file.exists() or not skills_file.exists():
+        return []
+    
+    import sys
+    sys.path.insert(0, "scripts")
+    from snakemake_utils import get_expected_conversation_files
+    
+    # Convert sanitized back to original model ID
+    original_model_id = model_id_sanitized.replace('_', '/', 1)
+    
+    return get_expected_conversation_files(
+        str(models_file), str(skills_file), original_model_id, str(DATA_DIR / "conversations")
+    )
+
+def get_model_ids():
+    """Dynamically extract model IDs from loaded models file."""
+    models_file = DATA_DIR / "loaded_models.json"
+    if not models_file.exists():
+        return []
+    
+    import sys
+    sys.path.insert(0, "scripts")
+    from snakemake_utils import get_model_ids, sanitize_model_id_for_filename
+    
+    model_ids = get_model_ids(str(models_file))
+    # Return sanitized IDs for use in filenames
+    return [sanitize_model_id_for_filename(model_id) for model_id in model_ids]
+
+# Use checkpoint to handle dynamic dependencies properly
+checkpoint execute_conversations_for_model:
+    input:
+        models=DATA_DIR / "loaded_models.json",
+        skills=DATA_DIR / "loaded_skills.json", 
+        judges=DATA_DIR / "loaded_judges.json"
+    output:
+        # Create a simple marker file to indicate completion
+        DATA_DIR / "conversations" / "completed" / "{model_id}.completed"
+    params:
+        # Convert sanitized model ID back to original for processing
+        original_model_id=lambda wildcards: wildcards.model_id.replace('_', '/', 1)
+    run:
+        import sys
+        sys.path.insert(0, "scripts")
+        from execute_conversations_single_model import execute_conversations_for_model_cache_only
+        
+        # Execute conversations and cache them directly to conversation files
+        from datetime import datetime
+        from pathlib import Path
+        cache_dir = DATA_DIR / "conversations"
+        intermediary_cache_dir = DATA_DIR / "intermediaries"
+        
+        try:
+            # This function now includes retry logic and raises exceptions on failure
+            success = execute_conversations_for_model_cache_only(
+                str(input.models),
+                str(input.skills),
+                str(input.judges),
+                params.original_model_id,
+                str(cache_dir),
+                str(intermediary_cache_dir)
+            )
+            
+            if not success:
+                raise RuntimeError(f"Model {params.original_model_id} execution failed")
+            
+            # Create completion marker
+            output_file = Path(output[0])
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_file, 'w') as f:
+                f.write(f"Model {params.original_model_id} completed at {datetime.utcnow().isoformat()}\n")
+                
+        except Exception as e:
+            # Provide clear error message and fail the pipeline
+            error_msg = (f"\n💥 PIPELINE FAILED: Model execution failed for {params.original_model_id}\n"
+                        f"🔍 Error Details: {str(e)}\n"
+                        f"📋 This could indicate:\n"
+                        f"   - API authentication issues\n"
+                        f"   - Rate limiting from the model provider\n" 
+                        f"   - Model endpoint unavailability\n"
+                        f"   - Network connectivity problems\n\n"
+                        f"🛠️  Troubleshooting steps:\n"
+                        f"   1. Check API keys and authentication\n"
+                        f"   2. Verify model availability at OpenRouter\n"
+                        f"   3. Try running with fewer parallel jobs (-j 2)\n"
+                        f"   4. Check network connectivity\n")
+            
+            print(error_msg, file=sys.stderr)
+            raise RuntimeError(f"Model execution failed: {params.original_model_id}") from e
+
+# LEGACY VERSION: Original sequential execution (kept as backup)
+rule execute_conversations_legacy:
+    input:
+        models=DATA_DIR / "loaded_models.json",
+        skills=DATA_DIR / "loaded_skills.json",
+        judges=DATA_DIR / "loaded_judges.json"
+    output:
+        DATA_DIR / "conversations_legacy.json"
+    script:
+        "scripts/execute_conversations.py"
+
+# Function to collect conversation completion markers after checkpoint
+def get_conversation_markers(wildcards):
+    # After checkpoint runs, collect all completion markers
+    checkpoint_output = checkpoints.execute_conversations_for_model.get(**wildcards)
+    model_ids = get_model_ids()
+    return [DATA_DIR / "conversations" / "completed" / f"{model_id}.completed" for model_id in model_ids]
+
+# Run Swiss tournaments for model evaluation (direct cache mode)
+rule run_tournaments:
+    input:
+        # Use the checkpoint system to depend on conversation completion
+        markers=get_conversation_markers,
+        models=DATA_DIR / "loaded_models.json",
+        judges=DATA_DIR / "loaded_judges.json", 
+        skills=DATA_DIR / "loaded_skills.json"
+    params:
+        conversations_dir=DATA_DIR / "conversations"
+    output:
+        DATA_DIR / "tournaments.json"
+    shell:
+        "python scripts/snakemake_tournament_wrapper.py {params.conversations_dir} {input.models} {input.judges} {input.skills} {output}"
+
+# Summarize tournaments with match history and rankings
+rule summarize_tournaments:
+    input:
+        tournaments=DATA_DIR / "tournaments.json",
+        models=DATA_DIR / "loaded_models.json",
+        judges=DATA_DIR / "loaded_judges.json",
+        skills=DATA_DIR / "loaded_skills.json"
+    output:
+        DATA_DIR / "tournament_summaries.json"
+    shell:
+        "python scripts/snakemake_summarize_wrapper.py {input.tournaments} {output}"
+
+# Fetch OpenRouter models data (depends on models/judges but doesn't invalidate cache)
+rule fetch_openrouter_models:
+    input:
+        models=DATA_DIR / "loaded_models.json",
+        judges=DATA_DIR / "loaded_judges.json"
+    output:
+        DATA_DIR / "openrouter_models_full.json",
+        DATA_DIR / "openrouter_models_filtered.json"
+    script:
+        "scripts/fetch_openrouter_models.py"
+
+# Calculate skill ratings using OpenSkill Bradley-Terry system
+rule calculate_skill_ratings:
+    input:
+        summaries=DATA_DIR / "tournament_summaries.json",
+        models=DATA_DIR / "loaded_models.json",
+        judges=DATA_DIR / "loaded_judges.json",
+        skills=DATA_DIR / "loaded_skills.json"
+    output:
+        DATA_DIR / "skill_ratings.json"
+    shell:
+        "{sys.executable} scripts/snakemake_ratings_wrapper.py {input.summaries} {input.models} {input.judges} {input.skills} {output}"
+
+# Generate final results JSON with all skills (triggered by score updates)
+rule generate_final_results:
+    input:
+        ratings=DATA_DIR / "skill_ratings.json",
+        skills=DATA_DIR / "loaded_skills.json"
+    output:
+        DATA_DIR / "final_results.json"
+    script:
+        "scripts/generate_final_results.py"
+
+# Print final results table
+rule print_results:
+    input:
+        DATA_DIR / "skill_ratings.json"
+    shell:
+        "python scripts/print_results_table.py"
+
+
+# Clean intermediate files
+rule clean:
+    shell:
+        "rm -rf data/ output/"

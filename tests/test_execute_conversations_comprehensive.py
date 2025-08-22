@@ -5,7 +5,12 @@ import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from scripts.execute_conversations import ConversationExecutor, cleanup_stale_cache, execute_all_conversations, main
+from scripts.execute_conversations import (
+    ConversationExecutor,
+    cleanup_stale_cache,
+    execute_all_conversations,
+    main,
+)
 
 
 class TestCleanupStaleCache:
@@ -23,7 +28,11 @@ class TestCleanupStaleCache:
             cache_file = cache_dir / "skill1" / "eval1_stale_model_abc123.json"
             cache_file.parent.mkdir(parents=True, exist_ok=True)
             cache_data = {
-                "metadata": {"model_id": "stale_model", "eval_id": "eval1", "skill_id": "skill1"},
+                "metadata": {
+                    "model_id": "stale_model",
+                    "eval_id": "eval1",
+                    "skill_id": "skill1",
+                },
                 "execution_info": {"status": "completed"},
             }
             with open(cache_file, "w") as f:
@@ -52,7 +61,11 @@ class TestCleanupStaleCache:
             cache_file = cache_dir / "skill1" / "eval1_active_model_abc123.json"
             cache_file.parent.mkdir(parents=True, exist_ok=True)
             cache_data = {
-                "metadata": {"model_id": "active_model", "eval_id": "eval1", "skill_id": "skill1"},
+                "metadata": {
+                    "model_id": "active_model",
+                    "eval_id": "eval1",
+                    "skill_id": "skill1",
+                },
                 "execution_info": {"status": "completed"},
             }
             with open(cache_file, "w") as f:
@@ -138,7 +151,11 @@ class TestExecuteAllConversationsComprehensive:
 
             # Create test data
             models_data = {"models": [{"id": "model1"}, {"id": "model2"}]}
-            skills_data = {"evals": [{"id": "eval1", "_metadata": {"skill": "skill1"}, "chain": []}]}
+            skills_data = {
+                "evals": [
+                    {"id": "eval1", "_metadata": {"skill": "skill1"}, "chain": []}
+                ]
+            }
             judges_data = {"judges": [{"id": "judge1"}]}
 
             # Write test data to files
@@ -154,23 +171,38 @@ class TestExecuteAllConversationsComprehensive:
                     # Mock the executor instance
                     mock_executor = Mock()
                     mock_executor.cache_dir = Path(temp_dir) / "conversations"
-                    mock_executor.intermediary_cache_dir = Path(temp_dir) / "intermediaries"
+                    mock_executor.intermediary_cache_dir = (
+                        Path(temp_dir) / "intermediaries"
+                    )
                     mock_executor.cache_dir.mkdir(parents=True, exist_ok=True)
-                    mock_executor.intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+                    mock_executor.intermediary_cache_dir.mkdir(
+                        parents=True, exist_ok=True
+                    )
 
                     # Mock successful conversation execution
                     mock_executor.execute_conversation.return_value = {
-                        "metadata": {"model_id": "model1", "eval_id": "eval1", "skill_id": "skill1"},
+                        "metadata": {
+                            "model_id": "model1",
+                            "eval_id": "eval1",
+                            "skill_id": "skill1",
+                        },
                         "execution_info": {"status": "completed"},
                     }
 
-                    with patch("scripts.execute_conversations.ConversationExecutor", return_value=mock_executor):
+                    with patch(
+                        "scripts.execute_conversations.ConversationExecutor",
+                        return_value=mock_executor,
+                    ):
                         with patch("scripts.execute_conversations.cleanup_stale_cache"):
                             with patch("builtins.print"):
-                                execute_all_conversations(models_file, skills_file, judges_file, output_file)
+                                execute_all_conversations(
+                                    models_file, skills_file, judges_file, output_file
+                                )
 
                     # Verify execution was called for each model
-                    assert mock_executor.execute_conversation.call_count == 2  # 2 models * 1 eval
+                    assert (
+                        mock_executor.execute_conversation.call_count == 2
+                    )  # 2 models * 1 eval
 
                     # Verify output file was created
                     assert output_file.exists()
@@ -220,28 +252,48 @@ class TestExecuteAllConversationsComprehensive:
                 with patch.object(ConversationExecutor, "__init__", return_value=None):
                     mock_executor = Mock()
                     mock_executor.cache_dir = Path(temp_dir) / "conversations"
-                    mock_executor.intermediary_cache_dir = Path(temp_dir) / "intermediaries"
+                    mock_executor.intermediary_cache_dir = (
+                        Path(temp_dir) / "intermediaries"
+                    )
                     mock_executor.cache_dir.mkdir(parents=True, exist_ok=True)
-                    mock_executor.intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+                    mock_executor.intermediary_cache_dir.mkdir(
+                        parents=True, exist_ok=True
+                    )
 
                     # Mock conversation and intermediary execution
                     conversation_result = {
-                        "metadata": {"model_id": "model1", "eval_id": "eval1", "skill_id": "skill1"},
+                        "metadata": {
+                            "model_id": "model1",
+                            "eval_id": "eval1",
+                            "skill_id": "skill1",
+                        },
                         "execution_info": {"status": "completed"},
                     }
-                    mock_executor.execute_conversation.return_value = conversation_result
+                    mock_executor.execute_conversation.return_value = (
+                        conversation_result
+                    )
                     mock_executor.execute_intermediary.return_value = {
-                        "metadata": {"intermediary_id": "intermediary1", "judge_model_id": "judge1"},
+                        "metadata": {
+                            "intermediary_id": "intermediary1",
+                            "judge_model_id": "judge1",
+                        },
                         "execution_info": {"status": "completed"},
                     }
 
-                    with patch("scripts.execute_conversations.ConversationExecutor", return_value=mock_executor):
+                    with patch(
+                        "scripts.execute_conversations.ConversationExecutor",
+                        return_value=mock_executor,
+                    ):
                         with patch("scripts.execute_conversations.cleanup_stale_cache"):
                             with patch("builtins.print"):
-                                execute_all_conversations(models_file, skills_file, judges_file, output_file)
+                                execute_all_conversations(
+                                    models_file, skills_file, judges_file, output_file
+                                )
 
                     # Verify intermediary execution was called
-                    assert mock_executor.execute_intermediary.call_count == 2  # 2 intermediaries
+                    assert (
+                        mock_executor.execute_intermediary.call_count == 2
+                    )  # 2 intermediaries
 
                     # Verify output includes intermediaries
                     with open(output_file) as f:
@@ -259,7 +311,11 @@ class TestExecuteAllConversationsComprehensive:
 
             # Create test data
             models_data = {"models": [{"id": "model1"}]}
-            skills_data = {"evals": [{"id": "eval1", "_metadata": {"skill": "skill1"}, "chain": []}]}
+            skills_data = {
+                "evals": [
+                    {"id": "eval1", "_metadata": {"skill": "skill1"}, "chain": []}
+                ]
+            }
             judges_data = {"judges": [{"id": "judge1"}]}
 
             # Write test data
@@ -274,24 +330,37 @@ class TestExecuteAllConversationsComprehensive:
                 with patch.object(ConversationExecutor, "__init__", return_value=None):
                     mock_executor = Mock()
                     mock_executor.cache_dir = Path(temp_dir) / "conversations"
-                    mock_executor.intermediary_cache_dir = Path(temp_dir) / "intermediaries"
+                    mock_executor.intermediary_cache_dir = (
+                        Path(temp_dir) / "intermediaries"
+                    )
                     mock_executor.cache_dir.mkdir(parents=True, exist_ok=True)
-                    mock_executor.intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+                    mock_executor.intermediary_cache_dir.mkdir(
+                        parents=True, exist_ok=True
+                    )
 
                     # Mock conversation execution to raise exception
-                    mock_executor.execute_conversation.side_effect = Exception("API Error")
+                    mock_executor.execute_conversation.side_effect = Exception(
+                        "API Error"
+                    )
 
-                    with patch("scripts.execute_conversations.ConversationExecutor", return_value=mock_executor):
+                    with patch(
+                        "scripts.execute_conversations.ConversationExecutor",
+                        return_value=mock_executor,
+                    ):
                         with patch("scripts.execute_conversations.cleanup_stale_cache"):
                             with patch("builtins.print"):
-                                execute_all_conversations(models_file, skills_file, judges_file, output_file)
+                                execute_all_conversations(
+                                    models_file, skills_file, judges_file, output_file
+                                )
 
                     # Verify output still contains failure information
                     with open(output_file) as f:
                         result_data = json.load(f)
 
                     assert result_data["execution_info"]["failed_conversations"] == 1
-                    assert result_data["execution_info"]["successful_conversations"] == 0
+                    assert (
+                        result_data["execution_info"]["successful_conversations"] == 0
+                    )
 
                     # Check that failed conversation has error info
                     failed_conversation = result_data["conversations"][0]
@@ -332,33 +401,54 @@ class TestExecuteAllConversationsComprehensive:
                 with patch.object(ConversationExecutor, "__init__", return_value=None):
                     mock_executor = Mock()
                     mock_executor.cache_dir = Path(temp_dir) / "conversations"
-                    mock_executor.intermediary_cache_dir = Path(temp_dir) / "intermediaries"
+                    mock_executor.intermediary_cache_dir = (
+                        Path(temp_dir) / "intermediaries"
+                    )
                     mock_executor.cache_dir.mkdir(parents=True, exist_ok=True)
-                    mock_executor.intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+                    mock_executor.intermediary_cache_dir.mkdir(
+                        parents=True, exist_ok=True
+                    )
 
                     # Mock successful conversation but failed intermediary
                     conversation_result = {
-                        "metadata": {"model_id": "model1", "eval_id": "eval1", "skill_id": "skill1"},
+                        "metadata": {
+                            "model_id": "model1",
+                            "eval_id": "eval1",
+                            "skill_id": "skill1",
+                        },
                         "execution_info": {"status": "completed"},
                     }
-                    mock_executor.execute_conversation.return_value = conversation_result
-                    mock_executor.execute_intermediary.side_effect = Exception("Intermediary Error")
+                    mock_executor.execute_conversation.return_value = (
+                        conversation_result
+                    )
+                    mock_executor.execute_intermediary.side_effect = Exception(
+                        "Intermediary Error"
+                    )
 
-                    with patch("scripts.execute_conversations.ConversationExecutor", return_value=mock_executor):
+                    with patch(
+                        "scripts.execute_conversations.ConversationExecutor",
+                        return_value=mock_executor,
+                    ):
                         with patch("scripts.execute_conversations.cleanup_stale_cache"):
                             with patch("builtins.print"):
-                                execute_all_conversations(models_file, skills_file, judges_file, output_file)
+                                execute_all_conversations(
+                                    models_file, skills_file, judges_file, output_file
+                                )
 
                     # Verify output contains failure information for intermediaries
                     with open(output_file) as f:
                         result_data = json.load(f)
 
                     assert result_data["execution_info"]["failed_intermediaries"] == 1
-                    assert result_data["execution_info"]["successful_intermediaries"] == 0
+                    assert (
+                        result_data["execution_info"]["successful_intermediaries"] == 0
+                    )
 
                     # Check that failed intermediary has error info
                     failed_intermediary = result_data["intermediaries"][0]
-                    assert failed_intermediary["metadata"]["error"] == "Intermediary Error"
+                    assert (
+                        failed_intermediary["metadata"]["error"] == "Intermediary Error"
+                    )
                     assert failed_intermediary["execution_info"]["status"] == "failed"
 
     def test_execute_all_conversations_without_judges(self):
@@ -395,20 +485,33 @@ class TestExecuteAllConversationsComprehensive:
                 with patch.object(ConversationExecutor, "__init__", return_value=None):
                     mock_executor = Mock()
                     mock_executor.cache_dir = Path(temp_dir) / "conversations"
-                    mock_executor.intermediary_cache_dir = Path(temp_dir) / "intermediaries"
+                    mock_executor.intermediary_cache_dir = (
+                        Path(temp_dir) / "intermediaries"
+                    )
                     mock_executor.cache_dir.mkdir(parents=True, exist_ok=True)
-                    mock_executor.intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+                    mock_executor.intermediary_cache_dir.mkdir(
+                        parents=True, exist_ok=True
+                    )
 
                     # Mock conversation execution
                     mock_executor.execute_conversation.return_value = {
-                        "metadata": {"model_id": "model1", "eval_id": "eval1", "skill_id": "skill1"},
+                        "metadata": {
+                            "model_id": "model1",
+                            "eval_id": "eval1",
+                            "skill_id": "skill1",
+                        },
                         "execution_info": {"status": "completed"},
                     }
 
-                    with patch("scripts.execute_conversations.ConversationExecutor", return_value=mock_executor):
+                    with patch(
+                        "scripts.execute_conversations.ConversationExecutor",
+                        return_value=mock_executor,
+                    ):
                         with patch("scripts.execute_conversations.cleanup_stale_cache"):
                             with patch("builtins.print"):
-                                execute_all_conversations(models_file, skills_file, judges_file, output_file)
+                                execute_all_conversations(
+                                    models_file, skills_file, judges_file, output_file
+                                )
 
                     # Verify no intermediary execution was attempted
                     mock_executor.execute_intermediary.assert_not_called()
@@ -425,7 +528,9 @@ class TestMainFunction:
 
     def test_main_function_execution(self):
         """Test main function calls execute_all_conversations with correct parameters."""
-        with patch("scripts.execute_conversations.execute_all_conversations") as mock_execute:
+        with patch(
+            "scripts.execute_conversations.execute_all_conversations"
+        ) as mock_execute:
             with patch("builtins.print"):
                 main()
 
@@ -462,7 +567,12 @@ class TestAdditionalEdgeCases:
 
             # Create larger test dataset
             models_data = {"models": [{"id": f"model{i}"} for i in range(3)]}
-            skills_data = {"evals": [{"id": f"eval{i}", "_metadata": {"skill": f"skill{i}"}, "chain": []} for i in range(2)]}
+            skills_data = {
+                "evals": [
+                    {"id": f"eval{i}", "_metadata": {"skill": f"skill{i}"}, "chain": []}
+                    for i in range(2)
+                ]
+            }
             judges_data = {"judges": [{"id": "judge1"}]}
 
             # Write test data
@@ -477,19 +587,32 @@ class TestAdditionalEdgeCases:
                 with patch.object(ConversationExecutor, "__init__", return_value=None):
                     mock_executor = Mock()
                     mock_executor.cache_dir = Path(temp_dir) / "conversations"
-                    mock_executor.intermediary_cache_dir = Path(temp_dir) / "intermediaries"
+                    mock_executor.intermediary_cache_dir = (
+                        Path(temp_dir) / "intermediaries"
+                    )
                     mock_executor.cache_dir.mkdir(parents=True, exist_ok=True)
-                    mock_executor.intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+                    mock_executor.intermediary_cache_dir.mkdir(
+                        parents=True, exist_ok=True
+                    )
 
                     mock_executor.execute_conversation.return_value = {
-                        "metadata": {"model_id": "test", "eval_id": "test", "skill_id": "test"},
+                        "metadata": {
+                            "model_id": "test",
+                            "eval_id": "test",
+                            "skill_id": "test",
+                        },
                         "execution_info": {"status": "completed"},
                     }
 
-                    with patch("scripts.execute_conversations.ConversationExecutor", return_value=mock_executor):
+                    with patch(
+                        "scripts.execute_conversations.ConversationExecutor",
+                        return_value=mock_executor,
+                    ):
                         with patch("scripts.execute_conversations.cleanup_stale_cache"):
                             with patch("builtins.print"):
-                                execute_all_conversations(models_file, skills_file, judges_file, output_file)
+                                execute_all_conversations(
+                                    models_file, skills_file, judges_file, output_file
+                                )
 
                     # Verify total combinations (3 models * 2 evals = 6 conversations)
                     assert mock_executor.execute_conversation.call_count == 6
@@ -509,7 +632,11 @@ class TestAdditionalEdgeCases:
 
             # Create test data
             models_data = {"models": [{"id": "model1"}, {"id": "model2"}]}
-            skills_data = {"evals": [{"id": "eval1", "_metadata": {"skill": "skill1"}, "chain": []}]}
+            skills_data = {
+                "evals": [
+                    {"id": "eval1", "_metadata": {"skill": "skill1"}, "chain": []}
+                ]
+            }
             judges_data = {"judges": [{"id": "judge1"}]}
 
             # Write test data
@@ -524,15 +651,23 @@ class TestAdditionalEdgeCases:
                 with patch.object(ConversationExecutor, "__init__", return_value=None):
                     mock_executor = Mock()
                     mock_executor.cache_dir = Path(temp_dir) / "conversations"
-                    mock_executor.intermediary_cache_dir = Path(temp_dir) / "intermediaries"
+                    mock_executor.intermediary_cache_dir = (
+                        Path(temp_dir) / "intermediaries"
+                    )
                     mock_executor.cache_dir.mkdir(parents=True, exist_ok=True)
-                    mock_executor.intermediary_cache_dir.mkdir(parents=True, exist_ok=True)
+                    mock_executor.intermediary_cache_dir.mkdir(
+                        parents=True, exist_ok=True
+                    )
 
                     # Mock mixed results: first succeeds, second fails
                     def side_effect(*args):
                         if args[0]["id"] == "model1":
                             return {
-                                "metadata": {"model_id": "model1", "eval_id": "eval1", "skill_id": "skill1"},
+                                "metadata": {
+                                    "model_id": "model1",
+                                    "eval_id": "eval1",
+                                    "skill_id": "skill1",
+                                },
                                 "execution_info": {"status": "completed"},
                             }
                         else:
@@ -540,15 +675,22 @@ class TestAdditionalEdgeCases:
 
                     mock_executor.execute_conversation.side_effect = side_effect
 
-                    with patch("scripts.execute_conversations.ConversationExecutor", return_value=mock_executor):
+                    with patch(
+                        "scripts.execute_conversations.ConversationExecutor",
+                        return_value=mock_executor,
+                    ):
                         with patch("scripts.execute_conversations.cleanup_stale_cache"):
                             with patch("builtins.print"):
-                                execute_all_conversations(models_file, skills_file, judges_file, output_file)
+                                execute_all_conversations(
+                                    models_file, skills_file, judges_file, output_file
+                                )
 
                     # Verify mixed results
                     with open(output_file) as f:
                         result_data = json.load(f)
 
-                    assert result_data["execution_info"]["successful_conversations"] == 1
+                    assert (
+                        result_data["execution_info"]["successful_conversations"] == 1
+                    )
                     assert result_data["execution_info"]["failed_conversations"] == 1
                     assert result_data["execution_info"]["total_conversations"] == 2

@@ -9,8 +9,7 @@ With proper types, MyPy would have caught:
 - Invalid dictionary structure assumptions
 """
 
-from datetime import datetime
-from typing import List, Literal, Optional, TypedDict
+from typing import Literal, TypedDict
 
 
 class ModelConfig(TypedDict):
@@ -18,7 +17,7 @@ class ModelConfig(TypedDict):
 
     id: str
     author: str
-    slug: Optional[str]
+    slug: str | None
     context_window: int
     endpoint: str
 
@@ -28,7 +27,7 @@ class JudgeConfig(TypedDict):
 
     id: str
     author: str
-    context_window: Optional[int]
+    context_window: int | None
 
 
 class EvalMetadata(TypedDict):
@@ -48,10 +47,10 @@ class EvalConfig(TypedDict):
     """Type-safe evaluation configuration."""
 
     id: str
-    name: Optional[str]
+    name: str | None
     _metadata: EvalMetadata
-    chain: List[str]
-    intermediaries: Optional[List[IntermediaryConfig]]
+    chain: list[str]
+    intermediaries: list[IntermediaryConfig] | None
 
 
 class ConversationMessage(TypedDict):
@@ -66,9 +65,9 @@ class ConversationMetadata(TypedDict):
 
     skill_id: str
     eval_id: str
-    eval_name: Optional[str]
+    eval_name: str | None
     model_id: str
-    model_slug: Optional[str]
+    model_slug: str | None
     model_author: str
     timestamp: str
     cache_key: str
@@ -81,14 +80,16 @@ class ConversationExecutionInfo(TypedDict):
 
     total_steps: int
     completed_steps: int
-    status: Literal["completed", "failed", "partial"]  # THIS would have caught the KeyError!
+    status: Literal[
+        "completed", "failed", "partial"
+    ]  # THIS would have caught the KeyError!
 
 
 class ConversationResult(TypedDict):
     """Type-safe conversation result."""
 
     metadata: ConversationMetadata
-    messages: List[ConversationMessage]
+    messages: list[ConversationMessage]
     execution_info: ConversationExecutionInfo
 
 
@@ -112,15 +113,15 @@ class PipelineResult(TypedDict):
     """Type-safe pipeline result."""
 
     execution_info: PipelineExecutionInfo  # This dict structure was the issue!
-    conversations: List[ConversationResult]
-    intermediaries: List[ConversationResult]
+    conversations: list[ConversationResult]
+    intermediaries: list[ConversationResult]
 
 
 class IntermediaryResult(TypedDict):
     """Type-safe intermediary result."""
 
     metadata: ConversationMetadata
-    messages: List[ConversationMessage]
+    messages: list[ConversationMessage]
     execution_info: ConversationExecutionInfo
 
 
@@ -173,35 +174,13 @@ def demonstrate_typing_would_catch_bugs():
     """Show how proper typing would have prevented the runtime failures."""
 
     # Bug 1: KeyError: 'status'
-    pipeline_result: PipelineResult = {
-        "execution_info": {
-            "total_conversations": 1,
-            "successful_conversations": 1,
-            "failed_conversations": 0,
-            # ... other required fields
-            # Notice: no 'status' field
-        },
-        "conversations": [],
-        "intermediaries": [],
-    }
 
     # This would be a MyPy error with proper typing:
     # status = pipeline_result["execution_info"]["status"]  # ❌ Key 'status' not in PipelineExecutionInfo
 
     # Bug 2: Wrong method signature
-    intermediary: IntermediaryConfig = {"id": "test", "prompt": "test"}
-    conversation: ConversationResult = {
-        "metadata": {
-            "skill_id": "test",
-            "eval_id": "test",
-            # ... other required fields
-        },
-        "messages": [],
-        "execution_info": {"total_steps": 1, "completed_steps": 1, "status": "completed"},
-    }
-    judge: JudgeConfig = {"id": "test", "author": "test"}
 
-    executor = TypedConversationExecutor()
+    TypedConversationExecutor()
 
     # This would be a MyPy error with proper typing:
     # executor.execute_intermediary(judge, intermediary, conversation, "skill", "eval")
