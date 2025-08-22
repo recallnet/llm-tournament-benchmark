@@ -431,6 +431,204 @@ def show_skills_page(data):
                     st.json(eval_json)
 
 
+def show_progress_page(data):
+    """Display pipeline progress and status information."""
+    st.header("📊 Pipeline Progress")
+
+    data_dir = data["data_dir"]
+
+    # Pipeline Stage Overview
+    st.subheader("🔄 Pipeline Stages")
+
+    stages = [
+        {
+            "name": "Skills Loading",
+            "icon": "🎯",
+            "complete": "skills" in data["available_data"],
+            "file": "loaded_skills.json",
+            "description": "Evaluation definitions loaded"
+        },
+        {
+            "name": "Models Loading", 
+            "icon": "🤖",
+            "complete": "models" in data["available_data"],
+            "file": "loaded_models.json",
+            "description": "Model configurations loaded"
+        },
+        {
+            "name": "Judges Loading",
+            "icon": "⚖️", 
+            "complete": "judges" in data["available_data"],
+            "file": "loaded_judges.json",
+            "description": "Judge configurations loaded"
+        },
+        {
+            "name": "Conversation Generation",
+            "icon": "💬",
+            "complete": os.path.exists(f"{data_dir}/conversations_completed.flag"),
+            "file": "conversations/",
+            "description": "Model responses generated"
+        },
+        {
+            "name": "Tournament Execution",
+            "icon": "🏆",
+            "complete": "tournament_summaries" in data["available_data"],
+            "file": "tournament_summaries.json",
+            "description": "Head-to-head competitions"
+        },
+        {
+            "name": "Skill Rating Calculation", 
+            "icon": "📈",
+            "complete": "skill_ratings" in data["available_data"],
+            "file": "skill_ratings.json",
+            "description": "OpenSkill ratings computed"
+        }
+    ]
+
+    # Display stages in a grid
+    cols = st.columns(3)
+    for i, stage in enumerate(stages):
+        with cols[i % 3]:
+            status_icon = "✅" if stage["complete"] else "⏳"
+            status_color = "green" if stage["complete"] else "orange"
+            
+            st.markdown(f"""
+            <div style="
+                border: 2px solid {status_color};
+                border-radius: 10px;
+                padding: 15px;
+                margin: 10px 0;
+                background-color: {'#f0f8f0' if stage['complete'] else '#fff8f0'};
+            ">
+                <h4>{status_icon} {stage['icon']} {stage['name']}</h4>
+                <p style="margin: 5px 0; color: #666;">{stage['description']}</p>
+                <small style="font-family: monospace; background: #f5f5f5; padding: 2px 4px; border-radius: 3px;">
+                    {stage['file']}
+                </small>
+            </div>
+            """, unsafe_allow_html=True)
+
+    # Detailed Progress Metrics
+    st.subheader("📋 Detailed Progress")
+
+    # Conversation Generation Progress
+    if "models" in data["available_data"] and "skills" in data["available_data"]:
+        model_count = len(data["models"]["models"])
+        eval_count = len(data["skills"]["evals"])
+        expected_conversations = model_count * eval_count
+
+        # Count actual conversation files
+        conversation_pattern = f"{data_dir}/conversations/*/*.json"
+        actual_conversations = len(glob.glob(conversation_pattern))
+
+        progress_pct = (actual_conversations / expected_conversations * 100) if expected_conversations > 0 else 0
+        
+        st.metric(
+            "Conversation Files",
+            f"{actual_conversations:,} / {expected_conversations:,}",
+            f"{progress_pct:.1f}% complete"
+        )
+
+        # Progress bar (clamp to 0-1 range)
+        progress_value = min(1.0, max(0.0, actual_conversations / expected_conversations)) if expected_conversations > 0 else 0.0
+        st.progress(progress_value)
+
+    # Model completion tracking
+    if "models" in data["available_data"]:
+        model_count = len(data["models"]["models"])
+        completion_flags = glob.glob(f"{data_dir}/model_conversations_*.completed")
+        completed_models = len(completion_flags)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Models Completed", f"{completed_models} / {model_count}")
+        with col2:
+            completion_pct = (completed_models / model_count * 100) if model_count > 0 else 0
+            st.metric("Completion Rate", f"{completion_pct:.1f}%")
+
+    # Skill-level progress
+    if "skills" in data["available_data"]:
+        st.subheader("🎯 Progress by Skill")
+        
+        skill_progress = []
+        for skill_name, skill_info in data["skills"]["skills"].items():
+            # Count conversations for this skill
+            skill_conversations = len(glob.glob(f"{data_dir}/conversations/{skill_name}/*.json"))
+            expected_skill_conversations = len(data["models"]["models"]) * skill_info["eval_count"] if "models" in data["available_data"] else skill_info["eval_count"]
+            
+            # Check if tournaments exist
+            has_tournaments = "tournament_summaries" in data["available_data"] and skill_name in data.get("validated_tournaments", {})
+            
+            # Check for judge cache
+            judge_cache_files = len(glob.glob(f"{data_dir}/judge_cache/{skill_name}/*.json"))
+            
+            skill_progress.append({
+                "Skill": skill_name.replace("_", " ").title(),
+                "Conversations": f"{skill_conversations:,} / {expected_skill_conversations:,}",
+                "Tournament": "✅ Complete" if has_tournaments else "⏳ Pending", 
+                "Judge Decisions": f"{judge_cache_files:,} cached"
+            })
+
+        if skill_progress:
+            import pandas as pd
+            progress_df = pd.DataFrame(skill_progress)
+            st.dataframe(progress_df, use_container_width=True)
+
+    # File System Overview
+    st.subheader("📁 File System Status")
+    
+    # Data directory size and file counts
+    try:
+        import subprocess
+        result = subprocess.run(['du', '-sh', data_dir], capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            dir_size = result.stdout.split()[0]
+            st.metric("Data Directory Size", dir_size)
+    except:
+        pass
+
+    # Recent activity
+    st.subheader("🕐 Recent Activity")
+    
+    recent_files = []
+    for pattern in ["*.json", "conversations/*/*.json", "judge_cache/*/*.json", "*.completed"]:
+        files = glob.glob(f"{data_dir}/{pattern}")
+        for file_path in files:
+            try:
+                mtime = os.path.getmtime(file_path)
+                recent_files.append((file_path, mtime))
+            except:
+                continue
+    
+    # Sort by modification time and show most recent 10
+    recent_files.sort(key=lambda x: x[1], reverse=True)
+    
+    if recent_files:
+        st.write("**Most Recently Modified Files:**")
+        for file_path, mtime in recent_files[:10]:
+            relative_path = os.path.relpath(file_path, data_dir)
+            mod_time = datetime.fromtimestamp(mtime).strftime("%H:%M:%S")
+            st.code(f"{mod_time} - {relative_path}")
+
+    # Next Steps
+    st.subheader("🚀 Next Steps")
+    
+    if not stages[0]["complete"]:  # Skills not loaded
+        st.info("Run: `snakemake --profile profiles/quick data/quick/loaded_skills.json`")
+    elif not stages[1]["complete"]:  # Models not loaded  
+        st.info("Run: `snakemake --profile profiles/quick data/quick/loaded_models.json`")
+    elif not stages[2]["complete"]:  # Judges not loaded
+        st.info("Run: `snakemake --profile profiles/quick data/quick/loaded_judges.json`")
+    elif not stages[3]["complete"]:  # Conversations not complete
+        st.info("Run: `snakemake --profile profiles/quick generate_conversations`")
+    elif not stages[4]["complete"]:  # Tournaments not complete
+        st.info("Run: `snakemake --profile profiles/quick run_tournaments`") 
+    elif not stages[5]["complete"]:  # Ratings not complete
+        st.info("Run: `snakemake --profile profiles/quick calculate_ratings`")
+    else:
+        st.success("🎉 Pipeline complete! All stages finished.")
+
+
 def show_tournaments_page(data):
     """Display tournament results and match analysis."""
     st.header("🏆 Tournaments")
@@ -738,17 +936,18 @@ def main():
 
     # Determine available pages based on data
     all_pages = {
+        "📊 Progress": (None, show_progress_page),  # Always available
         "🤖 Models": ("models", show_models_page),
         "⚖️ Judges": ("judges", show_judges_page),
         "🎯 Skills": ("skills", show_skills_page),
         "🏆 Tournaments": ("skill_ratings", show_tournaments_page),
     }
 
-    # Only show pages for which we have data
+    # Only show pages for which we have data (Progress is always available)
     available_pages = {
         name: page_func
         for name, (required_data, page_func) in all_pages.items()
-        if required_data in data["available_data"]
+        if required_data is None or required_data in data["available_data"]
     }
 
     if not available_pages:

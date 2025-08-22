@@ -7,17 +7,17 @@ COMMAND="Your job is to run 'snakemake --profile profiles/production -j5 > pipel
 echo "Starting pipeline monitoring script - will run 24 cycles over 12 hours"
 echo "Started at: $(date)"
 
-for i in {1..24}; do
+for i in {1..200}; do
     echo ""
     echo "=== Cycle $i/24 - $(date) ==="
-    
+
     # Send command to Claude Code
     claude --dangerously-skip-permissions -p "$COMMAND"
-    
+
     # Sleep for 30 minutes unless it's the last iteration
     if [ $i -lt 24 ]; then
         echo "Sleeping for 30 minutes before next check..."
-        sleep 1800  # 30 minutes = 1800 seconds
+        sleep 900  # 30 minutes = 1800 seconds
     fi
 done
 

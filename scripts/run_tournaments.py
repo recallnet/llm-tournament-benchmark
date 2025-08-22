@@ -1024,6 +1024,156 @@ def main_with_cache_dir(
     return {"success": True}
 
 
+def _execute_judges_for_match(
+    match,
+    judges,
+    judge_executor,
+    eval_data,
+    conversations_cache_dir
+):
+    """
+    Execute judges for a match with parallel optimization for first two judges.
+    
+    This function maintains complete backward compatibility with existing cache
+    and results while optimizing performance by running the first two judges
+    in parallel when possible.
+    """
+    if len(judges) < 2:
+        # Fallback to sequential for edge case
+        for i, judge in enumerate(judges):
+            try:
+                vote, conversation, explanation = (
+                    judge_executor.execute_judge_decision(
+                        match,
+                        judge,
+                        eval_data,
+                        conversations_cache_dir,
+                        {},  # Empty intermediaries for now
+                    )
+                )
+                match.add_judge_result(
+                    judge["id"], vote, conversation, explanation
+                )
+            except Exception as e:
+                print(f"         ❌ Judge {judge['id']} failed: {e}")
+                error_conversation = [
+                    {
+                        "role": "user",
+                        "content": "[JUDGE_EXECUTION_ERROR]",
+                    },
+                    {"role": "assistant", "content": f"Error: {e}"},
+                ]
+                match.add_judge_result(
+                    judge["id"],
+                    "TIE",
+                    error_conversation,
+                    f"Error: {e}",
+                )
+        return
+
+    # Parallel execution for first two judges
+    first_two_judges = judges[:2]
+    
+    def execute_single_judge(judge):
+        """Execute a single judge and return results with judge info."""
+        try:
+            vote, conversation, explanation = (
+                judge_executor.execute_judge_decision(
+                    match,
+                    judge,
+                    eval_data,
+                    conversations_cache_dir,
+                    {},  # Empty intermediaries for now
+                )
+            )
+            return {
+                "judge_id": judge["id"],
+                "vote": vote,
+                "conversation": conversation,
+                "explanation": explanation,
+                "success": True,
+            }
+        except Exception as e:
+            print(f"         ❌ Judge {judge['id']} failed: {e}")
+            error_conversation = [
+                {
+                    "role": "user",
+                    "content": "[JUDGE_EXECUTION_ERROR]",
+                },
+                {"role": "assistant", "content": f"Error: {e}"},
+            ]
+            return {
+                "judge_id": judge["id"],
+                "vote": "TIE",
+                "conversation": error_conversation,
+                "explanation": f"Error: {e}",
+                "success": False,
+            }
+
+    # Execute first two judges in parallel
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        # Submit both judges for parallel execution
+        future_to_judge = {
+            executor.submit(execute_single_judge, judge): judge
+            for judge in first_two_judges
+        }
+        
+        # Collect results in order (important for deterministic behavior)
+        judge_results = {}
+        for future in as_completed(future_to_judge):
+            result = future.result()
+            judge_results[result["judge_id"]] = result
+    
+    # Add results to match in original judge order (preserves determinism)
+    for judge in first_two_judges:
+        result = judge_results[judge["id"]]
+        match.add_judge_result(
+            result["judge_id"],
+            result["vote"],
+            result["conversation"],
+            result["explanation"]
+        )
+    
+    # Check for early consensus after first two judges
+    if match.check_early_consensus():
+        # Get the consensus vote for logging (both judges agree)
+        consensus_vote = list(match.judge_votes.values())[0]
+        print(f"         🎯 Early consensus reached: {consensus_vote}")
+        return  # Skip third judge
+    
+    # Execute third judge sequentially if needed
+    if len(judges) > 2:
+        third_judge = judges[2]
+        try:
+            vote, conversation, explanation = (
+                judge_executor.execute_judge_decision(
+                    match,
+                    third_judge,
+                    eval_data,
+                    conversations_cache_dir,
+                    {},  # Empty intermediaries for now
+                )
+            )
+            match.add_judge_result(
+                third_judge["id"], vote, conversation, explanation
+            )
+        except Exception as e:
+            print(f"         ❌ Judge {third_judge['id']} failed: {e}")
+            error_conversation = [
+                {
+                    "role": "user",
+                    "content": "[JUDGE_EXECUTION_ERROR]",
+                },
+                {"role": "assistant", "content": f"Error: {e}"},
+            ]
+            match.add_judge_result(
+                third_judge["id"],
+                "TIE",
+                error_conversation,
+                f"Error: {e}",
+            )
+
+
 def main_with_cache_dir_data_driven(
     conversations_cache_dir: str,
     models_file: str,
@@ -1154,7 +1304,7 @@ def main_with_cache_dir_data_driven(
                         match.timestamp = datetime.utcnow().isoformat()
 
                         # Execute judges for this match with parallel optimization
-                        self._execute_judges_for_match(
+                        _execute_judges_for_match(
                             match, judges, judge_executor, eval_data, conversations_cache_dir
                         )
 

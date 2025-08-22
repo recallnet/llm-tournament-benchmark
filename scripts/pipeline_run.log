@@ -1,0 +1,2 @@
+Using profile profiles/production for setting default command line arguments.
+Error: profile given but no config.yaml found. Profile has to be given as either absolute path, relative path or name of a directory available in either /Library/Application Support/snakemake or /Users/andrewhill/Library/Application Support/snakemake.
