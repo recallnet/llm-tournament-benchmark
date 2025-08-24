@@ -1,6 +1,7 @@
 """Generate final results JSON with all skills in EvalConfigTiny format."""
 
 import json
+import os
 from pathlib import Path
 from typing import Any
 

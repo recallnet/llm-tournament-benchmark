@@ -218,13 +218,31 @@ def show_models_page(data):
                 "Skills": skills_participated,
                 "Matches": total_matches,
                 "Win Rate": f"{win_rate:.1f}%",
+                "Win Rate (Numeric)": win_rate,  # For proper sorting
                 "Best Skill": best_skill or "None",
                 "Worst Skill": worst_skill or "None",
             }
         )
 
     df = pd.DataFrame(model_stats)
-    st.dataframe(df, use_container_width=True)
+    
+    # Configure column display and sorting
+    column_config = {
+        "Win Rate (Numeric)": None,  # Hide the numeric column from display
+        "Win Rate": st.column_config.TextColumn(
+            "Win Rate",
+            help="Win rate percentage based on tournament matches",
+            width="small"
+        )
+    }
+    
+    # Display dataframe with proper sorting
+    st.dataframe(
+        df,
+        use_container_width=True,
+        column_config=column_config,
+        hide_index=True
+    )
 
     # Capture models overview table for issue reporting
     issue_reporter.capture_table_data("Models Overview", df)
@@ -434,6 +452,43 @@ def show_skills_page(data):
 def show_progress_page(data):
     """Display pipeline progress and status information."""
     st.header("📊 Pipeline Progress")
+
+    # Profile selector
+    st.subheader("🔧 Profile Selection")
+    
+    # Available profiles
+    available_profiles = {
+        "data/quick": "Quick (Development)",
+        "data/production": "Production (Full Evaluation)",
+        "data/testonly": "Test Only (Testing)"
+    }
+    
+    # Get current profile from data_dir
+    current_profile = data["data_dir"].split("/")[-1] if "/" in data["data_dir"] else data["data_dir"]
+    current_profile_path = f"data/{current_profile}" if current_profile in ["quick", "production", "testonly"] else data["data_dir"]
+    
+    # Create profile dropdown
+    profile_options = list(available_profiles.keys())
+    try:
+        current_index = profile_options.index(current_profile_path)
+    except ValueError:
+        current_index = 0  # Default to first option if current profile not found
+    
+    selected_profile = st.selectbox(
+        "Select Profile:",
+        profile_options,
+        index=current_index,
+        format_func=lambda x: available_profiles[x],
+        help="Switch between different data profiles. Page will refresh to show selected profile data."
+    )
+    
+    # If profile changed, update the environment variable and rerun
+    if selected_profile != current_profile_path:
+        st.info(f"🔄 Switching to {available_profiles[selected_profile]} profile...")
+        os.environ["AFBENCH_ADMIN_DATA_DIR"] = selected_profile
+        # Clear the cache and rerun
+        load_available_data.clear()
+        st.rerun()
 
     data_dir = data["data_dir"]
 

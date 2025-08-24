@@ -31,7 +31,8 @@ except FileNotFoundError:
 # Define final outputs
 rule all:
     input:
-        DATA_DIR / "skill_ratings.json"
+        DATA_DIR / "final_results.json",
+        DATA_DIR / "benchmarks.json"
 
 # AFBench tournament pipeline
 rule afbench:
@@ -98,6 +99,30 @@ def get_model_ids():
         # Fallback to empty list if CSV doesn't exist or has issues
         return []
 
+# Helper function to get skill names for parallel tournament execution
+def get_skills():
+    """Get skill names from loaded_skills.json for parallel tournament wildcards."""
+    skills_file = DATA_DIR / "loaded_skills.json"
+    
+    try:
+        import json
+        with open(skills_file) as f:
+            skills_data = json.load(f)
+        # Extract skill names from the skills section
+        skill_names = list(skills_data.get("skills", {}).keys())
+        return skill_names
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
+        # Fallback: try to infer from conversations directory
+        try:
+            conversations_dir = DATA_DIR / "conversations"
+            if conversations_dir.exists():
+                # Get skill names from subdirectories
+                return [d.name for d in conversations_dir.iterdir() if d.is_dir()]
+        except:
+            pass
+        # Final fallback to common skills
+        return ["code_generation", "harm_avoidance", "empathy", "hidden_messages"]
+
 # Execute conversations for each model in parallel with per-model serialization
 rule execute_conversations_for_model:
     input:
@@ -127,8 +152,8 @@ rule execute_conversations:
     shell:
         "touch {output}"
 
-# Run Swiss tournaments - depends on conversations being completed
-rule run_tournaments:
+# Run Swiss tournaments per skill in parallel - depends on conversations being completed
+rule run_tournament_per_skill:
     input:
         flag=DATA_DIR / "conversations_completed.flag",
         models=DATA_DIR / "loaded_models.json",
@@ -137,9 +162,20 @@ rule run_tournaments:
     params:
         conversations_dir=DATA_DIR / "conversations"
     output:
+        DATA_DIR / "tournament_{skill}.json"
+    wildcard_constraints:
+        skill="[a-z_]+"
+    shell:
+        "python scripts/run_single_skill_tournament.py {wildcards.skill} {params.conversations_dir} {input.models} {input.judges} {input.skills} {output}"
+
+# Aggregate per-skill tournament results into single tournaments.json
+rule aggregate_tournaments:
+    input:
+        lambda wildcards: [DATA_DIR / f"tournament_{skill}.json" for skill in get_skills()]
+    output:
         DATA_DIR / "tournaments.json"
     shell:
-        "python scripts/snakemake_tournament_wrapper.py {params.conversations_dir} {input.models} {input.judges} {input.skills} {output}"
+        "python scripts/aggregate_tournament_results.py {input} {output}"
 
 # Summarize tournaments
 rule summarize_tournaments:
@@ -164,6 +200,33 @@ rule calculate_skill_ratings:
         DATA_DIR / "skill_ratings.json"
     shell:
         "{sys.executable} scripts/snakemake_ratings_wrapper.py {input.summaries} {input.models} {input.judges} {input.skills} {output}"
+
+# Generate final results - always run (never cached)
+rule generate_final_results:
+    input:
+        skills=DATA_DIR / "loaded_skills.json",
+        ratings=DATA_DIR / "skill_ratings.json"  # Ensure this runs after ratings
+    output:
+        DATA_DIR / "final_results.json"
+    params:
+        data_dir=DATA_DIR
+    shell:
+        "AFBENCH_DATA_DIR={params.data_dir} python scripts/generate_final_results.py"
+
+# Generate benchmarks leaderboard - always run (never cached)
+rule generate_benchmarks:
+    input:
+        skills=DATA_DIR / "loaded_skills.json",
+        ratings=DATA_DIR / "skill_ratings.json",
+        summaries=DATA_DIR / "tournament_summaries.json",
+        models=DATA_DIR / "loaded_models.json",
+        judges=DATA_DIR / "loaded_judges.json"
+    output:
+        DATA_DIR / "benchmarks.json"
+    params:
+        data_dir=DATA_DIR
+    shell:
+        "AFBENCH_DATA_DIR={params.data_dir} python scripts/generate_benchmarks.py"
 
 # Clean intermediate files
 rule clean:

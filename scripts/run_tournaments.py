@@ -304,20 +304,35 @@ class JudgeExecutor:
         current_judges: list[dict[str, Any]],
         current_evals: list[dict[str, Any]],
     ) -> None:
-        """Remove ALL cached judge decisions that are no longer valid due to model/judge/eval changes."""
-        # CRITICAL SAFETY: Prevent production data destruction during testing
+        """
+        Remove cached judge decisions that are no longer valid due to model/judge/eval changes.
+        
+        CRITICAL FIX: This function now uses exclusive locking to prevent race conditions
+        when multiple tournament processes run in parallel, which was causing production
+        data deletion in the original implementation.
+        """
+        # Import parallel cache safety utilities
         try:
-            from scripts.safety_guards import (
-                check_production_data_access,
-                ensure_test_mode_for_cache_operations,
+            from scripts.parallel_cache_safety import (
+                exclusive_cache_lock,
+                safe_remove_directory_tree,
+                safe_remove_file,
+                should_skip_cache_cleanup,
+                mark_cache_cleanup_complete
             )
         except ImportError:
-            from safety_guards import (
-                check_production_data_access,
-                ensure_test_mode_for_cache_operations,
+            from parallel_cache_safety import (
+                exclusive_cache_lock,
+                safe_remove_directory_tree,
+                safe_remove_file,  
+                should_skip_cache_cleanup,
+                mark_cache_cleanup_complete
             )
-        ensure_test_mode_for_cache_operations()
-        check_production_data_access(self.cache_dir, "cache cleanup")
+
+        # Check if cleanup can be skipped (already done recently with same config)
+        if should_skip_cache_cleanup(self.cache_dir, current_models, current_judges, current_evals):
+            return
+
         current_model_ids = {model["id"] for model in current_models}
         current_judge_ids = {judge["id"] for judge in current_judges}
         current_eval_ids = {eval_data["id"] for eval_data in current_evals}
@@ -325,81 +340,109 @@ class JudgeExecutor:
             eval_data["_metadata"]["skill"] for eval_data in current_evals
         }
 
-        cleaned_count = 0
-
         print("🧹 Cleaning invalid tournament match cache entries...")
         print(f"   Valid models: {sorted(current_model_ids)}")
         print(f"   Valid judges: {sorted(current_judge_ids)}")
         print(f"   Valid evals: {sorted(current_eval_ids)}")
 
-        if self.cache_dir.exists():
-            for skill_dir in self.cache_dir.iterdir():
-                if skill_dir.is_dir():
-                    skill_name = skill_dir.name
+        # CRITICAL FIX: Use exclusive locking to prevent race conditions
+        try:
+            with exclusive_cache_lock(self.cache_dir, f"cache_cleanup_pid_{os.getpid()}", timeout=60):
+                cleaned_count = self._perform_cache_cleanup_locked(
+                    current_model_ids, current_judge_ids, current_eval_ids, current_skill_ids
+                )
+                
+                # Mark cleanup complete to prevent other processes from re-doing it
+                mark_cache_cleanup_complete(self.cache_dir, current_models, current_judges, current_evals, cleaned_count)
+                
+        except Exception as e:
+            print(f"   ⚠️  Cache cleanup failed or was skipped due to locking: {e}")
+            print(f"   ℹ️  Another process may be handling cache cleanup")
 
-                    # Remove entire skill directory if skill no longer exists
-                    if skill_name not in current_skill_ids:
-                        print(f"   🗑️  Removing entire skill directory: {skill_name}")
-                        import shutil
+    def _perform_cache_cleanup_locked(
+        self, 
+        current_model_ids: set, 
+        current_judge_ids: set, 
+        current_eval_ids: set, 
+        current_skill_ids: set
+    ) -> int:
+        """
+        Perform the actual cache cleanup while holding an exclusive lock.
+        
+        This method is called from cleanup_invalid_match_cache() after acquiring
+        the exclusive lock to prevent race conditions.
+        """
+        cleaned_count = 0
 
-                        shutil.rmtree(skill_dir)
+        if not self.cache_dir.exists():
+            print("   ✅ Cache directory does not exist - no cleanup needed")
+            return 0
+
+        # Get list of skill directories before iteration (avoid modification during iteration)
+        skill_dirs = [d for d in self.cache_dir.iterdir() if d.is_dir() and not d.name.startswith('.')]
+        
+        for skill_dir in skill_dirs:
+            skill_name = skill_dir.name
+
+            # Remove entire skill directory if skill no longer exists  
+            if skill_name not in current_skill_ids:
+                if safe_remove_directory_tree(skill_dir, f"skill '{skill_name}' no longer exists"):
+                    cleaned_count += 1
+                continue
+
+            # Check individual match cache files in valid skills
+            cache_files = list(skill_dir.glob("*.json"))  # Materialize list to avoid modification during iteration
+            
+            for cache_file in cache_files:
+                should_remove = False
+                remove_reason = ""
+
+                try:
+                    # Load the cache file to check its validity
+                    with open(cache_file) as f:
+                        cached_data = json.load(f)
+
+                    metadata = cached_data.get("metadata", {})
+
+                    # Check if all referenced entities still exist
+                    model_a = metadata.get("model_a_id")
+                    model_b = metadata.get("model_b_id")
+                    judge_id = metadata.get("judge_id")
+                    eval_id = metadata.get("eval_id")
+                    skill_id = metadata.get("skill_id")
+
+                    # Validate all required components exist
+                    if model_a and model_a not in current_model_ids:
+                        should_remove = True
+                        remove_reason = f"model_a '{model_a}' no longer exists"
+                    elif model_b and model_b not in current_model_ids:
+                        should_remove = True
+                        remove_reason = f"model_b '{model_b}' no longer exists"
+                    elif judge_id and judge_id not in current_judge_ids:
+                        should_remove = True
+                        remove_reason = f"judge '{judge_id}' no longer exists"
+                    elif eval_id and eval_id not in current_eval_ids:
+                        should_remove = True
+                        remove_reason = f"eval '{eval_id}' no longer exists"
+                    elif skill_id and skill_id not in current_skill_ids:
+                        should_remove = True
+                        remove_reason = f"skill '{skill_id}' no longer exists"
+
+                except (OSError, json.JSONDecodeError, KeyError):
+                    # Corrupted or invalid cache file
+                    should_remove = True
+                    remove_reason = "corrupted cache file"
+
+                if should_remove:
+                    if safe_remove_file(cache_file, remove_reason):
                         cleaned_count += 1
-                        continue
-
-                    # Check individual match cache files in valid skills
-                    for cache_file in skill_dir.glob("*.json"):
-                        should_remove = False
-                        remove_reason = ""
-
-                        try:
-                            # Load the cache file to check its validity
-                            with open(cache_file) as f:
-                                cached_data = json.load(f)
-
-                            metadata = cached_data.get("metadata", {})
-
-                            # Check if all referenced entities still exist
-                            model_a = metadata.get("model_a_id")
-                            model_b = metadata.get("model_b_id")
-                            judge_id = metadata.get("judge_id")
-                            eval_id = metadata.get("eval_id")
-                            skill_id = metadata.get("skill_id")
-
-                            # Validate all required components exist
-                            if model_a and model_a not in current_model_ids:
-                                should_remove = True
-                                remove_reason = f"model_a '{model_a}' no longer exists"
-                            elif model_b and model_b not in current_model_ids:
-                                should_remove = True
-                                remove_reason = f"model_b '{model_b}' no longer exists"
-                            elif judge_id and judge_id not in current_judge_ids:
-                                should_remove = True
-                                remove_reason = f"judge '{judge_id}' no longer exists"
-                            elif eval_id and eval_id not in current_eval_ids:
-                                should_remove = True
-                                remove_reason = f"eval '{eval_id}' no longer exists"
-                            elif skill_id and skill_id not in current_skill_ids:
-                                should_remove = True
-                                remove_reason = f"skill '{skill_id}' no longer exists"
-
-                        except (OSError, json.JSONDecodeError, KeyError):
-                            # Corrupted or invalid cache file
-                            should_remove = True
-                            remove_reason = "corrupted cache file"
-
-                        if should_remove:
-                            print(
-                                f"   🗑️  Removing invalid match cache: {cache_file.name} ({remove_reason})"
-                            )
-                            cache_file.unlink()
-                            cleaned_count += 1
 
         if cleaned_count > 0:
-            print(
-                f"   ✅ Cleaned {cleaned_count} invalid match cache files/directories"
-            )
+            print(f"   ✅ Cleaned {cleaned_count} invalid match cache files/directories")
         else:
             print("   ✅ No invalid match cache files found")
+            
+        return cleaned_count
 
     def _generate_judge_cache_key_with_prompt(
         self,

@@ -30,8 +30,9 @@ class TestSnakemakeWorkflowIntegration:
         # Check for the actually implemented parallelization rules
         assert "execute_conversations_for_model" in snakefile_content
         assert (
-            "run_tournaments" in snakefile_content
-        )  # Uses cache-based approach instead of aggregate
+            "run_tournament_per_skill" in snakefile_content and
+            "aggregate_tournaments" in snakefile_content
+        )  # Now uses parallel per-skill tournaments
         assert "get_model_ids" in snakefile_content
 
     def test_snakemake_wildcard_expansion_works(self):
@@ -51,7 +52,9 @@ class TestSnakemakeWorkflowIntegration:
 
         # Should show parallel model rules or complete successfully
         assert (
-            result.returncode == 0 or "execute_conversations_for_model" in result.stdout
+            result.returncode == 0 or 
+            "execute_conversations_for_model" in result.stdout or
+            "run_tournament_per_skill" in result.stdout
         )
         assert multiple_model_ids_found_in_output(result.stdout)
         assert result.returncode == 0
@@ -80,7 +83,8 @@ class TestSnakemakeWorkflowIntegration:
         dag_output = result.stdout
         assert (
             "execute_conversations_for_model" in dag_output
-            or "run_tournaments" in dag_output
+            or "run_tournament_per_skill" in dag_output
+            or "aggregate_tournaments" in dag_output
             or result.returncode == 0
         )
         assert result.returncode == 0

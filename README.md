@@ -1,179 +1,144 @@
 # AFBench
 
-A comprehensive AI model evaluation framework using Snakemake for systematic benchmarking and skill assessment across multiple AI systems.
+A high-performance AI model evaluation framework using Snakemake with parallel execution and robust caching for systematic benchmarking across multiple AI systems.
 
 ## Overview
 
-AFBench is an advanced AI model evaluation pipeline that:
-- Evaluates multiple AI models across diverse skill categories
-- Conducts systematic tournaments between models using Swiss-system pairing
-- Calculates skill ratings using OpenSkill Bradley-Terry system
-- Generates comprehensive reports and visualizations
-- Maintains rigorous quality assurance standards
-
-## Core Components
-
-- **Model & Judge Pools**: Configurable sets of AI models and evaluation judges
-- **Skills & Evaluations**: Structured test scenarios across categories like:
-  - Code Generation (algorithm optimization, game development)
-  - Document Summarization (academic papers, technical content)
-  - Persuasiveness (communication effectiveness)
-  - Ethical Compliance (respect for constraints, harm avoidance)
-- **Tournament System**: Swiss-system tournaments for fair model comparison
-- **Skill Rating**: OpenSkill-based rating system for model capabilities
-- **Static Site Generation**: Web interface for results review
-
-## Pipeline Data Flow
-
-AFBench follows a multi-stage pipeline architecture:
-
-1. **Configuration Loading**: Load model pools, judge pools, and skill definitions
-   - Input: `model_pools/*.csv`, `judge_pools/*.csv`, `skills/*/*.json`
-   - Output: `data/loaded_models.json`, `data/loaded_judges.json`, `data/loaded_skills.json`
-
-2. **Parallel Conversation Execution**: Generate model conversations with evaluation scenarios
-   - Input: Configuration data from stage 1
-   - Output: `data/conversations/skill/eval_model_hash.json` (cached individual files)
-   - Markers: `data/conversations_cache_model.done`
-
-3. **Tournament Execution**: Run Swiss-system tournaments between models
-   - Input: Conversation cache files and configuration data
-   - Output: `data/tournaments.json`
-
-4. **Tournament Summarization**: Aggregate match results and rankings
-   - Input: `data/tournaments.json` and configuration data 
-   - Output: `data/tournament_summaries.json`
-
-5. **Skill Rating Calculation**: Compute OpenSkill Bradley-Terry ratings
-   - Input: `data/tournament_summaries.json` and configuration data
-   - Output: `data/skill_ratings.json`
-
-**Cache Management**: The pipeline maintains sophisticated caching:
-- `data/conversations/`: Individual conversation results (prevents re-execution)
-- `data/judge_cache/`: Judge decision cache (prevents re-evaluation)  
-- `data/skill_ratings/`: Rating calculation cache (prevents re-computation)
+AFBench provides a production-ready AI evaluation pipeline featuring:
+- **Parallel Tournament Execution**: Run multiple skill evaluations simultaneously with race-condition protection
+- **Swiss-System Competitions**: Fair head-to-head model comparisons with OpenSkill rating calculations
+- **Robust Cache Management**: Intelligent caching with atomic operations to prevent data corruption
+- **Profile-Based Configuration**: Separate quick (development) and production execution environments
+- **Web-Based Monitoring**: Real-time progress tracking via Streamlit admin interface
 
 ## Quick Start
 
+### Development Workflow
 ```bash
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the complete AI evaluation pipeline
-snakemake --cores 4
+# Run quick evaluation for development
+snakemake --profile profiles/quick -j5 > pipeline_run.log 2>&1 &
 
-# Run with custom configuration
-snakemake --cores 4 --configfile config/config.yaml
+# Monitor progress
+tail -f pipeline_run.log
 
-# View planned execution without running
-snakemake --dry-run
-
-# Visualize workflow dependency graph
-snakemake --dag | dot -Tpng > workflow_dag.png
-
-# Generate static site for results review
+# View results in web interface
 cd site && ./run.sh
 ```
 
-For detailed command explanations and expected outputs, see [RUNBOOK.md](RUNBOOK.md).
+### Production Workflow
+```bash
+# Run full production evaluation
+snakemake --profile profiles/production -j5 > pipeline_run.log 2>&1 &
 
-## Quality Assurance
+# Monitor with production data
+cd site && AFBENCH_ADMIN_DATA_DIR=data/production ./run.sh
+```
 
-This project maintains high code quality through comprehensive tooling:
+See [RUNBOOK.md](RUNBOOK.md) for complete pipeline management commands.
+
+## Pipeline Architecture
+
+AFBench uses a **5-stage parallel execution pipeline**:
+
+1. **Setup**: Load models (4-51), judges (3), and skills (7 categories) with validation
+2. **Conversations**: Generate model responses in parallel by model (race-condition safe caching)  
+3. **Tournaments**: Run Swiss-system competitions in parallel by skill (exclusive cache locking)
+4. **Analysis**: Aggregate match results and calculate OpenSkill ratings
+5. **Reporting**: Generate visualizations and summary statistics
+
+**Parallel Execution Features**:
+- Per-model conversation generation (independent caches)
+- Per-skill tournament execution (up to 6+ judge threads)
+- Atomic cache operations with exclusive file locking
+- Safe restart/resume without data loss
+
+## Profile Comparison
+
+| Feature | Quick Profile | Production Profile |
+|---------|---------------|-------------------|
+| **Models** | 4 lightweight | 51 comprehensive |
+| **Execution Time** | ~15 minutes | 2-8 hours |
+| **Parallel Jobs** | 4 cores | 5 cores |
+| **Use Case** | Development/testing | Final evaluation |
+| **Cache Safety** | Full protection | Full protection |
+
+## Core Skills & Evaluations
+
+AFBench evaluates models across **7 skill categories**:
+
+| Skill Category | Focus Area | Example Tasks |
+|---------------|------------|---------------|
+| **Code Generation** | Programming & algorithms | Conway's Game of Life, sorting visualizers, games |
+| **Document Summarization** | Content comprehension | Academic papers, technical documents |
+| **Empathy** | Emotional intelligence | Crisis support, life challenges |
+| **Persuasiveness** | Communication effectiveness | Professional requests, problem-solving |
+| **Harm Avoidance** | Safety & ethics | Refusing harmful requests, responsible guidance |
+| **Hidden Messages** | Instruction following | Following embedded directives in context |
+| **Ethical Loopholes** | Moral reasoning | Navigating complex ethical scenarios |
+
+## Cache & Data Management
+
+**Critical Data Protection**:
+- `data/*/judge_cache/` - **Never delete** - Contains thousands of expensive API calls
+- `data/*/conversations/` - **Never delete** - Contains expensive conversation data
+- **Race condition protection** - Exclusive locking prevents concurrent cache corruption
+- **Atomic operations** - Safe file operations prevent partial writes
+
+**Data Structure**:
+```
+data/[profile]/
+├── conversations/              # Individual conversations by skill
+├── judge_cache/               # Cached judge decisions (critical!)
+├── tournament_[skill].json   # Per-skill tournament results
+├── tournaments.json          # Aggregated tournament data
+└── skill_ratings.json       # Final OpenSkill ratings
+```
+
+## Development & Testing
 
 ### Quick Setup
 ```bash
+# Install dependencies & QA tools
+pip install -r requirements.txt
 ./setup_qa.sh
-```
 
-### Run Full QA Suite
-```bash
+# Run comprehensive test suite
+pytest tests/ -v
+
+# Run quality assurance
 ./qa.sh
 ```
 
-### Individual QA Tools
-
-- **Type Checking**: `mypy src/ --strict --show-error-codes`
-- **Code Formatting**: `black --check --diff src/ tests/`
-- **Linting**: `ruff check src/ tests/ --show-fixes`
-- **Import Sorting**: `isort --check-only --diff src/ tests/`
-- **Security**: `bandit -r src/ -f json -ll`
-- **Dependencies**: `safety check --json`
-- **Testing**: `pytest tests/ --cov=src --cov-fail-under=95`
-
-### Pre-commit Hooks
-
-Pre-commit hooks run automatically on each commit:
-```bash
-pre-commit install  # One-time setup (included in setup_qa.sh)
-```
-
-## Development
-
-### Requirements
-- Python >= 3.11
-- All dev dependencies installed via `requirements-dev.txt`
-
 ### Project Structure
 ```
-├── config/                  # Pipeline configuration
-│   └── config.yaml         # Main configuration file
-├── skills/                  # AI evaluation scenarios
-│   ├── code_generation/    # Programming tasks
-│   ├── document_summarization/ # Summarization tasks  
-│   ├── persuasiveness/     # Communication tasks
-│   ├── empathy/            # Empathy assessment tasks
-│   ├── harm_avoidance/     # Safety evaluation tasks
-│   ├── hidden_messages/    # Hidden message detection
-│   └── ethical_loopholes/  # Ethical reasoning tasks
-├── model_pools/            # AI model configurations
-├── judge_pools/            # Judge model configurations
-├── scripts/                # Pipeline processing scripts
-├── data/                   # Generated evaluation data and cache
-│   ├── conversations/      # Individual conversation cache files
-│   ├── intermediaries/     # Intermediate processing cache
-│   ├── judge_cache/        # Judge decision cache
-│   ├── skill_ratings/      # Skill rating calculation cache
-│   ├── loaded_*.json       # Pipeline configuration data
-│   ├── tournaments.json    # Tournament results
-│   ├── tournament_summaries.json  # Match history and rankings
-│   └── skill_ratings.json # Final model skill ratings
-├── output/                 # Analysis results and plots
-├── site/                   # Static site for results review
-├── tests/                  # Test suite with safety guards
-├── pyproject.toml          # Project configuration and QA settings
-├── Snakefile              # Main workflow definition
-├── requirements.txt        # Runtime dependencies
-├── requirements-dev.txt    # Development dependencies
-├── setup_qa.sh            # QA environment setup
-├── qa.sh                  # Full QA suite runner
-└── RUNBOOK.md             # Detailed command reference
+├── profiles/               # Execution profiles (quick/production)
+├── skills/                # AI evaluation scenarios (7 categories)
+├── model_pools/           # Model configurations (4-51 models)
+├── judge_pools/          # Judge configurations (3 judges)
+├── scripts/              # Pipeline processing & safety utilities
+├── tests/               # Comprehensive test suite (TDD approach)
+├── site/                # Streamlit admin interface
+├── Snakefile           # Main workflow with parallel execution
+└── RUNBOOK.md         # Complete command reference
 ```
 
-### Development Workflow
+### Safety & Quality Standards
 
-1. Add skills or modify configurations in respective directories
-2. Create tests in `tests/` for new functionality
-3. Run QA suite: `./qa.sh`  
-4. Test pipeline: `snakemake --dry-run`
-5. Commit changes
+**Testing**:
+- ✅ **Race condition protection** - Concurrent cache operation tests
+- ✅ **Cache corruption prevention** - Atomic file operation validation  
+- ✅ **Production safety** - Pipeline restart & resume testing
+- ✅ **Parallel execution** - Multi-skill tournament coordination
+- ✅ **95%+ test coverage** - Comprehensive TDD test suite
 
-### Adding New Skills
-
-1. Create skill JSON files in appropriate `skills/` subdirectories
-2. Update `config/config.yaml` if needed
-3. Run pipeline to generate new evaluation data
-
-### QA Standards
-
-All code must pass:
-- ✅ **100% type coverage** with MyPy strict mode
+**Code Quality**:
+- ✅ **Type safety** with MyPy strict mode
 - ✅ **Consistent formatting** with Black
-- ✅ **Clean linting** with Ruff
-- ✅ **Sorted imports** with isort
 - ✅ **Security analysis** with Bandit
-- ✅ **Dependency security** with Safety
-- ✅ **95%+ test coverage** with pytest
+- ✅ **Clean linting** with Ruff
 
 ## License
 

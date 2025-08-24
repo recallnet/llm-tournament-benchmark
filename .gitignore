@@ -3,6 +3,7 @@ data/production
 data/testonly
 staged=skills
 test_backup
+pipeline_run.log
 
 # Python
 __pycache__/
